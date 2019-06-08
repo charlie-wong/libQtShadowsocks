@@ -47,6 +47,7 @@ help:
 	@echo "    doxygen          generate doxygen mannual."
 	@echo "    pkg-source       build source release package."
 	@echo "    ccr-html         build HTML code coverage report."
+	@echo "    astyle           format the source code by astyle."
 	@echo "-------------------------------------------------------------------------"
 	@echo "See 'docs/local.mk' for much more setting details."
 
@@ -58,6 +59,20 @@ PHONY += ccr-html
 ccr-html: test
 ifeq ($(filter-out Dev Debug Coverage,$(BUILD_TYPE)),)
 	$(XMAKE) -C $(BUILD_DIR) code.coverage-mpack
+endif
+
+AstyleRc := $(PWD)/.astylerc
+AstyleRc := $(shell if [ -f $(AstyleRc) ]; then echo "Has"; else echo ""; fi;)
+PHONY += astyle
+astyle:
+ifeq ($(AstyleRc),Has)
+ifeq ($(ASTYLE_VERSION),3.1)
+	$(ASTYLE_PROG) $(ASTYLE_ARGS)
+else
+	@echo "SKIP: wanted astyle-v3.1, but got astyle-v$(ASTYLE_VERSION)"
+endif
+else
+	@echo "SKIP: NOT exist file '$(PWD)/.astylerc'"
 endif
 
 .PHONY: $(PHONY)

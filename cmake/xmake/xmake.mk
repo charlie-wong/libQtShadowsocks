@@ -266,6 +266,22 @@ else
     DOXYGEN_PROG := $(Q)$(DOXYGEN_PROG)
 endif
 
+##########################################
+# astyle is a source code style formater #
+##########################################
+# https://gitlab.com/gkide/prebuild/astyle/blob/master/v3.1/astyle-cpp
+# C/C++ source files, OPTIONS file must be .astylerc of project top directory
+ASTYLE_ARGS ?= --project '*.h' '*.c' '*.cpp' $(ASTYLE_FILES)
+ifeq ($(ASTYLE_PROG),)
+    ifneq ($(strip $(shell (command -v astyle))),)
+        ASTYLE_PROG := $(Q)$(shell (command -v astyle))
+        ASTYLE_VERSION := $(strip $(shell astyle --version | cut -d' ' -f4))
+    endif
+else
+    ASTYLE_PROG := $(Q)$(ASTYLE_PROG)
+    ASTYLE_VERSION := $(strip $(shell $(ASTYLE_PROG) --version | cut -d' ' -f4))
+endif
+
 ###########################################
 # Debugging and Profiling Generating Tool #
 ###########################################

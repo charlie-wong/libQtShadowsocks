@@ -16,6 +16,8 @@
 # - A line-end comment tag      // *NOPAD*
 
 ################################################################################
+# Allow processing to continue if there are errors in the exclude option
+--ignore-exclude-errors
 # Specify files or subdirectories to be excluded from processing
 --exclude="build cmake docs contrib scripts temp todo .deps .git"
 
@@ -24,6 +26,7 @@
 --verbose # Verbose display mode, display extra optional information
 --recursive # For each directory, process all subdirectories recursively
 --formatted # Display only the formatted files, do not show the unchanged ones
+--preserve-date # Preserve file's date and time, invalid if rename the file
 
 ################################################################################
 # !!NOTE!! Before formating the code, there should have a way to restore the
