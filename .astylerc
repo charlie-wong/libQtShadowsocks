@@ -62,7 +62,7 @@
 --pad-oper # Insert space padding around operators
 #--pad-comma # Insert space padding after commas
 --unpad-paren # Remove extra space padding around parens on the inside and outside
---pad-paren-in # Insert space padding around paren on the inside only
+#--pad-paren-in # Insert space padding around paren on the inside only
 
 --align-pointer=name # Attach a operator(*, &, or ^) to variable name
 #--align-reference=name # Attach reference operator(&) to variable name
@@ -71,7 +71,7 @@
 # For C++ files only #
 ######################
 
---indent-classes # Indent 'class' and 'struct' entire blocks
+#--indent-classes # Indent 'class' and 'struct' entire blocks
 --attach-namespaces # Attach braces to a namespace statement
 --attach-classes # Attach braces to a class statement
 --attach-inlines # Attach braces to class and struct inline functions
