@@ -1,17 +1,19 @@
-macro(qss_add_test component)
-    add_executable(${component} ${component}.cpp)
-    add_test(${component} ${component})
-    target_link_libraries(${component}
-                          Qt5::Core
-                          Qt5::Network
-                          Qt5::Test
-                          QtShadowsocks)
-    target_include_directories(${component}
-                               PUBLIC ${PROJECT_SOURCE_DIR}/lib)
-endmacro(qss_add_test)
+include_directories(${PROJECT_SOURCE_DIR}/source/lib)
 
-qss_add_test(address)
+macro(qss_add_test component)
+    set(tname "test-${component}")
+    set(tprog "test-${component}")
+    add_executable(${tprog} ${component}.cpp)
+    add_dependencies(${tprog} shared_LibQtShadowSocks)
+    target_link_libraries(${tprog}
+        Qt5::Core Qt5::Network Qt5::Test
+        shared_LibQtShadowSocks ${botan2_LIBRARIES} #--verbose
+    )
+    add_test(NAME ${tname} COMMAND $<TARGET_FILE:${tprog}>)
+endmacro()
+
 qss_add_test(chacha)
 qss_add_test(cipher)
-qss_add_test(encryptor)
+qss_add_test(address)
 qss_add_test(profile)
+qss_add_test(encryptor)

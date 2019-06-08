@@ -1,63 +1,77 @@
 cmake_minimum_required(VERSION 3.1)
+project(ssqtl) # ShadowSocks Core Library
 
-project(QtShadowsocks
-        VERSION 2.1.0
-        LANGUAGES CXX)
+set(SSQTL_VERSION_MAJOR 2)
+set(SSQTL_VERSION_MINOR 1)
+set(SSQTL_VERSION_PATCH 0)
+# Date/SHA1 Build Time Update
+set(SSQTL_VERSION_TWEAK "")
 
-option(BUILD_SHARED_LIBS "Build ${PROJECT_NAME} as a shared library" ON)
-option(USE_CONAN "Use C++ Package Manager Conan" OFF)
+option(SSQTL_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
+option(SSQTL_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
 
-set(LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib
-    CACHE PATH "Installation directory for libraries")
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include
-    CACHE PATH "Installation directory for headers")
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(SSQTL_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
+option(SSQTL_BUILD_SSTUI "Build shadowsocks TUI server/client." ON)
+option(SSQTL_BUILD_SHARED "Build shared shadowsocks core library." ON)
 
-find_package(Qt5Core 5.5)
-find_package(Qt5Network 5.5)
-find_package(PkgConfig)
-
-if(USE_CONAN)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup()
-    add_definitions(-DUSE_BOTAN2)
-    set(BOTAN_LIBRARY_VAR ${CONAN_LIBS})
-else()
-pkg_search_module(BOTAN REQUIRED botan-2>=2.3.0 botan-1.10)
-if(BOTAN_VERSION VERSION_GREATER 2.0)
-    message(STATUS "Botan-2 is found and will be used in this build")
-    add_definitions(-DUSE_BOTAN2)
-else()
-    message(DEPRECATION "Botan-1.10 is found and will be used in this build. However, Botan-1.10 is deprecated and should not be used if possible")
+# xmake setup configuration for mpack
+option(SSQTL_ENABLE_CI "Enable CI build." OFF)
+option(SSQTL_ENABLE_GCOV "Enable code coverage." ON)
+option(SSQTL_ENABLE_ASSERTION "Enable assertion." ON)
+if(SSQTL_DBI_BOTAN2)
+    option(SSQTL_ENABLE_DEPENDENCY "Enable deps support." ON)
 endif()
-find_library(BOTAN_LIBRARY_VAR
-             NAMES ${BOTAN_LIBRARIES}
-             HINTS ${BOTAN_LIBRARY_DIRS} ${BOTAN_LIBDIR})
-endif()
-if(BUILD_SHARED_LIBS)
-    add_definitions(-DQSS_LIBRARY)
+
+# cmake xmake modules
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(xmake)
+
+include(BuildBotan) # botan2 down, extract, build, install and search
+
+# ShadowSocks Qt5 setup by xmake
+if(SSQTL_AUTOMATIC_QT5)
+    set(AUTOMATIC_QT5 AUTOMATIC)
 else()
-    add_definitions(-DQSS_STATIC)
-    if (MINGW)
-        # This however doesn't fix the problem that the executables are depending on the GCC shared libraries
-        # I can't find a solution in CMake so far. The workaround is to manually append "-l:libgcc.a -l:libstdc++.a -l:libwinpthread.a" to the end of executables' linklibs.rsp files (in CMakeFiles directory)
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+    if(NOT SSQTL_QT5_STATIC_PREFIX AND NOT SSQTL_QT5_SHARED_PREFIX)
+        message(FATAL_ERROR "Qt5 setup error for ShadowSocks Core!")
     endif()
 endif()
+
+XmakeQt5SupportSetup(${AUTOMATIC_QT5}
+    STATIC_PREFIX ${SSQTL_QT5_STATIC_PREFIX}
+    SHARED_PREFIX ${SSQTL_QT5_SHARED_PREFIX}
+    FATAL_ERROR_IF_NOT_FOUND
+)
+
+# Find Qt5 library
+# https://doc.qt.io/qt-5/cmake-manual.html#variable-reference
+find_package(Qt5Gui 5.5 REQUIRED)
+find_package(Qt5Core 5.5 REQUIRED)
+find_package(Qt5Widgets 5.5 REQUIRED)
+find_package(Qt5Network 5.5 REQUIRED)
+
+# C++ 14
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32 OR APPLE)
     add_definitions(-DFD_SETSIZE=1024)
 endif()
 
-add_subdirectory(lib)
-add_subdirectory(shadowsocks-libqss)
-find_package(Qt5Test)
-if (Qt5Test_FOUND)
-    # enable_testing() has to be in the root CMakeLists.txt, see https://cmake.org/pipermail/cmake/2010-November/040725.html
-    enable_testing()
-    add_subdirectory(test)
+# ShadowSocks Core Library Name
+set(SSCL_NAME "QtShadowSocks")
+
+add_subdirectory(source/lib)
+add_subdirectory(source/tui)
+
+if(SSQTL_BUILD_TEST)
+    find_package(Qt5Test)
+    if(Qt5Test_FOUND)
+        # enable_testing() has to be in the root CMakeLists.txt
+        # see https://cmake.org/pipermail/cmake/2010-November/040725.html
+        enable_testing()
+        add_subdirectory(test)
+    endif()
 endif()
+
+XmakePrintConfigurationInfo()

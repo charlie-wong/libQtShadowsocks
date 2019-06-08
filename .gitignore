@@ -1,7 +1,16 @@
-*.user
 *~
-*.bak
-*.orig
 *.swp
+*.bak
+*.user
+*.orig
+
+todo/
 build/
-compile_commands.json
+.deps/
+
+local.mk
+DistRepoInfo
+
+# Ignore xmake
+#cmake/xmake/
+#cmake/xmake.cmake

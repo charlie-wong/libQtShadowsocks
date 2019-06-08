@@ -1,0 +1,106 @@
+# Copy from cmake source and make some modification
+# https://github.com/Kitware/CMake/blob/master/CMakeCPackOptions.cmake.in
+#
+# This file is configured at cmake time, and loaded at cpack time.
+# To pass variables to cpack from cmake, they must be configured here.
+
+# NOTE
+# message(STATUS ...) do not working, i do not known why?
+# message(WARNING/FATAL_ERROR ...) works, can be used to debug!
+
+# 'cpack --config build/CPackOptions.cmake' do NOT set 'CMAKE_SOURCE_DIR'
+set(CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@")
+
+# User extra configuration for package installer build
+if(EXISTS @CMAKE_SOURCE_DIR@/ConfigCpack.cmake)
+    include(@CMAKE_SOURCE_DIR@/ConfigCpack.cmake)
+elseif(EXISTS @CMAKE_SOURCE_DIR@/cmake/ConfigCpack.cmake)
+    include(@CMAKE_SOURCE_DIR@/cmake/ConfigCpack.cmake)
+endif()
+
+# NOTE There is a bug in NSI that does not handle full unix paths properly.
+# https://cmake.org/cmake/help/latest/cpack_gen/nsis.html
+if(CPACK_GENERATOR MATCHES "NSIS")
+    # The default installation directory presented to the end user
+    set(CPACK_NSIS_INSTALL_ROOT "@CPACK_NSIS_INSTALL_ROOT@")
+
+    if(NOT "@PKG_LOGO@" STREQUAL "" AND EXISTS "@PKG_LOGO@")
+        # The brand image displayed on the top of the installer
+        string(REPLACE "/" "\\\\" WIN_PKG_LOGO "@PKG_LOGO@")
+        set(CPACK_PACKAGE_ICON "${WIN_PKG_LOGO}")
+    endif()
+
+    # The install icon for the installer
+    if(NOT "${NSIS_INSTALLER_LOGO}" STREQUAL ""
+       AND EXISTS "${NSIS_INSTALLER_LOGO}")
+        string(REPLACE "/" "\\\\" WIN_INSTALLER_LOGO "${NSIS_INSTALLER_LOGO}")
+        set(CPACK_NSIS_MUI_ICON "${WIN_INSTALLER_LOGO}")
+    endif()
+
+    # The unistall icon for the uninstaller
+    if(NOT "${NSIS_UNINSTALLER_LOGO}" STREQUAL ""
+       AND EXISTS "${NSIS_UNINSTALLER_LOGO}")
+        string(REPLACE "/" "\\\\" WIN_UNINSTALLER_LOGO "${NSIS_UNINSTALLER_LOGO}")
+        set(CPACK_NSIS_MUI_UNIICON "${WIN_UNINSTALLER_LOGO}")
+    endif()
+
+    # Tell cpack to create links in start menu folder
+    # The pair as the value of 'CPACK_NSIS_CREATE_ICONS'
+    string(REPLACE "/" "\\" NSIS_MENU_LINKS "${NSIS_MENU_LINKS}")
+    set(CPACK_NSIS_MENU_LINKS
+        "@PKG_REPO@" "@PKG_NAME@ Home"
+        "@PKG_DOC_HELP@" "@PKG_NAME@ Help"
+        # Extra user settings for create links
+        ${NSIS_MENU_LINKS}
+    )
+
+    # Whether add to system ENV path
+    set(CPACK_NSIS_MODIFY_PATH ON)
+
+    # URL to a web site providing assistance for installing application
+    set(CPACK_NSIS_HELP_LINK "@PKG_REPO@")
+
+    # URL to a web site providing more information about the application
+    set(CPACK_NSIS_URL_INFO_ABOUT "@PKG_REPO@")
+
+    # Contact information for questions and comments about the application
+    set(CPACK_NSIS_CONTACT "@CPACK_PACKAGE_CONTACT@")
+
+    # The title displayed at the top of the installer.
+    set(CPACK_NSIS_PACKAGE_NAME "@CPACK_NSIS_PACKAGE_NAME@")
+
+    # The windows control panel display name for 'Add/Remove Program'
+    set(CPACK_NSIS_DISPLAY_NAME "@CPACK_NSIS_PACKAGE_NAME@ - @PKG_VERSION@")
+
+    ##############################################################################
+    # NSIS Advanced Configurations to Cpack
+    # https://gitlab.kitware.com/cmake/community/wikis/home
+    # https://gitlab.kitware.com/cmake/community/wikis/doc/cpack/NSISAdvancedTips
+    ##############################################################################
+    set(NSIS_PKG_NAME "@PKG_NAME@")
+    set(NSIS_PKG_VENDOR "@PKG_VENDOR@")
+    set(NSIS_PKG_LICENSE "@PKG_LICENSE@")
+    set(NSIS_PKG_DESCRIPTION "@PKG_NAME@ @PKG_VERSION@ installer")
+
+    string(REPLACE "v" "" win_version_nums @PKG_VERSION@)
+    execute_process(COMMAND cmd /c echo %date:~0,4%
+        OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE YEAR
+    )
+    set(NSIS_PKG_VERSION_ZERO "${win_version_nums}.${YEAR}")
+endif()
+
+# TODO MacOS App packer
+if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
+    if(NOT PKG_APP_GUI)
+        set(CPACK_PACKAGE_DEFAULT_LOCATION "/usr")
+    else()
+        set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
+    endif()
+endif()
+
+# TODO Qt Installer Framework
+# - https://doc.qt.io/qtinstallerframework/index.html
+# - https://cmake.org/cmake/help/latest/module/CPackIFW.html
+if(CPACK_GENERATOR MATCHES "IFW")
+
+endif()

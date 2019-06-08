@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Free Desktop Specifications
+# https://www.freedesktop.org/wiki/Specifications
+# Desktop Entry Specification
+# https://www.freedesktop.org/wiki/Specifications/desktop-entry-spec
+
+[Desktop Entry]
+
+# Name of the application
+Name=@PKG_NAME@
+Comment=@PKG_BRIEF_SUMMARY@
+
+# Application, Link or Directory
+Type=Application
+
+# Categories in which the entry should be shown in a menu
+# https://specifications.freedesktop.org/menu-spec/latest/apa.html
+Categories=Development;
+
+# Icon to display in file manager, menus, etc. PNG/XPM/SVG
+#
+# If the value is an absolute path, the given file will be used.
+# If the value is not absolute path, use algorithm to to locate the icon.
+# - https://freedesktop.org/wiki/Specifications/icon-theme-spec
+# - https://developer.gnome.org/integration-guide/stable/icons.html.en
+Icon=@PKG_NAME@
+
+# Program name to execute in '/usr/bin', possibly with arguments.
+Exec=@PKG_APP_EXEC@
+
+# Whether the program runs in a terminal window.
+Terminal=@pkg_app_is_tui@

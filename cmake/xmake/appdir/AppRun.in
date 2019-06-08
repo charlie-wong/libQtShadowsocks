@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# https://docs.appimage.org/reference/appdir.html
+# https://docs.appimage.org/introduction/software-overview.html
+
+# This file is being used so that users don't have to unset env vars manually
+# ... Add More Env Settings Here ...
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+exec "${HERE}/bin/@PKG_APP_EXEC@" "$@"
