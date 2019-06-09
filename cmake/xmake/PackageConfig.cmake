@@ -62,12 +62,12 @@ function(XmakePackageConfig)
 
     # export library information for pkgconfig
     configure_file(${pkgconfig_DIR}/pkgconfig.pc.in
-        ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/lib${lib_NAME}.pc @ONLY
+        ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/${lib_NAME}.pc @ONLY
     )
 
     set(lib_PKGCONFIG_DEST lib/pkgconfig)
     install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/lib${lib_NAME}.pc
+        ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/${lib_NAME}.pc
         DESTINATION "${lib_PKGCONFIG_DEST}"
     )
 endfunction()
