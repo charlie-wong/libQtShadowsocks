@@ -205,7 +205,6 @@ CMAKE_ARGS += $(SOURCE_DIR)
 #
 # - GIT_PROG      full path of git programme
 # - MAKE_PROG     full path of make programme
-# - VALGRIND_PROG full path of valgrind programme
 
 #######################################################
 # Auto Detect System Common Development Tools
@@ -269,7 +268,7 @@ endif
 ##########################################
 # astyle is a source code style formater #
 ##########################################
-# https://gitlab.com/gkide/prebuild/astyle/blob/master/v3.1/astyle-cpp
+# https://gitlab.com/gkide/prebuild/astyle
 # C/C++ source files, OPTIONS file must be .astylerc of project top directory
 ifeq ($(ASTYLE_ARGS),) # empty then use the default value for C/C++
     ASTYLE_ARGS := --project '*.h' '*.c' '*.cpp'
