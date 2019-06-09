@@ -5,15 +5,13 @@
 
 namespace QSS {
 
-class QSS_EXPORT TcpRelayClient : public TcpRelay
-{
+class QSS_EXPORT TcpRelayClient : public TcpRelay {
     Q_OBJECT
 public:
-    TcpRelayClient(QTcpSocket *localSocket,
-                   int timeout,
-                   Address server_addr,
-                   const std::string& method,
-                   const std::string& password);
+    TcpRelayClient(QTcpSocket *localSocket, int timeout,
+        Address server_addr, const std::string &method,
+        const std::string &password
+    );
 
 protected:
     void handleStageAddr(std::string &data) final;

@@ -11,14 +11,12 @@
 
 namespace QSS {
 
-class QSS_EXPORT RC4
-{
+class QSS_EXPORT RC4 {
 public:
     // non-skip
-    // This class implements so-called RC4-MD5 cipher instead of original RC4
-    // _iv is not allowed to be empty!
-    RC4(const std::string &_key,
-        const std::string &_iv);
+    // This class implements so-called RC4-MD5 cipher instead
+    // of original RC4 _iv is not allowed to be empty!
+    RC4(const std::string &_key, const std::string &_iv);
 
     RC4(const RC4 &) = delete;
 
@@ -28,13 +26,13 @@ public:
 private:
     void generate();
 
-    uint32_t position;
     unsigned char x;
     unsigned char y;
+    uint32_t position;
     std::vector<unsigned char> state;
     std::vector<unsigned char> buffer;
 };
 
-}
+} // namespace QSS
 
 #endif // RC4_H

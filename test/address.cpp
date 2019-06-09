@@ -3,10 +3,8 @@
 #include <QString>
 #include <QtTest>
 
-class Address : public QObject
-{
+class Address : public QObject {
     Q_OBJECT
-
 public:
     Address() = default;
 
@@ -85,7 +83,7 @@ void Address::testLookup()
 {
     QSS::Address a("www.google.com", 443);
     a.lookUp([&a](bool success) {
-        if (success) {
+        if(success) {
             QVERIFY(a.isIPValid());
         } else {
             QVERIFY(!a.isIPValid());

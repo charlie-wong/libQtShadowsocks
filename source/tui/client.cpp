@@ -5,20 +5,24 @@
 #include <QDebug>
 #include "client.h"
 
-Client::Client() :
-    autoBan(false)
-{}
+Client::Client() : autoBan(false)
+{
+    // Nothing Todo
+}
 
 bool Client::readConfig(const QString &file)
 {
     QFile c(file);
-    if (!c.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QDebug(QtMsgType::QtCriticalMsg).noquote() << "Can't open configuration file" << file;
+
+    if(!c.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QDebug(QtMsgType::QtCriticalMsg).noquote()
+            << "Can't open configuration file" << file;
         return false;
     }
-    if (!c.isReadable()) {
+
+    if(!c.isReadable()) {
         QDebug(QtMsgType::QtCriticalMsg).noquote()
-                << "Configuration file" << file << "is not readable!";
+            << "Configuration file" << file << "is not readable!";
         return false;
     }
 
@@ -26,7 +30,8 @@ bool Client::readConfig(const QString &file)
     QJsonDocument confJson = QJsonDocument::fromJson(c.readAll(), &error);
     c.close();
     QJsonObject confObj = confJson.object();
-    if (error.error != QJsonParseError::NoError) {
+
+    if(error.error != QJsonParseError::NoError) {
         qCritical() << "Failed to parse configuration file:" << error.errorString();
         return false;
     }
@@ -39,21 +44,19 @@ bool Client::readConfig(const QString &file)
     profile.setServerPort(confObj["server_port"].toInt());
     profile.setTimeout(confObj["timeout"].toInt());
     profile.setHttpProxy(confObj["http_proxy"].toBool());
-    if (confObj["auth"].toBool()) {
-        QDebug(QtMsgType::QtCriticalMsg) << "OTA is deprecated, please remove OTA from the configuration file.";
+
+    if(confObj["auth"].toBool()) {
+        QDebug(QtMsgType::QtCriticalMsg)
+            << "OTA is deprecated, remove OTA from the configuration file.";
     }
 
     return true;
 }
 
-void Client::setup(const QString &remote_addr,
-                   const QString &remote_port,
-                   const QString &local_addr,
-                   const QString &local_port,
-                   const QString &password,
-                   const QString &method,
-                   const QString &timeout,
-                   const bool http_proxy)
+void Client::setup(const QString &remote_addr, const QString &remote_port,
+    const QString &local_addr, const QString &local_port,
+    const QString &password, const QString &method,
+    const QString &timeout, const bool http_proxy)
 {
     profile.setServerAddress(remote_addr.toStdString());
     profile.setServerPort(remote_port.toInt());
@@ -77,41 +80,46 @@ void Client::setHttpMode(bool http)
 
 bool Client::start(bool _server)
 {
-    if (profile.debug()) {
-        if (!headerTest()) {
+    if(profile.debug()) {
+        if(!headerTest()) {
             QDebug(QtMsgType::QtCriticalMsg) << "Header test failed.";
             return false;
         }
     }
 
-    if (!profile.isValid()) {
+    if(!profile.isValid()) {
         qCritical() << "The profile is invalid. Improper setup?";
         return false;
     }
 
     controller.reset(new QSS::Controller(profile, !_server, autoBan));
 
-    if (!_server) {
+    if(!_server) {
         QSS::Address server(profile.serverAddress(), profile.serverPort());
         server.blockingLookUp();
-        tester.reset(new QSS::AddressTester(server.getFirstIP(), server.getPort()));
+        tester.reset(new QSS::AddressTester(server.getFirstIP(),
+            server.getPort())
+        );
+
         QObject::connect(tester.get(), &QSS::AddressTester::connectivityTestFinished,
-                [] (bool c) {
-            if (c) {
+        [](bool c) {
+            if(c) {
                 QDebug(QtMsgType::QtInfoMsg) << "The shadowsocks connection is okay.";
             } else {
                 QDebug(QtMsgType::QtWarningMsg)
-                        << "Destination is not reachable. "
-                           "Please check your network and firewall settings. "
-                           "And make sure the profile is correct.";
+                    << "Destination is not reachable. "
+                       "Please check your network and firewall settings. "
+                       "And make sure the profile is correct.";
             }
         });
+
         QObject::connect(tester.get(), &QSS::AddressTester::testErrorString,
-                [] (const QString& error) {
-            QDebug(QtMsgType::QtWarningMsg).noquote() << "Connectivity testing error:" << error;
+        [](const QString & error) {
+            QDebug(QtMsgType::QtWarningMsg).noquote()
+                << "Connectivity testing error:" << error;
         });
-        tester->startConnectivityTest(profile.method(),
-                                      profile.password());
+
+        tester->startConnectivityTest(profile.method(), profile.password());
     }
 
     return controller->start();
@@ -127,21 +135,30 @@ bool Client::headerTest()
     std::string packed = QSS::Common::packAddress(test_v6);
     QSS::Common::parseHeader(packed, test_res, length);
     bool success = (test_v6 == test_res);
-    if (!success) {
-        qWarning("%s --> %s", test_v6.toString().data(), test_res.toString().data());
+
+    if(!success) {
+        qWarning("%s --> %s",
+            test_v6.toString().data(), test_res.toString().data()
+        );
     }
+
     packed = QSS::Common::packAddress(test_addr, test_port);
     QSS::Common::parseHeader(packed, test_res, length);
+
     bool success2 = ((test_res.getFirstIP() == test_addr)
-                 && (test_res.getPort() == test_port));
-    if (!success2) {
+        && (test_res.getPort() == test_port)
+    );
+
+    if(!success2) {
         QDebug(QtMsgType::QtWarningMsg).noquote().nospace()
-                << test_addr.toString() << ":" << test_port << " --> " << test_res.toString().data();
+            << test_addr.toString() << ":" << test_port
+            << " --> " << test_res.toString().data();
     }
+
     return success & success2;
 }
 
-const std::string& Client::getMethod() const
+const std::string &Client::getMethod() const
 {
     return profile.method();
 }

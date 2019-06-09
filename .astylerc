@@ -24,7 +24,7 @@
 ################################################################################
 #--dry-run # Perform a trial run with no changes made to the files
 --verbose # Verbose display mode, display extra optional information
---recursive # For each directory, process all subdirectories recursively
+#--recursive # For each directory, process all subdirectories recursively
 --formatted # Display only the formatted files, do not show the unchanged ones
 --preserve-date # Preserve file's date and time, invalid if rename the file
 
@@ -51,7 +51,7 @@
 --indent-switches # Indent entire 'case' block of 'switch' statements
 --indent-preproc-block # Indent the preprocessor blocks
 --indent-preproc-define # Indent multi-line preprocessor blocks ending with a backslash
---indent-preproc-cond # Indent preprocessor conditional statements to the same level as source code
+#--indent-preproc-cond # Indent preprocessor conditional statements to the same level as source code
 --indent-after-parens # Indent continuation lines for opening ( or assignment =
 --indent-continuation=1 # The number of continuous indents
 

@@ -3,10 +3,8 @@
 #include <QString>
 #include <QtTest>
 
-class Profile : public QObject
-{
+class Profile : public QObject {
     Q_OBJECT
-
 public:
     Profile() = default;
 
@@ -35,7 +33,9 @@ void Profile::testConstructorEmpty()
 void Profile::testFromUri()
 {
     // ss://bf-cfb-auth:test@192.168.100.1:8888
-    QSS::Profile p = QSS::Profile::fromUri("ss://YmYtY2ZiLWF1dGg6dGVzdEAxOTIuMTY4LjEwMC4xOjg4ODg#Tést");
+    QSS::Profile p = QSS::Profile::fromUri(
+        "ss://YmYtY2ZiLWF1dGg6dGVzdEAxOTIuMTY4LjEwMC4xOjg4ODg#Tést"
+    );
     QCOMPARE(std::string("Tést"), p.name());
     QCOMPARE(std::string("192.168.100.1"), p.serverAddress());
     QCOMPARE(std::string("bf-cfb-auth"), p.method());
@@ -45,7 +45,9 @@ void Profile::testFromUri()
 
 void Profile::testFromUriSip002()
 {
-    QSS::Profile p = QSS::Profile::fromUri("ss://cmM0LW1kNTpwYXNzd2Q=@192.168.100.1:8888/?plugin=obfs-local%3Bobfs%3Dhttp#Example2");
+    QSS::Profile p = QSS::Profile::fromUri(
+        "ss://cmM0LW1kNTpwYXNzd2Q=@192.168.100.1:8888/?plugin=obfs-local%3Bobfs%3Dhttp#Example2"
+    );
     QCOMPARE(std::string("Example2"), p.name());
     QCOMPARE(std::string("192.168.100.1"), p.serverAddress());
     QCOMPARE(std::string("rc4-md5"), p.method());
@@ -61,7 +63,9 @@ void Profile::testToUri()
     p.setPassword("test");
     p.setServerAddress("192.168.100.1");
     p.setServerPort(8888);
-    QCOMPARE(std::string("ss://YmYtY2ZiOnRlc3RAMTkyLjE2OC4xMDAuMTo4ODg4#Tést"), p.toUri());
+    QCOMPARE(std::string(
+        "ss://YmYtY2ZiOnRlc3RAMTkyLjE2OC4xMDAuMTo4ODg4#Tést"), p.toUri()
+    );
 }
 
 void Profile::testToUriSip002()
@@ -72,7 +76,9 @@ void Profile::testToUriSip002()
     p.setMethod("rc4-md5");
     p.setPassword("passwd");
     p.setServerPort(8888);
-    QCOMPARE(std::string("ss://cmM0LW1kNTpwYXNzd2Q=@192.168.100.1:8888#Example"), p.toUriSip002());
+    QCOMPARE(std::string(
+        "ss://cmM0LW1kNTpwYXNzd2Q=@192.168.100.1:8888#Example"), p.toUriSip002()
+    );
 }
 
 QTEST_MAIN(Profile)

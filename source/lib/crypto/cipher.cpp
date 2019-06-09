@@ -10,9 +10,9 @@
 #include <botan/pipe.h>
 
 #ifdef USE_BOTAN2
-#include <botan/hkdf.h>
-#include <botan/hmac.h>
-#include <botan/sha160.h>
+    #include <botan/hkdf.h>
+    #include <botan/hmac.h>
+    #include <botan/sha160.h>
 #endif
 
 #include <QCryptographicHash>
@@ -22,18 +22,19 @@
 namespace {
 
 #ifdef USE_BOTAN2
-using SecureByteArray = Botan::secure_vector<Botan::byte>;
-#define DataOfSecureByteArray(sba) sba.data()
+    using SecureByteArray = Botan::secure_vector<Botan::byte>;
+    #define DataOfSecureByteArray(sba) sba.data()
 #else
-using SecureByteArray = Botan::SecureVector<Botan::byte>;
-#define DataOfSecureByteArray(sba) sba.begin()
+    using SecureByteArray = Botan::SecureVector<Botan::byte>;
+    #define DataOfSecureByteArray(sba) sba.begin()
 #endif
 
 // Copied from libsodium's sodium_increment
 void nonceIncrement(unsigned char *n, const size_t nlen)
 {
     uint_fast16_t c = 1U;
-    for (size_t i = 0U; i < nlen; i++) {
+
+    for(size_t i = 0U; i < nlen; i++) {
         c += static_cast<uint_fast16_t>(n[i]);
         n[i] = static_cast<unsigned char>(c);
         c >>= 8;
@@ -44,44 +45,50 @@ void nonceIncrement(unsigned char *n, const size_t nlen)
 
 namespace QSS {
 
-Cipher::Cipher(const std::string& method,
-               std::string key,
-               std::string iv,
-               bool encrypt) :
+Cipher::Cipher(const std::string &method, std::string key,
+    std::string iv, bool encrypt) :
     m_key(std::move(key)),
     m_iv(std::move(iv)),
     cipherInfo(cipherInfoMap.at(method))
 {
-    if (method.find("rc4") != std::string::npos) {
+    if(method.find("rc4") != std::string::npos) {
         rc4 = std::make_unique<QSS::RC4>(m_key, m_iv);
         return;
     }
+
 #ifndef USE_BOTAN2
-    else if (method.find("chacha20") != std::string::npos) {
+    else if(method.find("chacha20") != std::string::npos) {
         chacha.reset(new ChaCha(m_key, m_iv));
         return;
     }
+
 #endif
+
     try {
         Botan::SymmetricKey _key(
-                    reinterpret_cast<const Botan::byte *>(m_key.data()),
-                    m_key.size());
+            reinterpret_cast<const Botan::byte *>(m_key.data()),
+            m_key.size()
+        );
         Botan::InitializationVector _iv(
-                    reinterpret_cast<const Botan::byte *>(m_iv.data()),
-                    m_iv.size());
+            reinterpret_cast<const Botan::byte *>(m_iv.data()),
+            m_iv.size()
+        );
         filter = Botan::get_cipher(cipherInfo.internalName, _key, _iv,
-                    encrypt ? Botan::ENCRYPTION : Botan::DECRYPTION);
+            encrypt ? Botan::ENCRYPTION : Botan::DECRYPTION
+        );
         // Botan::pipe will take control over filter
         // we shouldn't deallocate filter externally
         pipe = std::make_unique<Botan::Pipe>(filter);
     } catch(const Botan::Exception &e) {
-        QDebug(QtMsgType::QtFatalMsg) << "Failed to initialise cipher: " << e.what();
+        QDebug(QtMsgType::QtFatalMsg)
+            << "Failed to initialise cipher: " << e.what();
     }
 }
 
 Cipher::~Cipher() = default;
 
-const std::unordered_map<std::string, Cipher::CipherInfo> Cipher::cipherInfoMap = {
+const std::unordered_map<std::string, Cipher::CipherInfo>
+Cipher::cipherInfoMap = {
     {"aes-128-cfb", {"AES-128/CFB", 16, 16, Cipher::CipherType::STREAM}},
     {"aes-192-cfb", {"AES-192/CFB", 24, 16, Cipher::CipherType::STREAM}},
     {"aes-256-cfb", {"AES-256/CFB", 32, 16, Cipher::CipherType::STREAM}},
@@ -104,65 +111,73 @@ const std::unordered_map<std::string, Cipher::CipherInfo> Cipher::cipherInfoMap 
     {"rc4-md5", {"RC4-MD5", 16, 16, Cipher::CipherType::STREAM}},
     {"salsa20", {"Salsa20", 32, 8, Cipher::CipherType::STREAM}},
     {"seed-cfb", {"SEED/CFB", 16, 16, Cipher::CipherType::STREAM}},
-    {"serpent-256-cfb", {"Serpent/CFB", 32, 16, Cipher::CipherType::STREAM}}
+    {"serpent-256-cfb", {"Serpent/CFB", 32, 16, Cipher::CipherType::STREAM}},
 #ifdef USE_BOTAN2
-   ,{"chacha20-ietf-poly1305", {"ChaCha20Poly1305", 32, 12, Cipher::CipherType::AEAD, 32, 16}},
+    {"chacha20-ietf-poly1305", {"ChaCha20Poly1305", 32, 12, Cipher::CipherType::AEAD, 32, 16}},
     {"aes-128-gcm", {"AES-128/GCM", 16, 12, Cipher::CipherType::AEAD, 16, 16}},
     {"aes-192-gcm", {"AES-192/GCM", 24, 12, Cipher::CipherType::AEAD, 24, 16}},
     {"aes-256-gcm", {"AES-256/GCM", 32, 12, Cipher::CipherType::AEAD, 32, 16}}
 #endif
 };
+
 const std::string Cipher::kdfLabel = {"ss-subkey"};
 
 std::string Cipher::update(const std::string &data)
 {
-    return update(reinterpret_cast<const uint8_t*>(data.data()), data.length());
+    return update(reinterpret_cast<const uint8_t *>(data.data()), data.length());
 }
 
 std::string Cipher::update(const uint8_t *data, size_t length)
 {
-    if (chacha) {
+    if(chacha) {
         return chacha->update(data, length);
     }
-    if (rc4) {
+
+    if(rc4) {
         return rc4->update(data, length);
     }
-    if (pipe) {
-        pipe->process_msg(reinterpret_cast<const Botan::byte *>
-                          (data), length);
+
+    if(pipe) {
+        pipe->process_msg(reinterpret_cast<const Botan::byte *>(data), length);
         SecureByteArray c = pipe->read_all(Botan::Pipe::LAST_MESSAGE);
-        return std::string(reinterpret_cast<const char *>(DataOfSecureByteArray(c)),
-                           c.size());
+        return std::string(
+            reinterpret_cast<const char *>(DataOfSecureByteArray(c)), c.size()
+        );
     }
+
     throw std::logic_error("Underlying ciphers are all uninitialised!");
 }
 
 void Cipher::incrementIv()
 {
-    nonceIncrement(reinterpret_cast<unsigned char*>(&m_iv[0]), m_iv.length());
+    nonceIncrement(reinterpret_cast<unsigned char *>(&m_iv[0]), m_iv.length());
     filter->set_iv(Botan::InitializationVector(
-                       reinterpret_cast<const Botan::byte *>(m_iv.data()), m_iv.size()
-                       ));
+        reinterpret_cast<const Botan::byte *>(m_iv.data()), m_iv.size()
+    ));
 }
 
 std::string Cipher::randomIv(int length)
 {
-    //directly return empty byte array if no need to genenrate iv
-    if (length == 0) {
+    // directly return empty byte array if no need to genenrate iv
+    if(length == 0) {
         return std::string();
     }
 
     Botan::AutoSeeded_RNG rng;
     SecureByteArray out = rng.random_vec(length);
-    return std::string(reinterpret_cast<const char *>(DataOfSecureByteArray(out)), out.size());
+    return std::string(
+        reinterpret_cast<const char *>(DataOfSecureByteArray(out)), out.size()
+    );
 }
 
 std::string Cipher::randomIv(const std::string &method)
 {
     CipherInfo cipherInfo = cipherInfoMap.at(method);
-    if (cipherInfo.type == AEAD) {
+
+    if(cipherInfo.type == AEAD) {
         return std::string(cipherInfo.ivLen, static_cast<char>(0));
     }
+
     return randomIv(cipherInfo.ivLen);
 }
 
@@ -170,58 +185,75 @@ std::string Cipher::md5Hash(const std::string &in)
 {
     Botan::MD5 md5;
     SecureByteArray result = md5.process(in);
-    return std::string(reinterpret_cast<const char*>(DataOfSecureByteArray(result)), result.size());
+    return std::string(
+        reinterpret_cast<const char *> (DataOfSecureByteArray(result)),
+        result.size()
+    );
 }
 
 bool Cipher::isSupported(const std::string &method)
 {
     const auto cIt = cipherInfoMap.find(method);
-    if (cIt == cipherInfoMap.end()) {
+
+    if(cIt == cipherInfoMap.end()) {
         return false;
     }
 
 #ifndef USE_BOTAN2
-    if (method.find("chacha20") != std::string::npos)  return true;
+    if(method.find("chacha20") != std::string::npos) {
+        return true;
+    }
 #endif
-    if (method.find("rc4") != std::string::npos) {
+
+    if(method.find("rc4") != std::string::npos) {
         return true;
     }
 
     std::unique_ptr<Botan::Keyed_Filter> keyFilter;
+
     try {
-        keyFilter.reset(Botan::get_cipher(cIt->second.internalName, Botan::ENCRYPTION));
-    } catch (Botan::Exception &e) {
+        keyFilter.reset(
+            Botan::get_cipher(cIt->second.internalName, Botan::ENCRYPTION)
+        );
+    } catch(Botan::Exception &e) {
         qDebug("Method %s(%s) is not supported by Botan: %s",
-               method.data(), cIt->second.internalName.data(), e.what());
+            method.data(), cIt->second.internalName.data(), e.what()
+        );
         return false;
     }
+
     return true;
 }
 
 std::vector<std::string> Cipher::supportedMethods()
 {
     std::vector<std::string> supportedMethods;
-    for (auto& cipher : Cipher::cipherInfoMap) {
-        if (Cipher::isSupported(cipher.first)) {
+
+    for(auto &cipher : Cipher::cipherInfoMap) {
+        if(Cipher::isSupported(cipher.first)) {
             supportedMethods.push_back(cipher.first);
         }
     }
+
     return supportedMethods;
 }
 
 #ifdef USE_BOTAN2
-/*
- * Derives per-session subkey from the master key, which is required
- * for Shadowsocks AEAD ciphers
- */
-std::string Cipher::deriveAeadSubkey(size_t length, const std::string& masterKey, const std::string& salt)
+// Derives per-session subkey from the master key, which is required
+// for Shadowsocks AEAD ciphers
+std::string Cipher::deriveAeadSubkey(size_t length,
+    const std::string &masterKey, const std::string &salt)
 {
     std::unique_ptr<Botan::KDF> kdf;
     kdf = std::make_unique<Botan::HKDF>(new Botan::HMAC(new Botan::SHA_160()));
     //std::string salt = randomIv(cipherInfo.saltLen);
-    SecureByteArray skey = kdf->derive_key(length, reinterpret_cast<const uint8_t*>(masterKey.data()), masterKey.length(), salt, kdfLabel);
-    return std::string(reinterpret_cast<const char *>(DataOfSecureByteArray(skey)),
-                       skey.size());
+    SecureByteArray skey = kdf->derive_key(length,
+        reinterpret_cast<const uint8_t *> (masterKey.data()),
+        masterKey.length(), salt, kdfLabel
+    );
+    return std::string(
+        reinterpret_cast<const char *>(DataOfSecureByteArray(skey)), skey.size()
+    );
 }
 #endif
 

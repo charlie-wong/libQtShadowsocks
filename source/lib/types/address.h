@@ -14,76 +14,62 @@
 
 namespace QSS {
 
-class QSS_EXPORT DnsLookup : public QObject
-{
+class QSS_EXPORT DnsLookup : public QObject {
     // A simple wrapper class to provide asynchronous DNS lookup
     Q_OBJECT
 public:
-    void lookup(const QString& hostname);
+    void lookup(const QString &hostname);
     const QList<QHostAddress> iplist() const;
 
 signals:
     void finished();
 
 private slots:
-    void lookedUp(const QHostInfo& info);
+    void lookedUp(const QHostInfo &info);
 
 private:
     QList<QHostAddress> m_ips;
 };
 
-class QSS_EXPORT Address
-{
+class QSS_EXPORT Address {
 public:
-    explicit Address(const std::string &a = std::string(),
-                     uint16_t p = 0);
+    explicit Address(const std::string &a = std::string(), uint16_t p = 0);
 
-    Address(const QHostAddress &ip,
-            uint16_t p);
+    Address(const QHostAddress &ip, uint16_t p);
 
     Address(const Address &) = default;
     Address(Address &&) = default;
 
-    Address& operator=(const Address&) = default;
+    Address &operator=(const Address &) = default;
 
     const std::string &getAddress() const;
 
-    /*
-     * Because the ipAddrList might include both IPv4 and IPv6 addresses
-     * getRandomIP() will literally return a random IP address
-     * (either IPv4 or IPv6)
-     * If there is no valid IP, a default constructed QHostAddress is returned.
-     * TODO: detect IPv4/IPv6 reachability automatically
-     */
+    /// Because the ipAddrList might include both IPv4 and IPv6 addresses
+    /// getRandomIP() will literally return a random IP address (IPv4 or IPv6)
+    /// If there is no valid IP, a default constructed QHostAddress is returned.
+    ///
+    /// @todo: detect IPv4/IPv6 reachability automatically
     QHostAddress getRandomIP() const;
 
-    /*
-     * Normally the order is platform-dependent and it'd consider IPv4 and IPv6
-     * precedence, which *might* be more suitable to use this function to get
-     * a reachable IP address
-     * If there is no valid IP, a default constructed QHostAddress is returned.
-     */
+    /// Normally the order is platform-dependent and it'd consider IPv4
+    /// and IPv6 precedence, which *might* be more suitable to use this
+    /// function to get a reachable IP address. If there is no valid IP,
+    /// a default constructed QHostAddress is returned.
     QHostAddress getFirstIP() const;
 
     bool isIPValid() const;
     uint16_t getPort() const;
 
-    /**
-     * @brief LookUpCallback
-     * The argument indicates whether a lookup was successful.
-     */
+    /// @brief LookUpCallback
+    /// The argument indicates whether a lookup was successful.
     typedef std::function<void(bool)> LookUpCallback;
 
-    /*
-     * Looks up the network address if the address is a domain name.
-     * The callback is invoked whenever the operation is finished.
-     */
+    /// Looks up the network address if the address is a domain name.
+    /// The callback is invoked whenever the operation is finished.
     void lookUp(LookUpCallback);
 
-    /**
-     * @brief blockingLookUp
-     * @return Whether the DNS lookup was successful
-     */
+    /// @brief blockingLookUp
+    /// @return Whether the DNS lookup was successful
     bool blockingLookUp();
 
     void setAddress(const std::string &);
@@ -104,17 +90,18 @@ public:
         return this->data == o.data;
     }
 
-    friend inline QDataStream& operator<< (QDataStream &os,
-                                           const Address &addr) {
+    friend inline QDataStream &operator<< (QDataStream &os,
+        const Address &addr) {
         return os << QString::fromStdString(addr.toString());
     }
 
-    friend inline QDebug& operator<< (QDebug &os, const Address &addr) {
+    friend inline QDebug &operator<< (QDebug &os, const Address &addr) {
         return os << QString::fromStdString(addr.toString());
     }
 
 private:
-    std::pair<std::string, uint16_t> data;//first: address string; second: port
+    // first: address string; second: port
+    std::pair<std::string, uint16_t> data;
     std::vector<QHostAddress> ipAddrList;
     std::shared_ptr<DnsLookup> dns;
 };

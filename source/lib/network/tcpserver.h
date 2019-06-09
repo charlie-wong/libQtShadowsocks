@@ -11,17 +11,13 @@ namespace QSS {
 
 class TcpRelay;
 
-class QSS_EXPORT TcpServer : public QTcpServer
-{
+class QSS_EXPORT TcpServer : public QTcpServer {
     Q_OBJECT
 public:
-    TcpServer(std::string method,
-              std::string password,
-              int timeout,
-              bool is_local,
-              bool auto_ban,
-              Address serverAddress);
     ~TcpServer();
+    TcpServer(std::string method, std::string password, int timeout,
+        bool is_local, bool auto_ban, Address serverAddress
+    );
 
     TcpServer(const TcpServer &) = delete;
 
@@ -44,6 +40,6 @@ private:
     std::list<std::shared_ptr<TcpRelay> > conList;
 };
 
-}
+} // namespace QSS
 
 #endif // TCPSERVER_H

@@ -10,33 +10,26 @@
 
 namespace QSS {
 
-/**
- * The abstract base class representing a Shadowsocks TCP connection
- */
-class QSS_EXPORT TcpRelay : public QObject
-{
+/// The abstract base class representing a Shadowsocks TCP connection
+class QSS_EXPORT TcpRelay : public QObject {
     Q_OBJECT
 public:
-    TcpRelay(QTcpSocket *localSocket,
-             int timeout,
-             Address server_addr,
-             const std::string& method,
-             const std::string& password);
+    TcpRelay(QTcpSocket *localSocket, int timeout, Address server_addr,
+        const std::string &method, const std::string &password
+    );
 
     TcpRelay(const TcpRelay &) = delete;
 
     enum STAGE { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
 
 signals:
-    /*
-     * Count only remote socket's traffic
-     * Either in local or server mode, the remote socket is used to communicate
-     * with other-side shadowsocks instance (a local or a server)
-     */
+    // Count only remote socket's traffic. Either in local or server mode,
+    // the remote socket is used to communicate with other-side shadowsocks
+    // instance (a local or a server)
     void bytesRead(quint64);
     void bytesSend(quint64);
 
-    //time used for remote to connect to the host (msec)
+    // Time used for remote to connect to the host (msec)
     void latencyAvailable(int);
     void finished();
 
@@ -70,5 +63,6 @@ protected slots:
     void close();
 };
 
-}
+} // namespace QSS
+
 #endif // TCPRELAY_H

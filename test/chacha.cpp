@@ -3,10 +3,8 @@
 #include "util/common.h"
 #include <QtTest>
 
-class ChaCha : public QObject
-{
+class ChaCha : public QObject {
     Q_OBJECT
-
 public:
     ChaCha();
 
@@ -32,7 +30,6 @@ void ChaCha::testChaCha(const std::string &iv)
     std::string testString1("barfoo!");
     std::string intermed = chacha.update(testString1);
     QCOMPARE(decryptor.update(intermed), testString1);
-
     std::string testString2("$ is cheaper than £");
     intermed = chacha.update(testString2);
     QCOMPARE(decryptor.update(intermed), testString2);
@@ -56,13 +53,14 @@ void ChaCha::referenceTest()
     std::string testData(9, '\0');
     QSS::ChaCha chacha(testKey, testIv);
     QCOMPARE(chacha.update(testData),
-             QSS::Common::stringFromHex("76b8e0ada0f13d9040"));
-
+        QSS::Common::stringFromHex("76b8e0ada0f13d9040")
+    );
     // Test ChaCha20-IETF
     std::string testIv_ietf(12, 0);
     QSS::ChaCha chacha_ietf(testKey, testIv_ietf);
     QCOMPARE(chacha_ietf.update(testData),
-             QSS::Common::stringFromHex("76b8e0ada0f13d9040"));
+        QSS::Common::stringFromHex("76b8e0ada0f13d9040")
+    );
 }
 
 QTEST_MAIN(ChaCha)

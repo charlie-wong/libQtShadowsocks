@@ -21,6 +21,7 @@ if(SSQTL_DBI_BOTAN2)
             --optimize-for-size
             --without-documentation
             --disable-shared-library
+            # TODO just build the needed algorithms modules to speedup
             #--minimized-build # build the most core algorithms modules
             #--enable-modules=${botan2_Algorithms} # extra algorithms modules
             --prefix=${DEPS_INSTALL_DIR}

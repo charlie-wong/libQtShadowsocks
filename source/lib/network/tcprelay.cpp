@@ -5,48 +5,48 @@
 
 namespace QSS {
 
-TcpRelay::TcpRelay(QTcpSocket *localSocket,
-                   int timeout,
-                   Address server_addr,
-                   const std::string &method,
-                   const std::string &password) :
-    stage(INIT),
-    serverAddress(std::move(server_addr)),
-    encryptor(new Encryptor(method, password)),
-    local(localSocket),
-    remote(new QTcpSocket()),
-    timer(new QTimer())
+TcpRelay::TcpRelay(QTcpSocket *localSocket, int timeout, Address server_addr,
+    const std::string &method, const std::string &password) :
+    stage(INIT)
+    , serverAddress(std::move(server_addr))
+    , encryptor(new Encryptor(method, password))
+    , local(localSocket)
+    , remote(new QTcpSocket())
+    , timer(new QTimer())
 {
     timer->setInterval(timeout);
     connect(timer.get(), &QTimer::timeout, this, &TcpRelay::onTimeout);
-
     connect(local.get(),
-            static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-            (&QTcpSocket::error),
-            this,
-            &TcpRelay::onLocalTcpSocketError);
+        static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
+        (&QTcpSocket::error),
+        this, &TcpRelay::onLocalTcpSocketError
+    );
     connect(local.get(), &QTcpSocket::disconnected, this, &TcpRelay::close);
     connect(local.get(), &QTcpSocket::readyRead,
-            this, &TcpRelay::onLocalTcpSocketReadyRead);
+        this, &TcpRelay::onLocalTcpSocketReadyRead
+    );
     connect(local.get(), &QTcpSocket::readyRead,
-            timer.get(), static_cast<void (QTimer::*)()> (&QTimer::start));
-
-    connect(remote.get(), &QTcpSocket::connected, this, &TcpRelay::onRemoteConnected);
+        timer.get(), static_cast<void (QTimer::*)()> (&QTimer::start)
+    );
+    connect(remote.get(), &QTcpSocket::connected,
+        this, &TcpRelay::onRemoteConnected
+    );
     connect(remote.get(),
-            static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-            (&QTcpSocket::error),
-            this, &TcpRelay::onRemoteTcpSocketError);
+        static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
+        (&QTcpSocket::error),
+        this, &TcpRelay::onRemoteTcpSocketError
+    );
     connect(remote.get(), &QTcpSocket::disconnected, this, &TcpRelay::close);
     connect(remote.get(), &QTcpSocket::readyRead,
-            this, &TcpRelay::onRemoteTcpSocketReadyRead);
+        this, &TcpRelay::onRemoteTcpSocketReadyRead
+    );
     connect(remote.get(), &QTcpSocket::readyRead,
-            timer.get(), static_cast<void (QTimer::*)()> (&QTimer::start));
+        timer.get(), static_cast<void (QTimer::*)()> (&QTimer::start)
+    );
     connect(remote.get(), &QTcpSocket::bytesWritten, this, &TcpRelay::bytesSend);
-
     local->setReadBufferSize(RemoteRecvSize);
     local->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     local->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
-
     remote->setReadBufferSize(RemoteRecvSize);
     remote->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     remote->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -54,7 +54,7 @@ TcpRelay::TcpRelay(QTcpSocket *localSocket,
 
 void TcpRelay::close()
 {
-    if (stage == DESTROYED) {
+    if(stage == DESTROYED) {
         return;
     }
 
@@ -66,12 +66,15 @@ void TcpRelay::close()
 
 void TcpRelay::onLocalTcpSocketError()
 {
-    //it's not an "error" if remote host closed a connection
-    if (local->error() != QAbstractSocket::RemoteHostClosedError) {
-        QDebug(QtMsgType::QtWarningMsg).noquote() << "Local socket:" << local->errorString();
+    // it's not an "error" if remote host closed a connection
+    if(local->error() != QAbstractSocket::RemoteHostClosedError) {
+        QDebug(QtMsgType::QtWarningMsg).noquote()
+            << "Local socket:" << local->errorString();
     } else {
-        QDebug(QtMsgType::QtDebugMsg).noquote() << "Local socket:" << local->errorString();
+        QDebug(QtMsgType::QtDebugMsg).noquote()
+            << "Local socket:" << local->errorString();
     }
+
     close();
 }
 
@@ -84,7 +87,8 @@ void TcpRelay::onRemoteConnected()
 {
     emit latencyAvailable(startTime.msecsTo(QTime::currentTime()));
     stage = STREAM;
-    if (!dataToWrite.empty()) {
+
+    if(!dataToWrite.empty()) {
         writeToRemote(dataToWrite.data(), dataToWrite.size());
         dataToWrite.clear();
     }
@@ -92,12 +96,15 @@ void TcpRelay::onRemoteConnected()
 
 void TcpRelay::onRemoteTcpSocketError()
 {
-    //it's not an "error" if remote host closed a connection
-    if (remote->error() != QAbstractSocket::RemoteHostClosedError) {
-        QDebug(QtMsgType::QtWarningMsg).noquote() << "Remote socket:" << remote->errorString();
+    // it's not an "error" if remote host closed a connection
+    if(remote->error() != QAbstractSocket::RemoteHostClosedError) {
+        QDebug(QtMsgType::QtWarningMsg).noquote()
+            << "Remote socket:" << remote->errorString();
     } else {
-        QDebug(QtMsgType::QtDebugMsg).noquote() << "Remote socket:" << remote->errorString();
+        QDebug(QtMsgType::QtDebugMsg).noquote()
+            << "Remote socket:" << remote->errorString();
     }
+
     close();
 }
 
@@ -106,18 +113,21 @@ void TcpRelay::onLocalTcpSocketReadyRead()
     std::string data;
     data.resize(RemoteRecvSize);
     int64_t readSize = local->read(&data[0], data.size());
-    if (readSize == -1) {
+
+    if(readSize == -1) {
         qCritical("Attempted to read from closed local socket.");
         close();
         return;
     }
+
     data.resize(readSize);
 
-    if (data.empty()) {
+    if(data.empty()) {
         qCritical("Local received empty data.");
         close();
         return;
     }
+
     handleLocalTcpData(data);
 }
 
@@ -126,26 +136,31 @@ void TcpRelay::onRemoteTcpSocketReadyRead()
     std::string buf;
     buf.resize(RemoteRecvSize);
     int64_t readSize = remote->read(&buf[0], buf.size());
-    if (readSize == -1) {
+
+    if(readSize == -1) {
         qCritical("Attempted to read from closed remote socket.");
         close();
         return;
     }
+
     buf.resize(readSize);
 
-    if (buf.empty()) {
+    if(buf.empty()) {
         qWarning("Remote received empty data.");
         close();
         return;
     }
+
     emit bytesRead(buf.size());
+
     try {
         handleRemoteTcpData(buf);
-    } catch (const std::exception &e) {
+    } catch(const std::exception &e) {
         QDebug(QtMsgType::QtCriticalMsg) << "Remote:" << e.what();
         close();
         return;
     }
+
     local->write(buf.data(), buf.size());
 }
 

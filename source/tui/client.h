@@ -3,24 +3,24 @@
 
 #include <QtShadowsocks>
 
-class Client
-{
+class Client {
 public:
     Client();
     bool readConfig(const QString &);
 
     void setup(const QString &remote_addr,
-               const QString &remote_port,
-               const QString &local_addr,
-               const QString &local_port,
-               const QString &password,
-               const QString &method,
-               const QString &timeout,
-               const bool http_proxy);
+        const QString &remote_port,
+        const QString &local_addr,
+        const QString &local_port,
+        const QString &password,
+        const QString &method,
+        const QString &timeout,
+        const bool http_proxy
+    );
 
     void setAutoBan(bool ban);
     void setHttpMode(bool http);
-    const std::string& getMethod() const;
+    const std::string &getMethod() const;
     bool start(bool serverMode = false);
 
 private:

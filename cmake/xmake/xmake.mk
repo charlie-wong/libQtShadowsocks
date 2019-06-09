@@ -271,7 +271,26 @@ endif
 ##########################################
 # https://gitlab.com/gkide/prebuild/astyle/blob/master/v3.1/astyle-cpp
 # C/C++ source files, OPTIONS file must be .astylerc of project top directory
-ASTYLE_ARGS ?= --project '*.h' '*.c' '*.cpp' $(ASTYLE_FILES)
+ifeq ($(ASTYLE_ARGS),) # empty then use the default value for C/C++
+    ASTYLE_ARGS := --project '*.h' '*.c' '*.cpp'
+endif
+
+ifneq ($(ASTYLE_FILES),) # local setting for project
+    ASTYLE_ARGS := --project $(ASTYLE_FILES)
+endif
+
+AstyleArgs_star := $(shell echo $(ASTYLE_ARGS) | grep '\*')
+ifneq ($(AstyleArgs_star),)
+    AstyleArgs_Wildcard := Has
+endif
+AstyleArgs_quest := $(shell echo $(ASTYLE_ARGS) | grep '\?')
+ifneq ($(AstyleArgs_quest),)
+    AstyleArgs_Wildcard := Has
+endif
+ifeq ($(AstyleArgs_Wildcard),Has) # prepend --recursive
+    ASTYLE_ARGS := --recursive $(ASTYLE_ARGS)
+endif
+
 ifeq ($(ASTYLE_PROG),)
     ifneq ($(strip $(shell (command -v astyle))),)
         ASTYLE_PROG := $(Q)$(shell (command -v astyle))

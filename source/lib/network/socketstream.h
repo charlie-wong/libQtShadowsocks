@@ -7,18 +7,12 @@
 
 namespace QSS {
 
-class QSS_EXPORT SocketStream : public QObject
-{
+class QSS_EXPORT SocketStream : public QObject {
     Q_OBJECT
 public:
-    /*
-     * A light-weight class dedicated to stream data between two sockets
-     * all available data from socket a will be written to socket b
-     * vice versa
-     */
-    SocketStream(QAbstractSocket *a,
-                 QAbstractSocket *b,
-                 QObject *parent = 0);
+    // A light-weight class dedicated to stream data between two sockets
+    // all available data from socket a will be written to socket b vice versa
+    SocketStream(QAbstractSocket *a, QAbstractSocket *b, QObject *parent = 0);
 
     SocketStream(const SocketStream &) = delete;
 
@@ -31,6 +25,6 @@ private slots:
     void onSocketBReadyRead();
 };
 
-}
+} // namespace QSS
 
 #endif // SOCKETSTREAM_H

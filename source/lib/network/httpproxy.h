@@ -10,21 +10,18 @@
 
 namespace QSS {
 
-class QSS_EXPORT HttpProxy : public QTcpServer
-{
+class QSS_EXPORT HttpProxy : public QTcpServer {
     Q_OBJECT
 public:
     HttpProxy();
 
     HttpProxy(const HttpProxy &) = delete;
 
-    /*
-     * DO NOT use listen() function, use httpListen instead
-     * The socks_port is local socks proxy server port
-     */
+    // DO NOT use listen() function, use httpListen instead
+    // The socks_port is local socks proxy server port
     bool httpListen(const QHostAddress &http_addr,
-                    uint16_t http_port,
-                    uint16_t socks_port);
+        uint16_t http_port, uint16_t socks_port
+    );
 
 protected:
     void incomingConnection(qintptr handle);
@@ -36,11 +33,11 @@ private slots:
     void onSocketError(QAbstractSocket::SocketError);
     void onSocketReadyRead();
     void onProxySocketConnected();
-    //this function is used for HTTPS transparent proxy
+    // This function is used for HTTPS transparent proxy
     void onProxySocketConnectedHttps();
     void onProxySocketReadyRead();
 };
 
-}
+} // namespace QSS
 
 #endif // HTTPPROXY_H

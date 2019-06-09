@@ -4,11 +4,11 @@
 #include <QtGlobal>
 
 #ifdef QSS_STATIC
-#  define QSS_EXPORT
+    #define QSS_EXPORT
 #elif defined(QSS_LIBRARY)
-#  define QSS_EXPORT Q_DECL_EXPORT
+    #define QSS_EXPORT Q_DECL_EXPORT
 #else
-#  define QSS_EXPORT Q_DECL_IMPORT
+    #define QSS_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // EXPORT_H

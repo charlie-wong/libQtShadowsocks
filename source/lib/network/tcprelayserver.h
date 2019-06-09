@@ -5,16 +5,13 @@
 
 namespace QSS {
 
-class QSS_EXPORT TcpRelayServer : public TcpRelay
-{
+class QSS_EXPORT TcpRelayServer : public TcpRelay {
     Q_OBJECT
 public:
-    TcpRelayServer(QTcpSocket *localSocket,
-                   int timeout,
-                   Address server_addr,
-                   const std::string& method,
-                   const std::string& password,
-                   bool autoBan);
+    TcpRelayServer(QTcpSocket *localSocket, int timeout,
+        Address server_addr, const std::string &method,
+        const std::string &password, bool autoBan
+    );
 
 protected:
     const bool autoBan;
@@ -24,5 +21,6 @@ protected:
     void handleRemoteTcpData(std::string &data) final;
 };
 
-}
+} // namespace QSS
+
 #endif // TCPRELAYSERVER_H

@@ -41,7 +41,7 @@
 #EXTRA_CMAKE_ARGS += -DSSQTL_BUILD_SHARED=OFF
 
 #ASTYLE_PROG := /usr/bin/astyle
-#ASTYLE_ARGS := --project '*.h' '*.cpp'
+#ASTYLE_ARGS := --project '*.h' '*.c' '*.cpp'
 #ASTYLE_FILES := source/lib/crypto/cipher.cpp
 
 #GIT_PROG :=
