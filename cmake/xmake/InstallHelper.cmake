@@ -123,50 +123,48 @@ function(XmakeInstallHelper)
         DIRECTORY_PERMISSIONS   EXPORT_LIBRARY_WITH_EXTRA_LIBS
     )
 
-    cmake_parse_arguments(install_helper # prefix
+    cmake_parse_arguments(install # prefix
         "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
     )
 
-    if(NOT install_helper_FILES
-       AND NOT install_helper_TARGETS
-       AND NOT install_helper_PROGRAMS
-       AND NOT install_helper_DIRECTORY)
+    if(NOT install_FILES AND NOT install_TARGETS
+       AND NOT install_PROGRAMS AND NOT install_DIRECTORY)
         message(FATAL_ERROR "Must set FILES, PROGRAMS, TARGETS, or DIRECTORY")
     endif()
 
-    if(NOT install_helper_FILE_PERMISSIONS)
-        set(install_helper_FILE_PERMISSIONS
+    if(NOT install_FILE_PERMISSIONS)
+        set(install_FILE_PERMISSIONS
             OWNER_READ OWNER_WRITE
             GROUP_READ
             WORLD_READ)
     endif()
 
-    if(NOT install_helper_PROGRAM_PERMISSIONS)
-        set(install_helper_PROGRAM_PERMISSIONS
+    if(NOT install_PROGRAM_PERMISSIONS)
+        set(install_PROGRAM_PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE
             GROUP_READ GROUP_EXECUTE
             WORLD_READ WORLD_EXECUTE)
     endif()
 
-    if(NOT install_helper_DIRECTORY_PERMISSIONS)
-        set(install_helper_DIRECTORY_PERMISSIONS
+    if(NOT install_DIRECTORY_PERMISSIONS)
+        set(install_DIRECTORY_PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE
             GROUP_READ GROUP_EXECUTE
             WORLD_READ WORLD_EXECUTE)
     endif()
 
-    if(install_helper_DOMAIN AND
-       NOT "${install_helper_DOMAIN}" MATCHES "^[A-Za-z0-9]+$")
+    if(install_DOMAIN AND
+       NOT "${install_DOMAIN}" MATCHES "^[A-Za-z0-9]+$")
         message(FATAL_ERROR "DOMAIN must consist of [A-Za-z0-9]")
     endif()
 
-    if(install_helper_TARGETS)
-        if(install_helper_DESTINATION)
+    if(install_TARGETS)
+        if(install_DESTINATION)
             # The install layout controled by end user
-            set(DomainBin ${install_helper_DESTINATION})
-            set(DomainLib ${install_helper_DESTINATION})
-            set(DomainShare ${install_helper_DESTINATION})
-            set(DomainInclude ${install_helper_DESTINATION})
+            set(DomainBin ${install_DESTINATION})
+            set(DomainLib ${install_DESTINATION})
+            set(DomainShare ${install_DESTINATION})
+            set(DomainInclude ${install_DESTINATION})
         else()
             # The default install layout
             set(DomainBin ${${XMAKE}_INSTALL_BIN_DIR})
@@ -175,16 +173,16 @@ function(XmakeInstallHelper)
             set(DomainInclude ${${XMAKE}_INSTALL_INC_DIR})
         endif()
 
-        if(install_helper_DOMAIN)
-            set(export_lib_DOMAIN DOMAIN ${install_helper_DOMAIN})
-            set(DomainBin ${DomainBin}/${install_helper_DOMAIN})
-            set(DomainLib ${DomainLib}/${install_helper_DOMAIN})
-            set(DomainShare ${DomainShare}/${install_helper_DOMAIN})
-            set(DomainInclude ${DomainInclude}/${install_helper_DOMAIN})
+        if(install_DOMAIN)
+            set(export_lib_DOMAIN DOMAIN ${install_DOMAIN})
+            set(DomainBin ${DomainBin}/${install_DOMAIN})
+            set(DomainLib ${DomainLib}/${install_DOMAIN})
+            set(DomainShare ${DomainShare}/${install_DOMAIN})
+            set(DomainInclude ${DomainInclude}/${install_DOMAIN})
         endif()
 
         string(REGEX REPLACE " +" ";"
-               install_targets "${install_helper_TARGETS}")
+               install_targets "${install_TARGETS}")
         foreach(target ${install_targets}) # processed target one by one
             get_target_property(target_type ${target} TYPE)
             get_target_property(target_resources ${target} RESOURCE)
@@ -290,7 +288,7 @@ function(XmakeInstallHelper)
             CreateDestDirWithPerms(DESTINATION ${DomainLib})
 
             set(do_EXPORT)
-            if(install_helper_EXPORT_LIBRARY_INFO)
+            if(install_EXPORT_LIBRARY_INFO)
                 # Get the library output, which is library rename
                 get_target_property(libOutName ${target} OUTPUT_NAME)
                 if(NOT libOutName)
@@ -299,7 +297,7 @@ function(XmakeInstallHelper)
                 set(do_EXPORT EXPORT ${target})
                 XmakePackageConfig(TARGET ${target}
                     NAME ${libOutName} ${export_lib_DOMAIN}
-                    "${install_helper_EXPORT_LIBRARY_WITH_EXTRA_LIBS}"
+                    "${install_EXPORT_LIBRARY_WITH_EXTRA_LIBS}"
                 )
             endif()
 
@@ -329,45 +327,45 @@ function(XmakeInstallHelper)
     endif()
 
     # install to the install prefix root directory
-    if(NOT install_helper_DESTINATION)
+    if(NOT install_DESTINATION)
         # NOTE DESTINATION can not empty though if want to install to
         # the root of CMAKE_INSTALL_PREFIX, just go up-level and down
         # to make it happy and it works.
         get_filename_component(top_dir ${CMAKE_INSTALL_PREFIX} NAME)
-        set(install_helper_DESTINATION "../${top_dir}")
+        set(install_DESTINATION "../${top_dir}")
     endif()
 
     # Create directory with the correct permissions.
     CreateDestDirWithPerms(
-        DESTINATION ${install_helper_DESTINATION}
-        DIRECTORY_PERMISSIONS ${install_helper_DIRECTORY_PERMISSIONS})
+        DESTINATION ${install_DESTINATION}
+        DIRECTORY_PERMISSIONS ${install_DIRECTORY_PERMISSIONS})
 
-    if(install_helper_DIRECTORY)
+    if(install_DIRECTORY)
         install(
-            DIRECTORY ${install_helper_DIRECTORY}
-            DESTINATION ${install_helper_DESTINATION}
-            FILE_PERMISSIONS ${install_helper_FILE_PERMISSIONS}
-            DIRECTORY_PERMISSIONS ${install_helper_DIRECTORY_PERMISSIONS}
+            DIRECTORY ${install_DIRECTORY}
+            DESTINATION ${install_DESTINATION}
+            FILE_PERMISSIONS ${install_FILE_PERMISSIONS}
+            DIRECTORY_PERMISSIONS ${install_DIRECTORY_PERMISSIONS}
             COMPONENT Resource)
     endif()
 
-    if(install_helper_RENAME)
-        set(install_rename RENAME ${install_helper_RENAME})
+    if(install_RENAME)
+        set(install_rename RENAME ${install_RENAME})
     endif()
 
-    if(install_helper_FILES)
+    if(install_FILES)
         install(
-            FILES ${install_helper_FILES}
-            DESTINATION ${install_helper_DESTINATION}
-            PERMISSIONS ${install_helper_FILE_PERMISSIONS}
+            FILES ${install_FILES}
+            DESTINATION ${install_DESTINATION}
+            PERMISSIONS ${install_FILE_PERMISSIONS}
             COMPONENT Resource ${install_rename})
     endif()
 
-    if(install_helper_PROGRAMS)
+    if(install_PROGRAMS)
         install(
-            PROGRAMS ${install_helper_PROGRAMS}
-            DESTINATION ${install_helper_DESTINATION}
-            PERMISSIONS ${install_helper_PROGRAM_PERMISSIONS}
+            PROGRAMS ${install_PROGRAMS}
+            DESTINATION ${install_DESTINATION}
+            PERMISSIONS ${install_PROGRAM_PERMISSIONS}
             COMPONENT Resource ${install_rename})
     endif()
 endfunction()
