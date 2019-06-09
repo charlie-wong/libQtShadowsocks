@@ -35,7 +35,7 @@ set_target_properties(static_LibQtShadowSocks
 add_dependencies(static_LibQtShadowSocks ${botan2_TARGET})
 XmakeInstallHelper(TARGETS static_LibQtShadowSocks
     EXPORT_LIBRARY_INFO
-    EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network
+    EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network botan-2
 )
 
 if(SSQTL_BUILD_SHARED)
@@ -49,7 +49,7 @@ if(SSQTL_BUILD_SHARED)
     add_dependencies(shared_LibQtShadowSocks ${botan2_TARGET})
     XmakeInstallHelper(TARGETS shared_LibQtShadowSocks
         EXPORT_LIBRARY_INFO
-        EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network
+        EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network botan-2
     )
 endif()
 
