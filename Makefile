@@ -61,18 +61,18 @@ ifeq ($(filter-out Dev Debug Coverage,$(BUILD_TYPE)),)
 	$(XMAKE) -C $(BUILD_DIR) code.coverage-mpack
 endif
 
-AstyleRc := $(PWD)/.astylerc
+AstyleRc := $(SOURCE_DIR)/.astylerc
 AstyleRc := $(shell if [ -f $(AstyleRc) ]; then echo "Has"; else echo ""; fi;)
+AstyleUrl:=https://gitlab.com/gkide/prebuild/astyle/raw/master/v3.1/astyle-cpp
 PHONY += astyle
 astyle:
-ifeq ($(AstyleRc),Has)
+ifneq ($(AstyleRc),Has) # download by wget
+	@wget $(AstyleUrl) -O $(SOURCE_DIR)/.astylerc
+endif
 ifeq ($(ASTYLE_VERSION),3.1)
 	$(ASTYLE_PROG) $(ASTYLE_ARGS)
 else
 	@echo "SKIP: wanted astyle-v3.1, but got astyle-v$(ASTYLE_VERSION)"
-endif
-else
-	@echo "SKIP: NOT exist file '$(PWD)/.astylerc'"
 endif
 
 .PHONY: $(PHONY)

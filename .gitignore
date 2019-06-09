@@ -11,6 +11,9 @@ build/
 local.mk
 DistRepoInfo
 
+# astyle options, it will auto download by Makefile
+.astylerc
+
 # Ignore xmake
 #cmake/xmake/
 #cmake/xmake.cmake
