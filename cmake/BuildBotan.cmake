@@ -2,6 +2,26 @@
 # https://github.com/randombit/botan
 # https://botan.randombit.net/manual/contents.html
 
+# If local build static botan2, then the Shadowsocks Core Library
+# user must be also wanted the botan2 library, so just install them.
+function(InstallDepsBotan2)
+    XmakeInstallHelper(PROGRAMS ${DEPS_INSTALL_DIR}/bin/botan
+        DESTINATION bin
+    )
+    XmakeInstallHelper(FILES ${DEPS_INSTALL_DIR}/lib/libbotan-2.a
+        DESTINATION lib
+    )
+    XmakeInstallHelper(DIRECTORY ${DEPS_INSTALL_DIR}/include/botan-2
+        DESTINATION include
+    )
+    XmakeInstallHelper(DIRECTORY ${DEPS_INSTALL_DIR}/lib/python2.7
+        DESTINATION lib
+    )
+    XmakeInstallHelper(FILES ${DEPS_INSTALL_DIR}/lib/pkgconfig/botan-2.pc
+        DESTINATION lib/pkgconfig
+    )
+endfunction()
+
 # If build the full botan library, it takes
 # too long time, so just build the needed ones
 # for details, run $ configure.py --list-modules
@@ -12,6 +32,7 @@ set(botan2_Algorithms
 string(REGEX REPLACE "[ ;]" "" botan2_Algorithms "${botan2_Algorithms}")
 
 if(SSQTL_DBI_BOTAN2)
+    InstallDepsBotan2()
     set(botan2_TARGET libBotan)
     XmakeDepTarballBuild(${botan2_TARGET}
         VERSION     2.10.0
