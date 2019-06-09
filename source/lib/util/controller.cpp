@@ -1,10 +1,7 @@
 #include <QDebug>
 #include <QHostInfo>
 #include <QTcpSocket>
-
-#ifndef USE_BOTAN2
-    #include <botan/init.h>
-#endif
+#include <botan/init.h>
 
 #include "controller.h"
 #include "crypto/encryptor.h"
@@ -20,14 +17,6 @@ Controller::Controller(Profile _profile, bool is_local,
     , isLocal(is_local)
     , autoBan(auto_ban)
 {
-#ifndef USE_BOTAN2
-    try {
-        botanInit = std::make_unique<Botan::LibraryInitializer>("thread_safe");
-    } catch(std::exception &e) {
-        qFatal("Failed to initialise Botan library: %s", e.what());
-    }
-#endif
-
     qInfo("Initialising cipher: %s", profile.method().data());
 
     // the default QHostAddress constructor will construct "::"

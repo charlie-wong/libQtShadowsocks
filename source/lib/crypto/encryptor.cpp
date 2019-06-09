@@ -53,21 +53,17 @@ void Encryptor::reset()
 
 void Encryptor::initEncipher(std::string *header)
 {
-    std::string iv = Cipher::randomIv(m_method);
     std::string key;
+    std::string iv = Cipher::randomIv(m_method);
 
-#ifdef USE_BOTAN2
     if(cipherInfo.type == Cipher::CipherType::AEAD) {
         const std::string salt = Cipher::randomIv(cipherInfo.saltLen);
         key = Cipher::deriveAeadSubkey(cipherInfo.keyLen, masterKey, salt);
         *header = salt;
     } else {
-#endif
         key = masterKey;
         *header = iv;
-#ifdef USE_BOTAN2
     }
-#endif
 
     enCipher = std::make_unique<QSS::Cipher>(
         m_method, std::move(key), std::move(iv), true
@@ -78,7 +74,6 @@ void Encryptor::initDecipher(const char *data, size_t length, size_t *offset)
 {
     std::string key, iv;
 
-#ifdef USE_BOTAN2
     if(cipherInfo.type == Cipher::CipherType::AEAD) {
         iv = std::string(cipherInfo.ivLen, static_cast<char>(0));
 
@@ -93,7 +88,6 @@ void Encryptor::initDecipher(const char *data, size_t length, size_t *offset)
         );
         *offset = cipherInfo.saltLen;
     } else {
-#endif
         if(length < cipherInfo.ivLen) {
             throw std::length_error(
                 "Data chunk is too small to initialise a stream decipher"
@@ -103,10 +97,8 @@ void Encryptor::initDecipher(const char *data, size_t length, size_t *offset)
         iv = std::string(data, cipherInfo.ivLen);
         key = masterKey;
         *offset = cipherInfo.ivLen;
-#ifdef USE_BOTAN2
     }
 
-#endif
     deCipher = std::make_unique<QSS::Cipher>(
         m_method, std::move(key), std::move(iv), false
     );
@@ -131,7 +123,6 @@ std::string Encryptor::encrypt(const uint8_t *data, size_t length)
 
     std::string encrypted;
 
-#ifdef USE_BOTAN2
     if(cipherInfo.type == Cipher::CipherType::AEAD) {
         uint16_t inLen =
             length > AEAD_CHUNK_SIZE_MASK ? AEAD_CHUNK_SIZE_MASK : length;
@@ -148,12 +139,9 @@ std::string Encryptor::encrypt(const uint8_t *data, size_t length)
             encrypted += encrypt(data + inLen, length - inLen);
         }
     } else {
-#endif
         encrypted = enCipher->update(data, length);
-#ifdef USE_BOTAN2
     }
 
-#endif
     return header + encrypted;
 }
 
@@ -181,7 +169,6 @@ std::string Encryptor::decrypt(const uint8_t *data, size_t length)
         length -= headerLength;
     }
 
-#ifdef USE_BOTAN2
     if(cipherInfo.type == Cipher::CipherType::AEAD) {
         // Concatenate the data with incomplete chunk (if it exists)
         std::string chunk = incompleteChunk + std::string(
@@ -237,12 +224,9 @@ std::string Encryptor::decrypt(const uint8_t *data, size_t length)
             out += decrypt(data, dataEnd - data);
         }
     } else {
-#endif
         out = deCipher->update(data, length);
-#ifdef USE_BOTAN2
     }
 
-#endif
     return out;
 }
 

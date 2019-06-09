@@ -8,26 +8,17 @@
 #include <botan/lookup.h>
 #include <botan/md5.h>
 #include <botan/pipe.h>
-
-#ifdef USE_BOTAN2
-    #include <botan/hkdf.h>
-    #include <botan/hmac.h>
-    #include <botan/sha160.h>
-#endif
+#include <botan/hkdf.h>
+#include <botan/hmac.h>
+#include <botan/sha160.h>
 
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QMessageAuthenticationCode>
 
 namespace {
-
-#ifdef USE_BOTAN2
     using SecureByteArray = Botan::secure_vector<Botan::byte>;
     #define DataOfSecureByteArray(sba) sba.data()
-#else
-    using SecureByteArray = Botan::SecureVector<Botan::byte>;
-    #define DataOfSecureByteArray(sba) sba.begin()
-#endif
 
 // Copied from libsodium's sodium_increment
 void nonceIncrement(unsigned char *n, const size_t nlen)
@@ -55,14 +46,6 @@ Cipher::Cipher(const std::string &method, std::string key,
         rc4 = std::make_unique<QSS::RC4>(m_key, m_iv);
         return;
     }
-
-#ifndef USE_BOTAN2
-    else if(method.find("chacha20") != std::string::npos) {
-        chacha.reset(new ChaCha(m_key, m_iv));
-        return;
-    }
-
-#endif
 
     try {
         Botan::SymmetricKey _key(
@@ -104,20 +87,14 @@ Cipher::cipherInfoMap = {
     {"chacha20-ietf", {"ChaCha", 32, 12, Cipher::CipherType::STREAM}},
     {"des-cfb", {"DES/CFB", 8, 8, Cipher::CipherType::STREAM}},
     {"idea-cfb", {"IDEA/CFB", 16, 8, Cipher::CipherType::STREAM}},
-#ifndef USE_BOTAN2
-    // RC2 is not supported by botan-2
-    {"rc2-cfb", {"RC2/CFB", 16, 8, Cipher::CipherType::STREAM}},
-#endif
     {"rc4-md5", {"RC4-MD5", 16, 16, Cipher::CipherType::STREAM}},
     {"salsa20", {"Salsa20", 32, 8, Cipher::CipherType::STREAM}},
     {"seed-cfb", {"SEED/CFB", 16, 16, Cipher::CipherType::STREAM}},
     {"serpent-256-cfb", {"Serpent/CFB", 32, 16, Cipher::CipherType::STREAM}},
-#ifdef USE_BOTAN2
     {"chacha20-ietf-poly1305", {"ChaCha20Poly1305", 32, 12, Cipher::CipherType::AEAD, 32, 16}},
     {"aes-128-gcm", {"AES-128/GCM", 16, 12, Cipher::CipherType::AEAD, 16, 16}},
     {"aes-192-gcm", {"AES-192/GCM", 24, 12, Cipher::CipherType::AEAD, 24, 16}},
     {"aes-256-gcm", {"AES-256/GCM", 32, 12, Cipher::CipherType::AEAD, 32, 16}}
-#endif
 };
 
 const std::string Cipher::kdfLabel = {"ss-subkey"};
@@ -199,12 +176,6 @@ bool Cipher::isSupported(const std::string &method)
         return false;
     }
 
-#ifndef USE_BOTAN2
-    if(method.find("chacha20") != std::string::npos) {
-        return true;
-    }
-#endif
-
     if(method.find("rc4") != std::string::npos) {
         return true;
     }
@@ -238,7 +209,6 @@ std::vector<std::string> Cipher::supportedMethods()
     return supportedMethods;
 }
 
-#ifdef USE_BOTAN2
 // Derives per-session subkey from the master key, which is required
 // for Shadowsocks AEAD ciphers
 std::string Cipher::deriveAeadSubkey(size_t length,
@@ -255,6 +225,5 @@ std::string Cipher::deriveAeadSubkey(size_t length,
         reinterpret_cast<const char *>(DataOfSecureByteArray(skey)), skey.size()
     );
 }
-#endif
 
 } // namespace QSS

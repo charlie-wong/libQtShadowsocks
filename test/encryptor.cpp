@@ -12,12 +12,10 @@ public:
 
 private Q_SLOTS:
     void selfTestEncryptDecrypt();
-#ifdef USE_BOTAN2
     void testAesGcm();
     void testAesGcmUdp();
     void testAesGcmMultiChunks();
     void testAesGcmIncompleteChunks();
-#endif
 };
 
 void Encryptor::selfTestEncryptDecrypt()
@@ -29,7 +27,6 @@ void Encryptor::selfTestEncryptDecrypt()
     QCOMPARE(decryptor.decrypt(encryptor.encrypt(testData)), testData);
 }
 
-#ifdef USE_BOTAN2
 void Encryptor::testAesGcm()
 {
     const std::string method("aes-256-gcm");
@@ -109,7 +106,6 @@ void Encryptor::testAesGcmIncompleteChunks()
     decrypted += decryptor.decrypt(encrypted.substr(2));
     QCOMPARE(decrypted, testData);
 }
-#endif
 
 QTEST_MAIN(Encryptor)
 #include "encryptor.moc"

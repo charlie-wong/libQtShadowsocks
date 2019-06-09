@@ -92,11 +92,9 @@ public:
 
     static std::vector<std::string> supportedMethods();
 
-#ifdef USE_BOTAN2
     static std::string deriveAeadSubkey(
         size_t length, const std::string &masterKey, const std::string &salt
     );
-#endif
 
 private:
     Botan::Keyed_Filter *filter;

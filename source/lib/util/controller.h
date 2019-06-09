@@ -9,12 +9,6 @@
 #include "types/profile.h"
 #include "network/udprelay.h"
 
-#ifndef USE_BOTAN2
-namespace Botan {
-class LibraryInitializer;
-}
-#endif
-
 namespace QSS {
 
 class QSS_EXPORT Controller : public QObject {
@@ -48,12 +42,6 @@ signals:
 public slots:
     bool start(); // Return true if start successfully, otherwise return false
     void stop();
-
-private:
-#ifndef USE_BOTAN2
-    // This needs to be destructed in the end
-    std::unique_ptr<Botan::LibraryInitializer> botanInit;
-#endif
 
 protected:
     // The total bytes recevied or sent by/from all TCP and UDP connections.

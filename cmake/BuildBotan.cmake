@@ -39,4 +39,3 @@ endif()
 
 #message(STATUS "botan2_LIBRARIES=${botan2_LIBRARIES}")
 #message(STATUS "botan2_INCLUDE_DIRS=${botan2_INCLUDE_DIRS}")
-add_definitions(-DUSE_BOTAN2)
