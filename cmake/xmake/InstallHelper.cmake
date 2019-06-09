@@ -121,6 +121,7 @@ function(XmakeInstallHelper)
     set(oneValueArgs    RENAME  DOMAIN    DIRECTORY  DESTINATION)
     set(multiValueArgs  FILES   PROGRAMS  TARGETS    FILE_PERMISSIONS
         DIRECTORY_PERMISSIONS   EXPORT_LIBRARY_WITH_EXTRA_LIBS
+        EXTRA_INSTALL_ARGS
     )
 
     cmake_parse_arguments(install # prefix
@@ -216,7 +217,8 @@ function(XmakeInstallHelper)
                 else()
                     install(TARGETS ${target}
                         RUNTIME DESTINATION ${DomainBin} COMPONENT Runtime
-                        ${install_resources})
+                        ${install_resources} ${install_EXTRA_INSTALL_ARGS}
+                    )
                 endif()
 
                 set(xmakeI_installed_binaries "${xmakeI_installed_binaries}"
@@ -316,6 +318,7 @@ function(XmakeInstallHelper)
                     # Static Library, Shared Import Library(DLL)
                     ARCHIVE DESTINATION ${DomainLib} COMPONENT Develop
                     ${install_public_headers} ${install_private_headers}
+                    ${install_EXTRA_INSTALL_ARGS}
                 )
             endif()
 
@@ -346,7 +349,9 @@ function(XmakeInstallHelper)
             DESTINATION ${install_DESTINATION}
             FILE_PERMISSIONS ${install_FILE_PERMISSIONS}
             DIRECTORY_PERMISSIONS ${install_DIRECTORY_PERMISSIONS}
-            COMPONENT Resource)
+            COMPONENT Resource
+            ${install_EXTRA_INSTALL_ARGS}
+        )
     endif()
 
     if(install_RENAME)
@@ -358,7 +363,9 @@ function(XmakeInstallHelper)
             FILES ${install_FILES}
             DESTINATION ${install_DESTINATION}
             PERMISSIONS ${install_FILE_PERMISSIONS}
-            COMPONENT Resource ${install_rename})
+            COMPONENT Resource ${install_rename}
+            ${install_EXTRA_INSTALL_ARGS}
+        )
     endif()
 
     if(install_PROGRAMS)
@@ -366,6 +373,8 @@ function(XmakeInstallHelper)
             PROGRAMS ${install_PROGRAMS}
             DESTINATION ${install_DESTINATION}
             PERMISSIONS ${install_PROGRAM_PERMISSIONS}
-            COMPONENT Resource ${install_rename})
+            COMPONENT Resource ${install_rename}
+            ${install_EXTRA_INSTALL_ARGS}
+        )
     endif()
 endfunction()
