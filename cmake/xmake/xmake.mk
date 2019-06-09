@@ -315,6 +315,23 @@ else
     VALGRIND_PROG := $(Q)$(VALGRIND_PROG)
 endif
 
+########################################
+# curl/wget tools for file downloading #
+########################################
+# The 1st-arg to DOWNLOAD_AS is full path with file name for output
+# The 2nd-arg to DOWNLOAD_AS is the file URL to the target file
+WGET_PROG ?= $(shell (command -v wget))
+DOWNLOAD_AS := $(Q)$(WGET_PROG) -O
+ifeq ($(WGET_PROG),)
+    CURL_PROG ?= $(shell (command -v curl))
+    ifeq ($(CURL_PROG),)
+        $(info do NOT found 'curl' and 'wget' for file downloading!)
+        DOWNLOAD_AS := echo
+    else
+    DOWNLOAD_AS := $(Q)$(CURL_PROG) -L -o
+    endif
+endif
+
 ###########################
 # xmake predefined target #
 ###########################

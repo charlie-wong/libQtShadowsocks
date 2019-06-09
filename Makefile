@@ -63,11 +63,11 @@ endif
 
 AstyleRc := $(SOURCE_DIR)/.astylerc
 AstyleRc := $(shell if [ -f $(AstyleRc) ]; then echo "Has"; else echo ""; fi;)
-AstyleUrl:=https://gitlab.com/gkide/prebuild/astyle/raw/master/v3.1/astyle-cpp
+AstyleRcUrl:=https://gitlab.com/gkide/prebuild/astyle/raw/master/v3.1/astyle-cpp
 PHONY += astyle
 astyle:
 ifneq ($(AstyleRc),Has) # download by wget
-	@wget $(AstyleUrl) -O $(SOURCE_DIR)/.astylerc
+	$(DOWNLOAD_AS) $(SOURCE_DIR)/.astylerc $(AstyleRcUrl)
 endif
 ifeq ($(ASTYLE_VERSION),3.1)
 	$(ASTYLE_PROG) $(ASTYLE_ARGS)
