@@ -59,7 +59,7 @@ if(WIN32 OR APPLE)
 endif()
 
 # ShadowSocks Core Library Name
-set(SSCL_NAME "QtShadowSocks")
+set(SSCL_NAME "QtShadowsocks")
 
 add_subdirectory(source/lib)
 add_subdirectory(source/tui)

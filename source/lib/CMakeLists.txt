@@ -10,14 +10,15 @@ file(GLOB CRYPTO_SOURCES crypto/*.cpp)
 file(GLOB NETWORK_HEADERS network/*.h)
 file(GLOB NETWORK_SOURCES network/*.cpp)
 
-list(APPEND SSCL_HEADERS QtShadowsocks
+list(APPEND SSCL_HEADERS
+    QtShadowsocks
     "${TYPES_HEADERS}"
     "${UTILS_HEADERS}"
     "${CRYPTO_HEADERS}"
     "${NETWORK_HEADERS}"
 )
 
-list(APPEND SSCL_SOURCES QtShadowsocks
+list(APPEND SSCL_SOURCES
     "${TYPES_SOURCES}"
     "${UTILS_SOURCES}"
     "${CRYPTO_SOURCES}"
@@ -54,17 +55,17 @@ endif()
 
 # Install ShadowSocks Core Library Headers
 XmakeInstallHelper(FILES "${UTILS_HEADERS}"
-    DESTINATION include/QtShadowsocks/util
+    DESTINATION include/${SSCL_NAME}/util
 )
 XmakeInstallHelper(FILES "${TYPES_HEADERS}"
-    DESTINATION include/QtShadowsocks/types
+    DESTINATION include/${SSCL_NAME}/types
 )
 XmakeInstallHelper(FILES "${CRYPTO_HEADERS}"
-    DESTINATION include/QtShadowsocks/crypto
+    DESTINATION include/${SSCL_NAME}/crypto
 )
 XmakeInstallHelper(FILES "${NETWORK_HEADERS}"
-    DESTINATION include/QtShadowsocks/network
+    DESTINATION include/${SSCL_NAME}/network
 )
-XmakeInstallHelper(FILES "${SSCL_HEADERS}"
-    DESTINATION include/QtShadowsocks
+XmakeInstallHelper(FILES QtShadowsocks
+    DESTINATION include/${SSCL_NAME}/
 )
