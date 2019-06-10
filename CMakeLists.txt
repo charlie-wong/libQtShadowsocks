@@ -24,7 +24,8 @@ endif()
 
 # cmake xmake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(xmake)
+include(xmake.init)
+XmakeInit(${XMAKE_VERSION} ${XMAKE_TARBALL_SHA256})
 
 include(BuildBotan) # botan2 down, extract, build, install and search
 

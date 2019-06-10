@@ -15,5 +15,5 @@ DistRepoInfo
 .astylerc
 
 # Ignore xmake
-#cmake/xmake/
-#cmake/xmake.cmake
+cmake/xmake/
+cmake/xmake.cmake
