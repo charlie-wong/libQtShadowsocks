@@ -1,4 +1,4 @@
-if(NOT SSQTL_BUILD_SSTUI)
+if(NOT SSQT_BUILD_SSTUI)
     return()
 endif()
 

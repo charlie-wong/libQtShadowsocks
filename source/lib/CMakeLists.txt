@@ -1,5 +1,5 @@
-string(REPLACE "v" "" SSQTL_VERSION "${PKG_VERSION}")
-add_definitions(-DQSS_VERSION="${SSQTL_RELEASE_VERSION}")
+string(REPLACE "v" "" SSQT_VERSION "${PKG_VERSION}")
+add_definitions(-DQSS_VERSION="${SSQT_RELEASE_VERSION}")
 
 file(GLOB TYPES_HEADERS types/*.h)
 file(GLOB TYPES_SOURCES types/*.cpp)
@@ -38,13 +38,13 @@ XmakeInstallHelper(TARGETS static_LibQtShadowSocks
     EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network botan-2
 )
 
-if(SSQTL_BUILD_SHARED)
+if(SSQT_BUILD_SHARED)
     add_library(shared_LibQtShadowSocks SHARED ${SSCL_HEADERS} ${SSCL_SOURCES})
     target_link_libraries(shared_LibQtShadowSocks Qt5::Core Qt5::Network)
     set_target_properties(shared_LibQtShadowSocks PROPERTIES
         OUTPUT_NAME "${SSCL_NAME}"
-        VERSION ${SSQTL_VERSION}
-        SOVERSION ${SSQTL_VERSION_MAJOR}
+        VERSION ${SSQT_VERSION}
+        SOVERSION ${SSQT_VERSION_MAJOR}
     )
     add_dependencies(shared_LibQtShadowSocks ${botan2_TARGET})
     XmakeInstallHelper(TARGETS shared_LibQtShadowSocks

@@ -31,7 +31,7 @@ set(botan2_Algorithms
 )
 string(REGEX REPLACE "[ ;]" "" botan2_Algorithms "${botan2_Algorithms}")
 
-if(SSQTL_DBI_BOTAN2)
+if(SSQT_DBI_BOTAN2)
     InstallDepsBotan2()
     set(botan2_TARGET libBotan)
     XmakeDepTarballBuild(${botan2_TARGET}

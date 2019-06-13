@@ -1,25 +1,25 @@
 cmake_minimum_required(VERSION 3.1)
-project(ssqtl) # ShadowSocks Core Library
+project(SSQT) # ShadowSocks Server/Client
 
-set(SSQTL_VERSION_MAJOR 2)
-set(SSQTL_VERSION_MINOR 1)
-set(SSQTL_VERSION_PATCH 0)
+set(SSQT_VERSION_MAJOR 2)
+set(SSQT_VERSION_MINOR 1)
+set(SSQT_VERSION_PATCH 0)
 # Date/SHA1 Build Time Update
-set(SSQTL_VERSION_TWEAK "")
+set(SSQT_VERSION_TWEAK "")
 
-option(SSQTL_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
-option(SSQTL_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
+option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
+option(SSQT_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
 
-option(SSQTL_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
-option(SSQTL_BUILD_SSTUI "Build shadowsocks TUI server/client." ON)
-option(SSQTL_BUILD_SHARED "Build shared shadowsocks core library." ON)
+option(SSQT_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
+option(SSQT_BUILD_SSTUI "Build shadowsocks TUI server/client." ON)
+option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." ON)
 
 # xmake setup configuration for mpack
-option(SSQTL_ENABLE_CI "Enable CI build." OFF)
-option(SSQTL_ENABLE_GCOV "Enable code coverage." ON)
-option(SSQTL_ENABLE_ASSERTION "Enable assertion." ON)
-if(SSQTL_DBI_BOTAN2)
-    option(SSQTL_ENABLE_DEPENDENCY "Enable deps support." ON)
+option(SSQT_ENABLE_CI "Enable CI build." OFF)
+option(SSQT_ENABLE_GCOV "Enable code coverage." ON)
+option(SSQT_ENABLE_ASSERTION "Enable assertion." ON)
+if(SSQT_DBI_BOTAN2)
+    option(SSQT_ENABLE_DEPENDENCY "Enable deps support." ON)
 endif()
 
 # cmake xmake modules
@@ -30,17 +30,17 @@ XmakeInit(${XMAKE_VERSION} ${XMAKE_TARBALL_SHA256})
 include(BuildBotan) # botan2 down, extract, build, install and search
 
 # ShadowSocks Qt5 setup by xmake
-if(SSQTL_AUTOMATIC_QT5)
+if(SSQT_AUTOMATIC_QT5)
     set(AUTOMATIC_QT5 AUTOMATIC)
 else()
-    if(NOT SSQTL_QT5_STATIC_PREFIX AND NOT SSQTL_QT5_SHARED_PREFIX)
+    if(NOT SSQT_QT5_STATIC_PREFIX AND NOT SSQT_QT5_SHARED_PREFIX)
         message(FATAL_ERROR "Qt5 setup error for ShadowSocks Core!")
     endif()
 endif()
 
 XmakeQt5SupportSetup(${AUTOMATIC_QT5}
-    STATIC_PREFIX ${SSQTL_QT5_STATIC_PREFIX}
-    SHARED_PREFIX ${SSQTL_QT5_SHARED_PREFIX}
+    STATIC_PREFIX ${SSQT_QT5_STATIC_PREFIX}
+    SHARED_PREFIX ${SSQT_QT5_SHARED_PREFIX}
     FATAL_ERROR_IF_NOT_FOUND
 )
 
@@ -65,7 +65,7 @@ set(SSCL_NAME "QtShadowsocks")
 add_subdirectory(source/lib)
 add_subdirectory(source/tui)
 
-if(SSQTL_BUILD_TEST)
+if(SSQT_BUILD_TEST)
     find_package(Qt5Test)
     if(Qt5Test_FOUND)
         # enable_testing() has to be in the root CMakeLists.txt

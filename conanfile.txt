@@ -1,7 +1,0 @@
-[requires]
-botan/2.7.0@bincrafters/stable
-
-[options]
-
-[generators]
-cmake
