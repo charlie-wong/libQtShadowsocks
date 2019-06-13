@@ -62,7 +62,9 @@ endif()
 # ShadowSocks Core Library Name
 set(SSCL_NAME "QtShadowsocks")
 
-add_subdirectory(source/lib)
+add_subdirectory(source/core)
+include_directories(${PROJECT_SOURCE_DIR}/source/core)
+
 add_subdirectory(source/tui)
 
 if(SSQT_BUILD_TEST)

@@ -1,5 +1,3 @@
-include_directories(${PROJECT_SOURCE_DIR}/source/lib)
-
 macro(qss_add_test component)
     set(tname "test-${component}")
     set(tprog "test-${component}")
