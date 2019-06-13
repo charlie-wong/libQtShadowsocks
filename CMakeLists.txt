@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 project(SSQT) # ShadowSocks Server/Client
 
-set(SSQT_VERSION_MAJOR 2)
-set(SSQT_VERSION_MINOR 1)
+set(SSQT_VERSION_MAJOR 3)
+set(SSQT_VERSION_MINOR 0)
 set(SSQT_VERSION_PATCH 0)
-# Date/SHA1 Build Time Update
-set(SSQT_VERSION_TWEAK "")
+set(SSQT_VERSION_TWEAK "") # Date/SHA1 Build Time Update
 
 option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
 option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" ON)
@@ -30,7 +29,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(xmake.init)
 XmakeInit(${XMAKE_VERSION} ${XMAKE_TARBALL_SHA256})
 
-# botan2 down, extract, build, install and search
+string(REPLACE "v" "" SSQT_VERSION_MMP "${PKG_VERSION}")
+add_definitions(-DSSQT_RELEASE_VERSION="${SSQT_RELEASE_VERSION}")
+
+# Down, Extract, Build, Install and Search
 include(BuildBotan)
 include(BuildQrencode)
 
@@ -39,7 +41,7 @@ if(SSQT_AUTOMATIC_QT5)
     set(AUTOMATIC_QT5 AUTOMATIC)
 else()
     if(NOT SSQT_QT5_STATIC_PREFIX AND NOT SSQT_QT5_SHARED_PREFIX)
-        message(FATAL_ERROR "Qt5 setup error for ShadowSocks Core!")
+        message(FATAL_ERROR "Qt5 setup error for ShadowSocks!")
     endif()
 endif()
 
@@ -63,9 +65,14 @@ find_package(Qt5Gui 5.6 REQUIRED)
 find_package(Qt5Core 5.6 REQUIRED)
 find_package(Qt5Widgets 5.6 REQUIRED)
 find_package(Qt5Network 5.6 REQUIRED)
+
 if(UNIX AND NOT APPLE)
     find_package(Qt5DBus 5.6 REQUIRED)
 endif()
+
+#message(STATUS "Qt5Core_VERSION=${Qt5Core_VERSION}")
+#message(STATUS "Qt5Core_LIBRARIES=${Qt5Core_LIBRARIES}")
+#message(STATUS "Qt5Core_INCLUDE_DIRS=${Qt5Core_INCLUDE_DIRS}")
 
 add_subdirectory(source/core)
 include_directories(${PROJECT_SOURCE_DIR}/source/core)
@@ -79,6 +86,11 @@ endif()
 if(SSQT_BUILD_TUI)
     add_subdirectory(source/tui)
 endif()
+
+if(SSQT_BUILD_GUI)
+    add_subdirectory(source/gui)
+endif()
+
 
 if(SSQT_BUILD_TEST)
     find_package(Qt5Test)

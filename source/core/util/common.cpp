@@ -20,7 +20,7 @@ const uint8_t Common::ADDRESS_MASK = 0b00001111; // 0xf
 
 const char *Common::version()
 {
-    return QSS_VERSION;
+    return SSQT_RELEASE_VERSION;
 }
 
 // pack a shadowsocks header

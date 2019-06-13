@@ -10,9 +10,8 @@ if(SSQT_DBI_QRENCODE)
         BUILD_CMD   ${MAKE_PROG}
         INSTALL_CMD ${MAKE_PROG} install
     )
-    set(qrencode_LIBRARIES -L${DEPS_INSTALL_DIR}/lib qrencode)
-    set(qrencode_LIBRARIES ${DEPS_INSTALL_DIR}/lib/libqrencode.so)
     set(qrencode_INCLUDE_DIRS ${DEPS_INSTALL_DIR}/include)
+    set(qrencode_LIBRARIES -L${DEPS_INSTALL_DIR}/lib -lqrencode)
 else()
     # Try to find the libqrencode library
     XmakeSearchLibrary(PREFIX qrencode
@@ -21,5 +20,5 @@ else()
     )
 endif()
 
-message(STATUS "qrencode_LIBRARIES=${qrencode_LIBRARIES}")
-message(STATUS "qrencode_INCLUDE_DIRS=${qrencode_INCLUDE_DIRS}")
+#message(STATUS "qrencode_LIBRARIES=${qrencode_LIBRARIES}")
+#message(STATUS "qrencode_INCLUDE_DIRS=${qrencode_INCLUDE_DIRS}")

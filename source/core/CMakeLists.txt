@@ -1,9 +1,6 @@
 # ShadowSocks Core Library Name
 set(SSCL_NAME "QtShadowsocks")
 
-string(REPLACE "v" "" SSQT_VERSION "${PKG_VERSION}")
-add_definitions(-DQSS_VERSION="${SSQT_RELEASE_VERSION}")
-
 file(GLOB TYPES_HEADERS types/*.h)
 file(GLOB TYPES_SOURCES types/*.cpp)
 file(GLOB UTILS_HEADERS util/*.h)
@@ -46,7 +43,7 @@ if(SSQT_BUILD_SHARED)
     target_link_libraries(shared_LibQtShadowSocks Qt5::Core Qt5::Network)
     set_target_properties(shared_LibQtShadowSocks PROPERTIES
         OUTPUT_NAME "${SSCL_NAME}"
-        VERSION ${SSQT_VERSION}
+        VERSION ${SSQT_VERSION_MMP}
         SOVERSION ${SSQT_VERSION_MAJOR}
     )
     add_dependencies(shared_LibQtShadowSocks ${botan2_TARGET})
