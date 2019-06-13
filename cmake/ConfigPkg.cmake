@@ -11,8 +11,8 @@ set(PKG_BRIEF_SUMMARY "The ShadowSocks TUI/GUI Client & Server")
 set(PKG_VENDOR "ShadowSocks")
 set(PKG_LOGO ${CMAKE_SOURCE_DIR}/shadowsocks.png)
 
-set(PKG_REPO "https://github.com/charlie-wong/ShadowSocks")
-set(PKG_BUG_REPORT "https://github.com/charlie-wong/ShadowSocks/issues")
+set(PKG_REPO "https://github.com/charlie-wong/ShadowSocksQt")
+set(PKG_BUG_REPORT "https://github.com/charlie-wong/ShadowSocksQt/issues")
 set(PKG_MAINTAINER_EMAIL "Charlie WONG <1213charlie@163.com>")
 
 #set(PKG_DOC_HELP)
