@@ -49,13 +49,6 @@ XmakeQt5SupportSetup(${AUTOMATIC_QT5}
     FATAL_ERROR_IF_NOT_FOUND
 )
 
-# Find Qt5 library
-# https://doc.qt.io/qt-5/cmake-manual.html#variable-reference
-find_package(Qt5Gui 5.5 REQUIRED)
-find_package(Qt5Core 5.5 REQUIRED)
-find_package(Qt5Widgets 5.5 REQUIRED)
-find_package(Qt5Network 5.5 REQUIRED)
-
 # C++ 14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -64,8 +57,15 @@ if(WIN32 OR APPLE)
     add_definitions(-DFD_SETSIZE=1024)
 endif()
 
-# ShadowSocks Core Library Name
-set(SSCL_NAME "QtShadowsocks")
+# Find Qt5 library
+# https://doc.qt.io/qt-5/cmake-manual.html#variable-reference
+find_package(Qt5Gui 5.6 REQUIRED)
+find_package(Qt5Core 5.6 REQUIRED)
+find_package(Qt5Widgets 5.6 REQUIRED)
+find_package(Qt5Network 5.6 REQUIRED)
+if(UNIX AND NOT APPLE)
+    find_package(Qt5DBus 5.6 REQUIRED)
+endif()
 
 add_subdirectory(source/core)
 include_directories(${PROJECT_SOURCE_DIR}/source/core)

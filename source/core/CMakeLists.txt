@@ -1,3 +1,6 @@
+# ShadowSocks Core Library Name
+set(SSCL_NAME "QtShadowsocks")
+
 string(REPLACE "v" "" SSQT_VERSION "${PKG_VERSION}")
 add_definitions(-DQSS_VERSION="${SSQT_RELEASE_VERSION}")
 
