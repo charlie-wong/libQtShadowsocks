@@ -2,10 +2,10 @@ macro(qss_add_test component)
     set(tname "test-${component}")
     set(tprog "test-${component}")
     add_executable(${tprog} ${component}.cpp)
-    add_dependencies(${tprog} shared_LibQtShadowSocks)
+    add_dependencies(${tprog} ${SSQT_CoreLib})
     target_link_libraries(${tprog}
         Qt5::Core Qt5::Network Qt5::Test
-        shared_LibQtShadowSocks ${botan2_LIBRARIES} #--verbose
+        ${SSQT_CoreLib} ${botan2_LIBRARIES} #--verbose
     )
     add_test(NAME ${tname} COMMAND $<TARGET_FILE:${tprog}>)
 endmacro()

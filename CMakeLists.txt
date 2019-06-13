@@ -8,10 +8,13 @@ set(SSQT_VERSION_PATCH 0)
 set(SSQT_VERSION_TWEAK "")
 
 option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
+option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" ON)
 option(SSQT_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
 
+option(SSQT_BUILD_TUI "Build shadowsocks TUI server/client." ON)
+option(SSQT_BUILD_GUI "Build shadowsocks TUI server/client." ON)
+
 option(SSQT_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
-option(SSQT_BUILD_SSTUI "Build shadowsocks TUI server/client." ON)
 option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." ON)
 
 # xmake setup configuration for mpack
@@ -27,7 +30,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(xmake.init)
 XmakeInit(${XMAKE_VERSION} ${XMAKE_TARBALL_SHA256})
 
-include(BuildBotan) # botan2 down, extract, build, install and search
+# botan2 down, extract, build, install and search
+include(BuildBotan)
+include(BuildQrencode)
 
 # ShadowSocks Qt5 setup by xmake
 if(SSQT_AUTOMATIC_QT5)
@@ -65,7 +70,15 @@ set(SSCL_NAME "QtShadowsocks")
 add_subdirectory(source/core)
 include_directories(${PROJECT_SOURCE_DIR}/source/core)
 
-add_subdirectory(source/tui)
+# Use static shadowSocks core library by default
+set(SSQT_CoreLib static_LibQtShadowSocks)
+if(SSQT_BUILD_SHARED)
+    set(SSQT_CoreLib shared_LibQtShadowSocks)
+endif()
+
+if(SSQT_BUILD_TUI)
+    add_subdirectory(source/tui)
+endif()
 
 if(SSQT_BUILD_TEST)
     find_package(Qt5Test)

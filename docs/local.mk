@@ -33,11 +33,20 @@
 
 # Skip botan2 download/build/install, try to used the system one
 #EXTRA_CMAKE_ARGS += -DSSQT_DBI_BOTAN2=OFF
+#
+# Skip libqrencode download/build/install, try to used the system one
+#EXTRA_CMAKE_ARGS += -DSSQT_DBI_QRENCODE=OFF
+#
 # Build shadowsocks Qt5 testing case.
 #EXTRA_CMAKE_ARGS += -DSSQT_BUILD_TEST=OFF
+#
 # Build shadowsocks TUI server/client.
-#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_SSTUI=OFF
-# Build shared shadowsocks core library.
+#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_TUI=OFF
+#
+# Build shadowsocks GUI server/client.
+#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_GUI=OFF
+#
+# Build & use shared shadowsocks core library.
 #EXTRA_CMAKE_ARGS += -DSSQT_BUILD_SHARED=OFF
 
 #ASTYLE_PROG := /usr/bin/astyle
