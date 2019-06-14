@@ -2,24 +2,11 @@
 # https://github.com/randombit/botan
 # https://botan.randombit.net/manual/contents.html
 
-# If build the full botan library, it takes
-# too long time, so just build the needed ones
-# for details, run $ configure.py --list-modules
-set(botan2_Algorithms
-    "aes, md5, sha1, hmac, hkdf, rng, auto_rng, dev_random, win32_stats,"
-    "filters, shake_cipher"
-)
-string(REGEX REPLACE "[ ;]" "" botan2_Algorithms "${botan2_Algorithms}")
-
-message(STATUS "HOST_ARCH_32=${HOST_ARCH_32}")
-message(STATUS "HOST_ARCH_64=${HOST_ARCH_64}")
-if(HOST_WINDOWS_MSYS OR HOST_WINDOWS_MINGW)
-    set(botan_EXTRA_ARGS --cc=gcc --cpu=x86)
-    if(HOST_ARCH_64)
-        set(botan_EXTRA_ARGS --cc=gcc --cpu=x86_64
-            --disable-modules=tls
-        )
-    endif()
+list(APPEND botan_CONFIG_ARGS --cc=gcc)
+if(HOST_ARCH_32)
+    list(APPEND botan_CONFIG_ARGS --cpu=x86)
+else()
+    list(APPEND botan_CONFIG_ARGS --cpu=x86_64)
 endif()
 
 if(SSQT_DBI_BOTAN2)
@@ -28,13 +15,11 @@ if(SSQT_DBI_BOTAN2)
         VERSION     2.10.0
         URL         https://github.com/randombit/botan/archive/2.10.0.tar.gz
         SHA256      b5f27e65e733fb43c0802aef8f86ff981eb47bcfeafbf085233a3e4046e3cba8
-        CONFIG_CMD  ${DEPS_BUILD_DIR}/libBotan/configure.py ${botan_EXTRA_ARGS}
+        CONFIG_CMD  ${DEPS_BUILD_DIR}/libBotan/configure.py
+            ${botan_CONFIG_ARGS}
             --optimize-for-size
             --without-documentation
             --disable-shared-library
-            # TODO just build the needed algorithms modules to speedup
-            #--minimized-build # build the most core algorithms modules
-            #--enable-modules=${botan2_Algorithms} # extra algorithms modules
             --prefix=${DEPS_INSTALL_DIR}
         BUILD_CMD   ${MAKE_PROG} libs # just build the library
         INSTALL_CMD ${MAKE_PROG} install

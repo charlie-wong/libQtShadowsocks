@@ -13,6 +13,25 @@ Introduction
 Written in C++ using Qt5 framework and [Botan](https://github.com/randombit/botan) library,
 the required [Qt5](http://download.qt.io/official_releases/qt) version is 5.6 or later.
 
+Building
+--------
+
+Dependencies
+- [botan](https://github.com/randombit/botan)
+  * $ pacman -S mingw-w64-i686-libbotan2.10.0-1
+  * $ pacman -S mingw-w64-x86_64-libbotan2.10.0-1
+
+- [bzar](http://zbar.sourceforge.net/)
+  * $ sudo apt install libzbar-dev
+
+- [libqrencode](https://fukuchi.org/works/qrencode)
+  * $ sudo apt install libqrencode-dev
+
+- [Qt]http://download.qt.io/official_releases/qt 5.6 or later
+  * $ pacman -S mingw-w64-i686-qt5
+  * $ pacman -S mingw-w64-i686-qt5-static
+  * $ pacman -S mingw-w64-x86_64-qt5
+  * $ pacman -S mingw-w64-x86_64-qt5-static
 
 License
 -------
