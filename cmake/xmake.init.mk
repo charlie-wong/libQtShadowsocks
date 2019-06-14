@@ -12,12 +12,12 @@ TAR ?= $(shell (command -v tar))
 XmakeTarball := xmake-$(XmakeVersion).tar.gz
 UNTGZ := $(TAR) -xvf $(XmakeTarball)
 ifeq ($(TAR),)
+    UNTGZ :=
     UNZIP ?= $(shell (command -v unzip))
-    ifeq ($(UNZIP),)
-        $(error do NOT found 'tar' and 'unzip', xmake init STOP.)
+    ifneq ($(UNZIP),)
+        XmakeTarball := xmake-$(XmakeVersion).zip
+        UNTGZ := $(UNZIP) $(XmakeTarball)
     endif
-    XmakeTarball := xmake-$(XmakeVersion).zip
-    UNTGZ := $(UNZIP) $(XmakeTarball)
 endif
 
 # curl/wget tools for download the xmake tarball
@@ -58,6 +58,9 @@ ifeq ($(XmakeInitBy),CmakeGitClone)
 	mkdir -p $(BUILD_DIR) && cd $(BUILD_DIR) && $(CMAKE_PROG) -G $(GENERATOR) $(CMAKE_ARGS)
 	rm -rf $(BUILD_DIR)/CMakeCache.txt # cmake config maybe not correct
 else
+ifeq ($(UNTGZ),)
+	@echo "do NOT found 'tar' and 'unzip', xmake init STOP"
+endif
 	CMAKE="$(PWD)/cmake"; mkdir -p $${CMAKE} && cd $${CMAKE} && $(FETCH) \
 	$(XmakeDownloadUrl)/$(XmakeVersion)/$(XmakeTarball) && $(UNTGZ) && \
 	mv xmake-$(XmakeVersion)/cmake/* ./ && rm -rf xmake-$(XmakeVersion)*

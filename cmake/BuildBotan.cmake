@@ -11,13 +11,24 @@ set(botan2_Algorithms
 )
 string(REGEX REPLACE "[ ;]" "" botan2_Algorithms "${botan2_Algorithms}")
 
+message(STATUS "HOST_ARCH_32=${HOST_ARCH_32}")
+message(STATUS "HOST_ARCH_64=${HOST_ARCH_64}")
+if(HOST_WINDOWS_MSYS OR HOST_WINDOWS_MINGW)
+    set(botan_EXTRA_ARGS --cc=gcc --cpu=x86)
+    if(HOST_ARCH_64)
+        set(botan_EXTRA_ARGS --cc=gcc --cpu=x86_64
+            --disable-modules=tls
+        )
+    endif()
+endif()
+
 if(SSQT_DBI_BOTAN2)
     set(botan2_TARGET libBotan)
     XmakeDepTarballBuild(${botan2_TARGET}
         VERSION     2.10.0
         URL         https://github.com/randombit/botan/archive/2.10.0.tar.gz
         SHA256      b5f27e65e733fb43c0802aef8f86ff981eb47bcfeafbf085233a3e4046e3cba8
-        CONFIG_CMD  ${DEPS_BUILD_DIR}/libBotan/configure.py
+        CONFIG_CMD  ${DEPS_BUILD_DIR}/libBotan/configure.py ${botan_EXTRA_ARGS}
             --optimize-for-size
             --without-documentation
             --disable-shared-library

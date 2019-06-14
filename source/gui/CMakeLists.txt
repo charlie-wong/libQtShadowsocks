@@ -2,6 +2,9 @@
 set(APP_NAME "shadowsocks-gui")
 
 find_package(PkgConfig)
+# MinGW
+# - $ pacman -S mingw-w64-i686-zbar
+# - $ pacman -S mingw-w64-x86_64-zbar
 pkg_check_modules(zbar REQUIRED zbar)
 
 file(GLOB SSGUI_HEADERS *.h)
