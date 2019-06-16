@@ -118,11 +118,11 @@ bool QtSsTui::start(void)
     if(!server_mode) {
         QSS::Address server(m_profile.serverAddress(), m_profile.serverPort());
         server.blockingLookUp();
-        m_tester.reset(new QSS::Connectivity(server.getFirstIP(),
+        m_conn.reset(new QSS::Connectivity(server.getFirstIP(),
             server.getPort())
         );
 
-        QObject::connect(m_tester.get(), &QSS::Connectivity::connectivityFinished,
+        QObject::connect(m_conn.get(), &QSS::Connectivity::connectivityFinished,
         [](bool c) {
             if(c) {
                 QDebug(QtMsgType::QtInfoMsg) << "The shadowsocks connection is okay.";
@@ -134,13 +134,13 @@ bool QtSsTui::start(void)
             }
         });
 
-        QObject::connect(m_tester.get(), &QSS::Connectivity::testErrorString,
+        QObject::connect(m_conn.get(), &QSS::Connectivity::testErrorString,
         [](const QString & error) {
             QDebug(QtMsgType::QtWarningMsg).noquote()
                 << "Connectivity testing error:" << error;
         });
 
-        m_tester->startConnectivityTest(m_profile.method(), m_profile.password());
+        m_conn->startConnectivityTest(m_profile.method(), m_profile.password());
     }
 
     return m_ctrl->start();

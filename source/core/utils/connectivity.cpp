@@ -4,7 +4,7 @@
 
 #include "common.h"
 #include "connectivity.h"
-#include "types/address.h"
+#include "network/address.h"
 #include "crypto/encryptor.h"
 
 namespace QSS {

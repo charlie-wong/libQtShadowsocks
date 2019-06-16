@@ -1,7 +1,7 @@
 // This is partly ported from Botan::ChaCha
 
-#ifndef CHACHA_H
-#define CHACHA_H
+#ifndef CRYPTO_CHACHA_H
+#define CRYPTO_CHACHA_H
 
 #include <string>
 #include <vector>
@@ -31,6 +31,6 @@ private:
     void setIV(const std::string &_iv);
 };
 
-}
+} // namespace QSS
 
-#endif // CHACHA_H
+#endif // CRYPTO_CHACHA_H

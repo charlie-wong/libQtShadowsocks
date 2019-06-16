@@ -1,5 +1,5 @@
-#ifndef TCPRELAYSERVER_H
-#define TCPRELAYSERVER_H
+#ifndef NETWORK_TCPRELAYSERVER_H
+#define NETWORK_TCPRELAYSERVER_H
 
 #include "tcprelay.h"
 
@@ -23,4 +23,4 @@ protected:
 
 } // namespace QSS
 
-#endif // TCPRELAYSERVER_H
+#endif // NETWORK_TCPRELAYSERVER_H

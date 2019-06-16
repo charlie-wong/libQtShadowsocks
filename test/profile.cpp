@@ -1,4 +1,4 @@
-#include "types/profile.h"
+#include "utils/profile.h"
 
 #include <QString>
 #include <QtTest>

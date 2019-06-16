@@ -33,7 +33,7 @@ private:
     WorkMode m_work_mode;
     QSS::Profile m_profile;
     std::unique_ptr<QSS::Controller> m_ctrl;
-    std::unique_ptr<QSS::Connectivity> m_tester;
+    std::unique_ptr<QSS::Connectivity> m_conn;
 };
 
 #endif // TUI_TUI_H

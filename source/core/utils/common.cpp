@@ -1,13 +1,13 @@
-#include "common.h"
-#include "types/address.h"
-
-#include <QHostInfo>
-#include <QtEndian>
-
 #include <mutex>
 #include <random>
 #include <sstream>
 #include <vector>
+
+#include <QHostInfo>
+#include <QtEndian>
+
+#include "utils/common.h"
+#include "network/address.h"
 
 namespace {
 std::vector<QHostAddress> bannedAddresses;

@@ -1,11 +1,12 @@
-#ifndef UDPRELAY_H
-#define UDPRELAY_H
+#ifndef NETWORK_UDPRELAY_H
+#define NETWORK_UDPRELAY_H
 
+#include <map>
 #include <QObject>
 #include <QUdpSocket>
 #include <QHostAddress>
-#include <map>
-#include "types/address.h"
+
+#include "network/address.h"
 #include "crypto/encryptor.h"
 
 namespace QSS {
@@ -50,4 +51,4 @@ private slots:
 
 } // namespace QSS
 
-#endif // UDPRELAY_H
+#endif // NETWORK_UDPRELAY_H

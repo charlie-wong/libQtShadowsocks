@@ -1,5 +1,5 @@
-#ifndef PROFILE_H
-#define PROFILE_H
+#ifndef UTILS_PROFILE_H
+#define UTILS_PROFILE_H
 
 #include <string>
 #include <cstdint>
@@ -61,8 +61,8 @@ public:
     static Profile fromUri(const std::string &);
 
 private:
-    std::unique_ptr<ProfilePrivate>
-    d_private; // For future extension (to keep ABI compatible)
+    // For future extension, keep ABI compatible
+    std::unique_ptr<ProfilePrivate> d_private;
 
     // Essential data are stored directly as members in this class. Don't
     // remove or change any these members, which would break ABI compatiblity
@@ -77,4 +77,4 @@ private:
 };
 
 }
-#endif // PROFILE_H
+#endif // UTILS_PROFILE_H
