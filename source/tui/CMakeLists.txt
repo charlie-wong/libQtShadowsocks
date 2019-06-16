@@ -1,6 +1,9 @@
 file(GLOB SSTUI_HEADERS *.h)
 file(GLOB SSTUI_SOURCES *.cpp)
 
+list(APPEND SSTUI_HEADERS ${CONFIG_HEADERS})
+list(APPEND SSTUI_SOURCES ${CONFIG_SOURCES})
+
 # Shadowsocks Client/Server TUI Name
 set(APP_NAME "shadowsocks-tui")
 

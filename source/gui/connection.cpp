@@ -97,11 +97,16 @@ void Connection::stop()
 
 void Connection::testAddressLatency(const QHostAddress &addr)
 {
-    QSS::Connectivity *addrTester = new QSS::Connectivity(addr, profile.serverPort, this);
-    connect(addrTester, &QSS::Connectivity::connectivityFinished, this, &Connection::onConnectivityTestFinished, Qt::QueuedConnection);
-    connect(addrTester, &QSS::Connectivity::lagTestFinished, this, &Connection::onLatencyAvailable, Qt::QueuedConnection);
+    QSS::Connectivity *addrTester =
+        new QSS::Connectivity(addr, profile.serverPort, this);
+    connect(addrTester, &QSS::Connectivity::connTestFinished,
+        this, &Connection::onConnectivityTestFinished, Qt::QueuedConnection
+    );
+    connect(addrTester, &QSS::Connectivity::lagTestFinished,
+        this, &Connection::onLatencyAvailable, Qt::QueuedConnection
+    );
     QSS::Profile qProfile = profile.toProfile();
-    addrTester->startConnectivityTest(qProfile.method(), qProfile.password());
+    addrTester->connTestStart(qProfile.method(), qProfile.password());
 }
 
 void Connection::onNewBytesTransmitted(const quint64 &b)

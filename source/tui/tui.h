@@ -6,7 +6,7 @@
 class QtSsTui {
 public:
     QtSsTui();
-    bool readConfig(const QString &);
+    bool parseConfigJson(const QString &);
 
     void setup(const QString &remote_addr,
         const QString &remote_port,
@@ -19,18 +19,12 @@ public:
     );
 
     bool start(void);
-
-    enum WorkMode { SERVER, CLIENT };
-
-    void setAutoBan(bool ban);
     void setHttpMode(bool http);
-    void setWorkMode(WorkMode mode);
     const std::string &getMethod() const;
+    void setWorkMode(QSS::Profile::WorkMode mode);
 private:
     bool headerTest();
 
-    bool autoBan;
-    WorkMode m_work_mode;
     QSS::Profile m_profile;
     std::unique_ptr<QSS::Controller> m_ctrl;
     std::unique_ptr<QSS::Connectivity> m_conn;

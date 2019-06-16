@@ -35,7 +35,8 @@ Profile::Profile(const Profile &b) :
 }
 
 Profile::Profile(Profile &&b) :
-    d_private(std::move(b.d_private))
+    m_work_mode(WorkMode::CLIENT)
+    , d_private(std::move(b.d_private))
     , d_name(std::move(b.d_name))
     , d_method(std::move(b.d_method))
     , d_password(std::move(b.d_password))
@@ -51,6 +52,14 @@ Profile::Profile(Profile &&b) :
 Profile::~Profile()
 {
     // Nothing Todo
+}
+
+Profile::WorkMode Profile::getWorkMode(void) {
+    return m_work_mode;
+}
+
+void Profile::setWorkMode(WorkMode mode) {
+    m_work_mode = mode;
 }
 
 const std::string &Profile::name() const
