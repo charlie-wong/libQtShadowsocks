@@ -5,14 +5,14 @@
 #include <QJsonObject>
 #include <QCoreApplication>
 
-#include "client.h"
+#include "tui.h"
 
-Client::Client() : autoBan(false), m_work_mode(CLIENT)
+QtSsTui::QtSsTui() : autoBan(false), m_work_mode(CLIENT)
 {
     // Nothing Todo
 }
 
-bool Client::readConfig(const QString &file)
+bool QtSsTui::readConfig(const QString &file)
 {
     QFile config(file);
 
@@ -65,7 +65,7 @@ bool Client::readConfig(const QString &file)
     return true;
 }
 
-void Client::setup(const QString &remote_addr, const QString &remote_port,
+void QtSsTui::setup(const QString &remote_addr, const QString &remote_port,
     const QString &local_addr, const QString &local_port,
     const QString &password, const QString &method,
     const QString &timeout, const bool http_proxy)
@@ -80,21 +80,21 @@ void Client::setup(const QString &remote_addr, const QString &remote_port,
     m_profile.setHttpProxy(http_proxy);
 }
 
-void Client::setAutoBan(bool ban)
+void QtSsTui::setAutoBan(bool ban)
 {
     autoBan = ban;
 }
 
-void Client::setHttpMode(bool http)
+void QtSsTui::setHttpMode(bool http)
 {
     m_profile.setHttpProxy(http);
 }
 
-void Client::setWorkMode(WorkMode mode) {
+void QtSsTui::setWorkMode(WorkMode mode) {
     m_work_mode = mode;
 }
 
-bool Client::start(void)
+bool QtSsTui::start(void)
 {
     if(m_profile.debug()) {
         if(!headerTest()) {
@@ -146,7 +146,7 @@ bool Client::start(void)
     return m_ctrl->start();
 }
 
-bool Client::headerTest()
+bool QtSsTui::headerTest()
 {
     int length;
     QHostAddress test_addr("1.2.3.4");
@@ -179,7 +179,7 @@ bool Client::headerTest()
     return success & success2;
 }
 
-const std::string &Client::getMethod() const
+const std::string &QtSsTui::getMethod() const
 {
     return m_profile.method();
 }

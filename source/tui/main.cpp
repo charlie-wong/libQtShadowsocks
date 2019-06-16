@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 
-#include "client.h"
+#include "tui.h"
 #include "utils.h"
 
 using namespace QSS;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     parser.addOption(autoBan);
     parser.process(app);
 
-    Client c;
+    QtSsTui c;
     Utils::logLevel = stringToLogLevel(parser.value(log));
 
     QString jsonConfig = parser.value(configFile);
@@ -152,11 +152,11 @@ int main(int argc, char *argv[])
     }
 
     if(parser.isSet(serverMode)) {
-        c.setWorkMode(Client::WorkMode::SERVER);
+        c.setWorkMode(QtSsTui::WorkMode::SERVER);
     }
 
     if(parser.isSet(clientMode)) {
-        c.setWorkMode(Client::WorkMode::CLIENT);
+        c.setWorkMode(QtSsTui::WorkMode::CLIENT);
     }
 
     if(parser.isSet(testSpeed)) {

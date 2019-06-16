@@ -1,11 +1,11 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef TUI_TUI_H
+#define TUI_TUI_H
 
 #include <QtShadowsocks>
 
-class Client {
+class QtSsTui {
 public:
-    Client();
+    QtSsTui();
     bool readConfig(const QString &);
 
     void setup(const QString &remote_addr,
@@ -36,4 +36,4 @@ private:
     std::unique_ptr<QSS::Connectivity> m_tester;
 };
 
-#endif // CLIENT_H
+#endif // TUI_TUI_H

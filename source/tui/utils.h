@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef TUI_UTILS_H
+#define TUI_UTILS_H
 
 #include <QtGlobal>
 #include <QStringList>
@@ -23,4 +23,4 @@ struct Utils {
     static LogLevel logLevel;
 };
 
-#endif // UTILS_H
+#endif // TUI_UTILS_H
