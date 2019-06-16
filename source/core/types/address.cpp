@@ -1,7 +1,7 @@
 // Communicate with lower-level encrytion library
 
 #include "address.h"
-#include "util/common.h"
+#include "utils/common.h"
 
 namespace  QSS {
 

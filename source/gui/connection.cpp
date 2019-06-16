@@ -97,9 +97,9 @@ void Connection::stop()
 
 void Connection::testAddressLatency(const QHostAddress &addr)
 {
-    QSS::AddressTester *addrTester = new QSS::AddressTester(addr, profile.serverPort, this);
-    connect(addrTester, &QSS::AddressTester::connectivityTestFinished, this, &Connection::onConnectivityTestFinished, Qt::QueuedConnection);
-    connect(addrTester, &QSS::AddressTester::lagTestFinished, this, &Connection::onLatencyAvailable, Qt::QueuedConnection);
+    QSS::Connectivity *addrTester = new QSS::Connectivity(addr, profile.serverPort, this);
+    connect(addrTester, &QSS::Connectivity::connectivityFinished, this, &Connection::onConnectivityTestFinished, Qt::QueuedConnection);
+    connect(addrTester, &QSS::Connectivity::lagTestFinished, this, &Connection::onLatencyAvailable, Qt::QueuedConnection);
     QSS::Profile qProfile = profile.toProfile();
     addrTester->startConnectivityTest(qProfile.method(), qProfile.password());
 }
@@ -128,11 +128,15 @@ void Connection::onLatencyAvailable(const int latency)
 
 void Connection::onConnectivityTestFinished(bool con)
 {
-    QSS::AddressTester* tester = qobject_cast<QSS::AddressTester*>(sender());
+    QSS::Connectivity* tester = qobject_cast<QSS::Connectivity*>(sender());
     if (!con) {
-        disconnect(tester, &QSS::AddressTester::lagTestFinished, this, &Connection::onLatencyAvailable);
+        disconnect(tester, &QSS::Connectivity::lagTestFinished,
+            this, &Connection::onLatencyAvailable
+        );
         this->onLatencyAvailable(SQProfile::LATENCY_ERROR);
-        qWarning("Internet connectivity test failed. Please check the connection's profile and your firewall settings.");
+        qWarning("Internet connectivity test failed. "
+            "Please check the connection's profile and your firewall settings."
+        );
     }
     tester->deleteLater();
 }

@@ -1,7 +1,8 @@
+#include <QtTest>
+
+#include "utils/common.h"
 #include "crypto/cipher.h"
 #include "crypto/chacha.h"
-#include "util/common.h"
-#include <QtTest>
 
 class ChaCha : public QObject {
     Q_OBJECT

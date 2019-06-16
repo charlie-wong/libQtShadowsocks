@@ -93,7 +93,7 @@ void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model, const QStrin
              */
             p.name = json["profile"].toString();
             p.serverPort = json["server_port"].toString().toUShort();
-            p.localAddress = json["local_address"].toString();
+            p.localAddress = json["local"].toString();
             p.localPort = json["local_port"].toString().toUShort();
             p.timeout = json["timeout"].toString().toInt();
         }
@@ -167,7 +167,7 @@ Connection* ConfigHelper::configJsonToConnection(const QString &file)
     SQProfile p;
     p.serverAddress = configObj["server"].toString();
     p.serverPort = configObj["server_port"].toInt();
-    p.localAddress = configObj["local_address"].toString();
+    p.localAddress = configObj["local"].toString();
     p.localPort = configObj["local_port"].toInt();
     p.method = configObj["method"].toString();
     p.password = configObj["password"].toString();

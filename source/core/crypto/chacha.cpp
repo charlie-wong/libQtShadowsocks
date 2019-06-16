@@ -1,8 +1,10 @@
-#include "chacha.h"
-#include "util/common.h"
+#include <stdexcept>
+
 #include <botan/loadstor.h>
 #include <botan/rotate.h>
-#include <stdexcept>
+
+#include "chacha.h"
+#include "utils/common.h"
 
 using namespace QSS;
 using namespace Botan;

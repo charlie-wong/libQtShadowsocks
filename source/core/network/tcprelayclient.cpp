@@ -1,7 +1,8 @@
-#include "tcprelayclient.h"
-#include "util/common.h"
 #include <QDebug>
 #include <utility>
+
+#include "utils/common.h"
+#include "tcprelayclient.h"
 
 namespace QSS {
 

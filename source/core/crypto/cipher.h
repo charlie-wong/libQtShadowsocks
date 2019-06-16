@@ -12,7 +12,7 @@
 #include <memory>
 #include "rc4.h"
 #include "chacha.h"
-#include "util/export.h"
+#include "utils/export.h"
 
 namespace Botan {
 class KDF;

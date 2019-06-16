@@ -1,13 +1,16 @@
-#include <QCoreApplication>
-#include <QCommandLineParser>
 #include <signal.h>
 #include <iostream>
+
+#include <QDir>
+#include <QCoreApplication>
+#include <QCommandLineParser>
+
 #include "client.h"
 #include "utils.h"
 
 using namespace QSS;
 
-static void onSIGINT_TERM(int sig)
+static void on_SIGINT_SIGTERM(int sig)
 {
     if(sig == SIGINT || sig == SIGTERM) {
         qApp->quit();
@@ -28,64 +31,82 @@ Utils::LogLevel stringToLogLevel(const QString &str)
         return Utils::LogLevel::FATAL;
     }
 
-    std::cerr << "Log level " << str.toStdString()
-        << " is not recognised, default to INFO" << std::endl;
+    std::cerr << "Log level [" << str.toStdString()
+        << "] is not recognised, default to INFO" << std::endl;
     return Utils::LogLevel::INFO;
 }
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication app(argc, argv);
+    app.setApplicationName("ShadowSocks(TUI)");
+    app.setApplicationVersion(QSS::Common::version());
     qInstallMessageHandler(Utils::messageHandler);
-    QCoreApplication a(argc, argv);
-    a.setApplicationName("Shadowsocks-libQtShadowsocks");
-    a.setApplicationVersion(Common::version());
-    signal(SIGINT, onSIGINT_TERM);
-    signal(SIGTERM, onSIGINT_TERM);
+
+    signal(SIGINT, on_SIGINT_SIGTERM);
+    signal(SIGTERM, on_SIGINT_SIGTERM);
+
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
     QCommandLineOption configFile("c",
         "specify config.json file.",
-        "config_file",
-        "config.json");
+        "config_file"
+    );
     QCommandLineOption serverAddress("s",
-        "host name or IP address of your remote server.",
-        "server_address");
-    QCommandLineOption serverPort("p", "port number of your remote server.",
-        "server_port");
+        "host name or IP address for the remote server.",
+        "server_address"
+    );
+    QCommandLineOption serverPort("p",
+        "port number of the remote server.",
+        "server_port"
+    );
     QCommandLineOption localAddress("b",
         "local address to bind. ignored in server mode.",
         "local_address",
-        "127.0.0.1");
+        "127.0.0.1"
+    );
     QCommandLineOption localPort("l",
-        "port number of your local server. ignored in server mode.",
-        "local_port");
+        "port number of the local server. ignored in server mode.",
+        "local_port"
+    );
     QCommandLineOption password("k",
-        "password of your remote server.",
-        "password");
+        "password of the remote server.",
+        "password"
+    );
     QCommandLineOption encryptionMethod("m",
         "encryption method.",
-        "method");
+        "method"
+    );
     QCommandLineOption timeout("t",
         "socket timeout in seconds.",
-        "timeout");
-    QCommandLineOption http(
-        QStringList() << "H" << "http-proxy",
-        "run in HTTP(S) proxy mode. ignored in server mode.");
+        "timeout"
+    );
     QCommandLineOption serverMode(
         QStringList() << "S" << "server-mode",
-        "run as shadowsocks server.");
+        "run as shadowsocks server."
+    );
+    QCommandLineOption clientMode(
+        QStringList() << "C" << "client-mode",
+        "run as shadowsocks client."
+    );
+    QCommandLineOption http(
+        QStringList() << "H" << "http-proxy",
+        "run in HTTP(S) proxy mode. ignored in server mode."
+    );
     QCommandLineOption testSpeed(
         QStringList() << "T" << "speed-test",
-        "test encrypt/decrypt speed.");
+        "test encrypt/decrypt speed."
+    );
     QCommandLineOption log("L",
-        "logging level. Valid levels are: debug, info, "
-        "warn, error, fatal.",
+        "log level: debug, info, warn, error, fatal.",
         "log_level",
-        "info");
+        "info"
+    );
     QCommandLineOption autoBan("autoban",
         "automatically ban IPs that send malformed header. "
-        "ignored in local mode.");
+        "ignored in local mode."
+    );
     parser.addOption(configFile);
     parser.addOption(serverAddress);
     parser.addOption(serverPort);
@@ -96,14 +117,22 @@ int main(int argc, char *argv[])
     parser.addOption(timeout);
     parser.addOption(http);
     parser.addOption(serverMode);
+    parser.addOption(clientMode);
     parser.addOption(testSpeed);
     parser.addOption(log);
     parser.addOption(autoBan);
-    parser.process(a);
-    Utils::logLevel = stringToLogLevel(parser.value(log));
-    Client c;
+    parser.process(app);
 
-    if(!c.readConfig(parser.value(configFile))) {
+    Client c;
+    Utils::logLevel = stringToLogLevel(parser.value(log));
+
+    QString jsonConfig = parser.value(configFile);
+    if(jsonConfig.isEmpty()) {
+        jsonConfig = QCoreApplication::applicationDirPath()
+          + QDir::separator() + "config.json";
+    }
+
+    if(!c.readConfig(jsonConfig)) {
         c.setup(parser.value(serverAddress),
             parser.value(serverPort),
             parser.value(localAddress),
@@ -117,23 +146,31 @@ int main(int argc, char *argv[])
 
     c.setAutoBan(parser.isSet(autoBan));
 
-    // command-line option has a higher priority to make H, S, T consistent
+    // command-line option has a higher priority for S, C, H, T
     if(parser.isSet(http)) {
         c.setHttpMode(true);
     }
 
+    if(parser.isSet(serverMode)) {
+        c.setWorkMode(Client::WorkMode::SERVER);
+    }
+
+    if(parser.isSet(clientMode)) {
+        c.setWorkMode(Client::WorkMode::CLIENT);
+    }
+
     if(parser.isSet(testSpeed)) {
         if(c.getMethod().empty()) {
-            std::cout << "Testing all encryption methods..." << std::endl;
+            std::cout << "Testing all encryption methods ... " << std::endl;
             Utils::testSpeed(100);
         } else {
             Utils::testSpeed(c.getMethod(), 100);
         }
 
         return 0;
-    } else if(c.start(parser.isSet(serverMode))) {
-        return a.exec();
+    } else if(c.start()) {
+        return app.exec();
     } else {
-        return 2;
+        return -1;
     }
 }

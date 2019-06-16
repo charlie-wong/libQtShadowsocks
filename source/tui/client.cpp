@@ -1,51 +1,63 @@
-#include <QObject>
 #include <QFile>
+#include <QDebug>
+#include <QObject>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDebug>
+#include <QCoreApplication>
+
 #include "client.h"
 
-Client::Client() : autoBan(false)
+Client::Client() : autoBan(false), m_work_mode(CLIENT)
 {
     // Nothing Todo
 }
 
 bool Client::readConfig(const QString &file)
 {
-    QFile c(file);
+    QFile config(file);
 
-    if(!c.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if(!config.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDebug(QtMsgType::QtCriticalMsg).noquote()
             << "Can't open configuration file" << file;
         return false;
     }
 
-    if(!c.isReadable()) {
+    if(!config.isReadable()) {
         QDebug(QtMsgType::QtCriticalMsg).noquote()
             << "Configuration file" << file << "is not readable!";
         return false;
     }
 
-    QJsonParseError error;
-    QJsonDocument confJson = QJsonDocument::fromJson(c.readAll(), &error);
-    c.close();
-    QJsonObject confObj = confJson.object();
+    QJsonParseError status;
+    QJsonDocument confJson = QJsonDocument::fromJson(config.readAll(), &status);
+    QJsonObject jsonObj = confJson.object();
+    config.close();
 
-    if(error.error != QJsonParseError::NoError) {
-        qCritical() << "Failed to parse configuration file:" << error.errorString();
+    if(status.error != QJsonParseError::NoError) {
+        qCritical() << "Failed to parse configuration file:" << status.errorString();
         return false;
     }
 
-    profile.setLocalAddress(confObj["local_address"].toString().toStdString());
-    profile.setLocalPort(confObj["local_port"].toInt());
-    profile.setMethod(confObj["method"].toString().toStdString());
-    profile.setPassword(confObj["password"].toString().toStdString());
-    profile.setServerAddress(confObj["server"].toString().toStdString());
-    profile.setServerPort(confObj["server_port"].toInt());
-    profile.setTimeout(confObj["timeout"].toInt());
-    profile.setHttpProxy(confObj["http_proxy"].toBool());
+    QString work_mode = jsonObj["mode"].toString();
+    if(work_mode.compare("server", Qt::CaseInsensitive) == 0) {
+        setWorkMode(SERVER);
+    } else if(work_mode.compare("client", Qt::CaseInsensitive) == 0) {
+        setWorkMode(CLIENT);
+    }
 
-    if(confObj["auth"].toBool()) {
+    m_profile.setLocalAddress(jsonObj["local"].toString().toStdString());
+    m_profile.setLocalPort((uint16_t)jsonObj["local_port"].toInt());
+
+    m_profile.setServerAddress(jsonObj["server"].toString().toStdString());
+    m_profile.setServerPort((uint16_t)jsonObj["server_port"].toInt());
+
+    m_profile.setMethod(jsonObj["method"].toString().toStdString());
+    m_profile.setPassword(jsonObj["password"].toString().toStdString());
+
+    m_profile.setTimeout(jsonObj["timeout"].toInt());
+    m_profile.setHttpProxy(jsonObj["http_proxy"].toBool());
+
+    if(jsonObj["auth"].toBool()) {
         QDebug(QtMsgType::QtCriticalMsg)
             << "OTA is deprecated, remove OTA from the configuration file.";
     }
@@ -58,14 +70,14 @@ void Client::setup(const QString &remote_addr, const QString &remote_port,
     const QString &password, const QString &method,
     const QString &timeout, const bool http_proxy)
 {
-    profile.setServerAddress(remote_addr.toStdString());
-    profile.setServerPort(remote_port.toInt());
-    profile.setLocalAddress(local_addr.toStdString());
-    profile.setLocalPort(local_port.toInt());
-    profile.setPassword(password.toStdString());
-    profile.setMethod(method.toStdString());
-    profile.setTimeout(timeout.toInt());
-    profile.setHttpProxy(http_proxy);
+    m_profile.setServerAddress(remote_addr.toStdString());
+    m_profile.setServerPort((uint16_t)remote_port.toInt());
+    m_profile.setLocalAddress(local_addr.toStdString());
+    m_profile.setLocalPort((uint16_t)local_port.toInt());
+    m_profile.setPassword(password.toStdString());
+    m_profile.setMethod(method.toStdString());
+    m_profile.setTimeout(timeout.toInt());
+    m_profile.setHttpProxy(http_proxy);
 }
 
 void Client::setAutoBan(bool ban)
@@ -75,54 +87,63 @@ void Client::setAutoBan(bool ban)
 
 void Client::setHttpMode(bool http)
 {
-    profile.setHttpProxy(http);
+    m_profile.setHttpProxy(http);
 }
 
-bool Client::start(bool _server)
+void Client::setWorkMode(WorkMode mode) {
+    m_work_mode = mode;
+}
+
+bool Client::start(void)
 {
-    if(profile.debug()) {
+    if(m_profile.debug()) {
         if(!headerTest()) {
             QDebug(QtMsgType::QtCriticalMsg) << "Header test failed.";
             return false;
         }
     }
 
-    if(!profile.isValid()) {
-        qCritical() << "The profile is invalid. Improper setup?";
+    if(!m_profile.isValid()) {
+        qCritical() << "The m_profile is invalid, check it and try again!";
         return false;
     }
 
-    controller.reset(new QSS::Controller(profile, !_server, autoBan));
+    bool server_mode = false;
+    if(SERVER == m_work_mode) {
+        server_mode = true;
+    }
 
-    if(!_server) {
-        QSS::Address server(profile.serverAddress(), profile.serverPort());
+    m_ctrl.reset(new QSS::Controller(m_profile, !server_mode, autoBan));
+
+    if(!server_mode) {
+        QSS::Address server(m_profile.serverAddress(), m_profile.serverPort());
         server.blockingLookUp();
-        tester.reset(new QSS::AddressTester(server.getFirstIP(),
+        m_tester.reset(new QSS::Connectivity(server.getFirstIP(),
             server.getPort())
         );
 
-        QObject::connect(tester.get(), &QSS::AddressTester::connectivityTestFinished,
+        QObject::connect(m_tester.get(), &QSS::Connectivity::connectivityFinished,
         [](bool c) {
             if(c) {
                 QDebug(QtMsgType::QtInfoMsg) << "The shadowsocks connection is okay.";
             } else {
                 QDebug(QtMsgType::QtWarningMsg)
                     << "Destination is not reachable. "
-                       "Please check your network and firewall settings. "
-                       "And make sure the profile is correct.";
+                       "Please check your network and firewall settings.";
+                QCoreApplication::exit(-1);
             }
         });
 
-        QObject::connect(tester.get(), &QSS::AddressTester::testErrorString,
+        QObject::connect(m_tester.get(), &QSS::Connectivity::testErrorString,
         [](const QString & error) {
             QDebug(QtMsgType::QtWarningMsg).noquote()
                 << "Connectivity testing error:" << error;
         });
 
-        tester->startConnectivityTest(profile.method(), profile.password());
+        m_tester->startConnectivityTest(m_profile.method(), m_profile.password());
     }
 
-    return controller->start();
+    return m_ctrl->start();
 }
 
 bool Client::headerTest()
@@ -160,5 +181,5 @@ bool Client::headerTest()
 
 const std::string &Client::getMethod() const
 {
-    return profile.method();
+    return m_profile.method();
 }

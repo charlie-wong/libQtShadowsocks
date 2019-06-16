@@ -3,7 +3,8 @@
 
 #include <QObject>
 #include <QAbstractSocket>
-#include "util/export.h"
+
+#include "utils/export.h"
 
 namespace QSS {
 

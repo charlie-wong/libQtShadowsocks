@@ -37,9 +37,10 @@ void Utils::testSpeed(uint32_t data_size_mb)
 void Utils::messageHandler(QtMsgType type, const QMessageLogContext &,
     const QString &msg)
 {
-    const std::string timestamp =
-        QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz").toStdString();
     const std::string message = msg.toStdString();
+    const QDateTime now = QDateTime::currentDateTime();
+    const std::string timestamp =
+        now.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();
 
     switch(type) {
         case QtDebugMsg:
@@ -70,8 +71,7 @@ void Utils::messageHandler(QtMsgType type, const QMessageLogContext &,
 
             break;
 
-        case QtFatalMsg:
-            // FATAL is not allowed to skip
+        case QtFatalMsg: // FATAL is not allowed to skip
             std::cerr << timestamp << " FATAL: " << message << std::endl;
             abort();
     }

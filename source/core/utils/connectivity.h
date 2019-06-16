@@ -1,7 +1,7 @@
-// Perform non-blocking address tests
+// Perform non-blocking connectivity tests
 
-#ifndef ADDRESSTESTER_H
-#define ADDRESSTESTER_H
+#ifndef UTILS_CONNECTIVITY_H
+#define UTILS_CONNECTIVITY_H
 
 #include "export.h"
 #include <QHostAddress>
@@ -12,27 +12,27 @@
 namespace QSS {
 
 // This class is only meaningful for client-side applications
-class QSS_EXPORT AddressTester : public QObject {
+class QSS_EXPORT Connectivity : public QObject {
     Q_OBJECT
 public:
-    AddressTester(const QHostAddress &server_address,
+    Connectivity(const QHostAddress &server_address,
         const uint16_t &server_port, QObject *parent = 0
     );
 
-    AddressTester(const AddressTester &) = delete;
+    Connectivity(const Connectivity &) = delete;
 
-    static const int LAG_TIMEOUT = -1;
     static const int LAG_ERROR = -2;
+    static const int LAG_TIMEOUT = -1;
 
     // Connectivity test will try to establish a shadowsocks connection with
-    // the server. The result is passed by signal connectivityTestFinished().
+    // the server. The result is passed by signal connectivityFinished().
     // If the server times out, the connectivity will be passed as false.
     //
     // Calling this function does lag (latency) test as well. Therefore, it's
     // the recommended way to do connectivity and latency test with just one
     // function call.
     //
-    // Don't call the same AddressTester instance's startConnectivityTest()
+    // Don't call the same Connectivity instance's startConnectivityTest()
     // and startLagTest() at the same time!
     void startConnectivityTest(const std::string &method,
         const std::string &password, int timeout = 3000
@@ -41,7 +41,7 @@ public:
 signals:
     void lagTestFinished(int);
     void testErrorString(const QString &);
-    void connectivityTestFinished(bool);
+    void connectivityFinished(bool);
 
 public slots:
     // The lag test only tests if the server port is open and listeninig
@@ -69,4 +69,4 @@ private slots:
 };
 
 }
-#endif // ADDRESSTESTER_H
+#endif // UTILS_CONNECTIVITY_H

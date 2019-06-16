@@ -1,10 +1,11 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef UTILS_CONTROLLER_H
+#define UTILS_CONTROLLER_H
 
-#include <QHostAddress>
 #include <QObject>
-#include "network/tcpserver.h"
+#include <QHostAddress>
+
 #include "export.h"
+#include "network/tcpserver.h"
 #include "network/httpproxy.h"
 #include "types/profile.h"
 #include "network/udprelay.h"
@@ -69,4 +70,4 @@ protected slots:
 };
 
 }
-#endif // CONTROLLER_H
+#endif // UTILS_CONTROLLER_H

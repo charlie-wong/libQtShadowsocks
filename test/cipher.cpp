@@ -1,6 +1,7 @@
 #include <QtTest>
+
+#include "utils/common.h"
 #include "crypto/cipher.h"
-#include "util/common.h"
 
 class Cipher : public QObject {
     Q_OBJECT

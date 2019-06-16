@@ -1,0 +1,13 @@
+{
+    "server":"127.0.0.1",
+    "server_port":8388,
+
+    "local":"127.0.0.1",
+    "local_port":1080,
+
+    "method":"aes-256-cfb",
+    "password":"password",
+
+    "timeout":600,
+    "log_level": "info"
+}

@@ -1,5 +1,5 @@
-#ifndef EXPORT_H
-#define EXPORT_H
+#ifndef UTILS_EXPORT_H
+#define UTILS_EXPORT_H
 
 #include <QtGlobal>
 
@@ -11,4 +11,4 @@
     #define QSS_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // EXPORT_H
+#endif // UTILS_EXPORT_H

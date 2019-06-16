@@ -1,6 +1,6 @@
 #include "rc4.h"
 #include "cipher.h"
-#include "util/common.h"
+#include "utils/common.h"
 
 using namespace QSS;
 

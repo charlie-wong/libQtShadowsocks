@@ -18,17 +18,22 @@ public:
         const bool http_proxy
     );
 
+    bool start(void);
+
+    enum WorkMode { SERVER, CLIENT };
+
     void setAutoBan(bool ban);
     void setHttpMode(bool http);
+    void setWorkMode(WorkMode mode);
     const std::string &getMethod() const;
-    bool start(bool serverMode = false);
-
 private:
-    std::unique_ptr<QSS::Controller> controller;
-    std::unique_ptr<QSS::AddressTester> tester;
-    QSS::Profile profile;
-    bool autoBan;
     bool headerTest();
+
+    bool autoBan;
+    WorkMode m_work_mode;
+    QSS::Profile m_profile;
+    std::unique_ptr<QSS::Controller> m_ctrl;
+    std::unique_ptr<QSS::Connectivity> m_tester;
 };
 
 #endif // CLIENT_H

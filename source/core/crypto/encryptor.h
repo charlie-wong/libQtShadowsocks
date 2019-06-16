@@ -8,8 +8,9 @@
 #define ENCRYPTOR_H
 
 #include <memory>
-#include "util/export.h"
+
 #include "cipher.h"
+#include "utils/export.h"
 
 namespace QSS {
 

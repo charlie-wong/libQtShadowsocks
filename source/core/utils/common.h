@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef UTILS_COMMON_H
+#define UTILS_COMMON_H
 
 #include <QHostAddress>
 #include "export.h"
@@ -35,4 +35,4 @@ extern const uint8_t ADDRESS_MASK;
 
 } // namespace QSS
 
-#endif // COMMON_H
+#endif // UTILS_COMMON_H
