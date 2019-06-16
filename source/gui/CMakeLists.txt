@@ -1,5 +1,5 @@
-# Shadowsocks Client/Server GUI Name
-set(APP_NAME "shadowsocks-gui")
+# Shadowsocks GUI Client/Server Name
+set(APP_NAME "shadowsocksqt-gui")
 
 find_package(PkgConfig)
 # MinGW
@@ -7,17 +7,20 @@ find_package(PkgConfig)
 # - $ pacman -S mingw-w64-x86_64-zbar
 pkg_check_modules(zbar REQUIRED zbar)
 
-file(GLOB SSGUI_HEADERS *.h)
-file(GLOB SSGUI_SOURCES *.cpp)
+file(GLOB GUI_APP_HEADERS *.h)
+file(GLOB GUI_APP_SOURCES *.cpp)
 
-list(APPEND SSGUI_SOURCES icons.qrc translations.qrc)
+list(APPEND GUI_APP_HEADERS ${CONFIG_HEADERS})
+list(APPEND GUI_APP_SOURCES ${CONFIG_SOURCES})
+
+list(APPEND GUI_APP_SOURCES icons.qrc translations.qrc)
 
 if (WIN32)
-    list(APPEND SSGUI_SOURCES ss-qt5.rc)
+    list(APPEND GUI_APP_SOURCES ssqt.rc)
 endif()
 
 add_executable(${APP_NAME} WIN32
-    ${SSGUI_HEADERS} ${SSGUI_SOURCES}
+    ${GUI_APP_HEADERS} ${GUI_APP_SOURCES}
     ${SSQT_AUTO_QT5_SOURCES}
 )
 
@@ -39,11 +42,13 @@ target_link_libraries(${APP_NAME}
     ${qrencode_LIBRARIES}
 )
 
-install(TARGETS ${APP_NAME}
-    RUNTIME DESTINATION bin
-)
+XmakeInstallHelper(TARGETS ${APP_NAME})
 
-if (UNIX)
-    install(FILES shadowsocks-qt5.desktop DESTINATION share/applications)
-    install(FILES icons/shadowsocks-qt5.png DESTINATION share/icons/hicolor/512x512/apps)
+if(UNIX)
+    XmakeInstallHelper(FILES "shadowsocksqt.desktop"
+        DESTINATION share/applications
+    )
+    XmakeInstallHelper(FILES "icons/shadowsocksqt.png"
+        DESTINATION share/icons/hicolor/512x512/apps
+    )
 endif()

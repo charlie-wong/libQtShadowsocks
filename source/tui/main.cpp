@@ -9,10 +9,12 @@
 
 using namespace QSS;
 
-static void on_SIGINT_SIGTERM(int sig)
+static void onSignalRecv(int sig)
 {
     if(sig == SIGINT || sig == SIGTERM) {
         qApp->quit();
+    } else {
+        qWarning("Unhandled Signal: %d", sig);
     }
 }
 
@@ -23,8 +25,8 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(QSS::Common::version());
     qInstallMessageHandler(Config::logMsgHandler);
 
-    signal(SIGINT, on_SIGINT_SIGTERM);
-    signal(SIGTERM, on_SIGINT_SIGTERM);
+    signal(SIGINT, onSignalRecv);
+    signal(SIGTERM, onSignalRecv);
 
     CmdArgs opts;
     opts.process(app);
