@@ -31,27 +31,31 @@
 #EXTRA_CMAKE_ARGS += -DSSQT_QT5_SHARED_PREFIX=/opt/Qt5.5.1/5.5/gcc_64
 #EXTRA_CMAKE_ARGS += -DSSQT_QT5_SHARED_PREFIX=/usr/lib/gcc/x86_64-linux-gnu
 
-# Skip botan2 download/build/install, try to used the system one
-#EXTRA_CMAKE_ARGS += -DSSQT_DBI_BOTAN2=OFF
+# botan2 download/build/install, try to used the system one by default
+#EXTRA_CMAKE_ARGS += -DSSQT_DBI_BOTAN2=ON
 #
-# Skip libqrencode download/build/install, try to used the system one
-#EXTRA_CMAKE_ARGS += -DSSQT_DBI_QRENCODE=OFF
+# libqrencode download/build/install, try to used the system one by default
+#EXTRA_CMAKE_ARGS += -DSSQT_DBI_QRENCODE=ON
 #
-# Build shadowsocks Qt5 testing case.
-#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_TEST=OFF
-#
+# Disable build & use shared shadowsocks core library by default
+#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_SHARED=ON
+
 # Build shadowsocks TUI server/client.
 #EXTRA_CMAKE_ARGS += -DSSQT_BUILD_TUI=OFF
 #
 # Build shadowsocks GUI server/client.
 #EXTRA_CMAKE_ARGS += -DSSQT_BUILD_GUI=OFF
-#
-# Build & use shared shadowsocks core library.
-#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_SHARED=OFF
+
+# Build shadowsocks Qt5 testing case.
+#EXTRA_CMAKE_ARGS += -DSSQT_BUILD_TEST=OFF
 
 #ASTYLE_PROG := /usr/bin/astyle
 #ASTYLE_ARGS := --project '*.h' '*.c' '*.cpp'
-#ASTYLE_FILES := source/lib/crypto/cipher.cpp
+#
+#ASTYLE_FILES := 'source/tui/*.cpp'
+#ASTYLE_FILES := 'source/core/crypto/*cpp'
+#ASTYLE_FILES := 'source/core/crypto/abc?cpp'
+#ASTYLE_FILES := source/core/crypto/cipher.cpp
 
 #GIT_PROG :=
 #MAKE_PROG :=
