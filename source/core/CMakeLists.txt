@@ -32,7 +32,11 @@ target_link_libraries(static_LibQtShadowSocks Qt5::Core Qt5::Network)
 set_target_properties(static_LibQtShadowSocks
     PROPERTIES OUTPUT_NAME "${SSCL_NAME}"
 )
-add_dependencies(static_LibQtShadowSocks ${botan2_TARGET})
+
+if(SSQT_DBI_BOTAN2)
+    add_dependencies(static_LibQtShadowSocks ${botan2_TARGET})
+endif()
+
 XmakeInstallHelper(TARGETS static_LibQtShadowSocks
     EXPORT_LIBRARY_INFO
     EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network botan-2
@@ -46,7 +50,11 @@ if(SSQT_BUILD_SHARED)
         VERSION ${SSQT_VERSION_MMP}
         SOVERSION ${SSQT_VERSION_MAJOR}
     )
-    add_dependencies(shared_LibQtShadowSocks ${botan2_TARGET})
+
+    if(SSQT_DBI_BOTAN2)
+        add_dependencies(shared_LibQtShadowSocks ${botan2_TARGET})
+    endif()
+
     XmakeInstallHelper(TARGETS shared_LibQtShadowSocks
         EXPORT_LIBRARY_INFO
         EXPORT_LIBRARY_WITH_EXTRA_LIBS Qt5Core Qt5Network botan-2
