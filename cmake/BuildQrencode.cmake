@@ -15,7 +15,7 @@ if(SSQT_DBI_QRENCODE)
 else()
     # Try to find the libqrencode library
     XmakeSearchLibrary(PREFIX qrencode
-        NAME qrencode VERSION 4.0.2
+        NAME libqrencode VERSION 4.0.2
         REQUIRED # STATIC VERBOSE
     )
 endif()
