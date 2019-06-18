@@ -49,22 +49,30 @@ QSS::Profile SQProfile::toProfile() const
     qssprofile.setPassword(password.toStdString());
     qssprofile.setTimeout(timeout);
     qssprofile.setHttpProxy(httpMode);
-    if (debug) {
+
+    if(debug) {
         qssprofile.enableDebug();
     } else {
         qssprofile.disableDebug();
     }
+
     return qssprofile;
 }
 
-QDataStream& operator << (QDataStream &out, const SQProfile &p)
+QDataStream &operator << (QDataStream &out, const SQProfile &p)
 {
-    out << p.autoStart << p.debug << p.serverPort << p.localPort << p.name << p.serverAddress << p.localAddress << p.method << p.password << p.timeout << p.latency << p.currentUsage << p.totalUsage << p.lastTime << p.nextResetDate << p.httpMode;
+    out << p.autoStart << p.debug << p.serverPort << p.localPort
+        << p.name << p.serverAddress  << p.localAddress << p.method
+        << p.password  << p.timeout << p.latency << p.currentUsage
+        << p.totalUsage << p.lastTime << p.nextResetDate << p.httpMode;
     return out;
 }
 
-QDataStream& operator >> (QDataStream &in, SQProfile &p)
+QDataStream &operator >> (QDataStream &in, SQProfile &p)
 {
-    in >> p.autoStart >> p.debug >> p.serverPort >> p.localPort >> p.name >> p.serverAddress >> p.localAddress >> p.method >> p.password >> p.timeout >> p.latency >> p.currentUsage >> p.totalUsage >> p.lastTime >> p.nextResetDate >> p.httpMode;
+    in >> p.autoStart >> p.debug >> p.serverPort >> p.localPort >> p.name
+       >> p.serverAddress >> p.localAddress >> p.method >> p.password
+       >> p.timeout >> p.latency >> p.currentUsage >> p.totalUsage
+       >> p.lastTime >> p.nextResetDate >> p.httpMode;
     return in;
 }

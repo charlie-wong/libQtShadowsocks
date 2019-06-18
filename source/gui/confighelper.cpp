@@ -1,5 +1,3 @@
-#include "confighelper.h"
-
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
@@ -8,9 +6,10 @@
 #include <QJsonParseError>
 #include <QCoreApplication>
 
+#include "confighelper.h"
+
 ConfigHelper::ConfigHelper(const QString &configuration, QObject *parent) :
-    QObject(parent),
-    configFile(configuration)
+    QObject(parent), configFile(configuration)
 {
     settings = new QSettings(configFile, QSettings::IniFormat, this);
     readGeneralSettings();
@@ -22,14 +21,15 @@ void ConfigHelper::save(const ConnectionTableModel &model)
 {
     int size = model.rowCount();
     settings->beginWriteArray(profilePrefix);
-    for (int i = 0; i < size; ++i) {
+
+    for(int i = 0; i < size; ++i) {
         settings->setArrayIndex(i);
         Connection *con = model.getItem(i)->getConnection();
         QVariant value = QVariant::fromValue<SQProfile>(con->getProfile());
         settings->setValue("SQProfile", value);
     }
-    settings->endArray();
 
+    settings->endArray();
     settings->setValue("ToolbarStyle", QVariant(toolbarStyle));
     settings->setValue("HideWindowOnStartup", QVariant(hideWindowOnStartup));
     settings->setValue("StartAtLogin", QVariant(startAtLogin));
@@ -40,14 +40,17 @@ void ConfigHelper::save(const ConnectionTableModel &model)
     settings->setValue("ConfigVersion", QVariant(2.6));
 }
 
-void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model, const QString &file)
+void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model,
+    const QString &file)
 {
     QFile JSONFile(file);
     JSONFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!JSONFile.isOpen()) {
+
+    if(!JSONFile.isOpen()) {
         qCritical() << "Error: cannot open " << file;
         return;
     }
+
     if(!JSONFile.isReadable()) {
         qCritical() << "Error: cannot read " << file;
         return;
@@ -56,46 +59,50 @@ void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model, const QStrin
     QJsonParseError pe;
     QJsonDocument JSONDoc = QJsonDocument::fromJson(JSONFile.readAll(), &pe);
     JSONFile.close();
-    if (pe.error != QJsonParseError::NoError) {
+
+    if(pe.error != QJsonParseError::NoError) {
         qCritical() << pe.errorString();
     }
-    if (JSONDoc.isEmpty()) {
+
+    if(JSONDoc.isEmpty()) {
         qCritical() << "JSON Document" << file << "is empty!";
         return;
     }
+
     QJsonObject JSONObj = JSONDoc.object();
     QJsonArray CONFArray = JSONObj["configs"].toArray();
-    if (CONFArray.isEmpty()) {
+
+    if(CONFArray.isEmpty()) {
         qWarning() << "configs in " << file << " is empty.";
         return;
     }
 
-    for (QJsonArray::iterator it = CONFArray.begin(); it != CONFArray.end(); ++it) {
+    for(QJsonArray::iterator it = CONFArray.begin(); it != CONFArray.end(); ++it) {
         QJsonObject json = (*it).toObject();
         SQProfile p;
-        if (!json["server_port"].isString()) {
-            /*
-             * shadowsocks-csharp uses integers to store ports directly.
-             */
+
+        if(!json["server_port"].isString()) {
+            // shadowsocks-csharp uses integers to store ports directly.
             p.name = json["remarks"].toString();
             p.serverPort = json["server_port"].toInt();
-            //shadowsocks-csharp has only global local port (all profiles use the same port)
+            // shadowsocks-csharp has only global local port
+            // all profiles use the same port
             p.localPort = JSONObj["localPort"].toInt();
-            if (JSONObj["shareOverLan"].toBool()) {
-                /*
-                 * it can only configure share over LAN or not (also a global value)
-                 * which is basically 0.0.0.0 or 127.0.0.1 (which is the default)
-                 */
+
+            if(JSONObj["shareOverLan"].toBool()) {
+                // it can only configure share over LAN or not, also a global
+                // value, which is basically 0.0.0.0 or 127.0.0.1, which is
+                // the default
                 p.localAddress = QString("0.0.0.0");
             }
         } else {
-            // Otherwise, the gui-config is from legacy shadowsocks-qt5 (v0.x)
             p.name = json["profile"].toString();
             p.serverPort = json["server_port"].toString().toUShort();
             p.localAddress = json["proxy_addr"].toString();
             p.localPort = json["proxy_port"].toString().toUShort();
             p.timeout = json["timeout"].toString().toInt();
         }
+
         p.serverAddress = json["server_addr"].toString();
         p.method = json["algorithm"].toString();
         p.password = json["password"].toString();
@@ -104,13 +111,15 @@ void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model, const QStrin
     }
 }
 
-void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model, const QString &file)
+void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model,
+    const QString &file)
 {
     QJsonArray confArray;
     int size = model.rowCount();
-    for (int i = 0; i < size; ++i) {
-        Connection *con = model.getItem(i)->getConnection();
+
+    for(int i = 0; i < size; ++i) {
         QJsonObject json;
+        Connection *con = model.getItem(i)->getConnection();
         json["remarks"] = QJsonValue(con->profile.name);
         json["algorithm"] = QJsonValue(con->profile.method.toLower());
         json["password"] = QJsonValue(con->profile.password);
@@ -123,15 +132,15 @@ void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model, const 
     JSONObj["configs"] = QJsonValue(confArray);
     JSONObj["localPort"] = QJsonValue(1080);
     JSONObj["shareOverLan"] = QJsonValue(false);
-
     QJsonDocument JSONDoc(JSONObj);
-
     QFile JSONFile(file);
     JSONFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!JSONFile.isOpen()) {
+
+    if(!JSONFile.isOpen()) {
         qCritical() << "Error: cannot open " << file;
         return;
     }
+
     if(!JSONFile.isWritable()) {
         qCritical() << "Error: cannot write into " << file;
         return;
@@ -141,13 +150,15 @@ void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model, const 
     JSONFile.close();
 }
 
-Connection* ConfigHelper::configJsonToConnection(const QString &file)
+Connection *ConfigHelper::configJsonToConnection(const QString &file)
 {
     QFile JSONFile(file);
     JSONFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!JSONFile.isOpen()) {
+
+    if(!JSONFile.isOpen()) {
         qCritical() << "Error: cannot open " << file;
     }
+
     if(!JSONFile.isReadable()) {
         qCritical() << "Error: cannot read " << file;
     }
@@ -155,15 +166,18 @@ Connection* ConfigHelper::configJsonToConnection(const QString &file)
     QJsonParseError pe;
     QJsonDocument JSONDoc = QJsonDocument::fromJson(JSONFile.readAll(), &pe);
     JSONFile.close();
-    if (pe.error != QJsonParseError::NoError) {
+
+    if(pe.error != QJsonParseError::NoError) {
         qCritical() << pe.errorString();
     }
-    if (JSONDoc.isEmpty()) {
+
+    if(JSONDoc.isEmpty()) {
         qCritical() << "JSON Document" << file << "is empty!";
         return nullptr;
     }
-    QJsonObject configObj = JSONDoc.object();
+
     SQProfile p;
+    QJsonObject configObj = JSONDoc.object();
     p.serverAddress = configObj["server_addr"].toString();
     p.serverPort = configObj["server_port"].toInt();
     p.localAddress = configObj["proxy_addr"].toString();
@@ -210,11 +224,13 @@ bool ConfigHelper::isNativeMenuBar() const
     return nativeMenuBar;
 }
 
-void ConfigHelper::setGeneralSettings(int ts, bool hide, bool sal, bool oneInstance, bool nativeMB)
+void ConfigHelper::setGeneralSettings(int ts, bool hide, bool sal,
+    bool oneInstance, bool nativeMB)
 {
-    if (toolbarStyle != ts) {
+    if(toolbarStyle != ts) {
         emit toolbarStyleChanged(static_cast<Qt::ToolButtonStyle>(ts));
     }
+
     toolbarStyle = ts;
     hideWindowOnStartup = hide;
     startAtLogin = sal;
@@ -234,9 +250,10 @@ void ConfigHelper::setShowFilterBar(bool show)
 
 void ConfigHelper::read(ConnectionTableModel *model)
 {
-    qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
     int size = settings->beginReadArray(profilePrefix);
-    for (int i = 0; i < size; ++i) {
+    qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
+
+    for(int i = 0; i < size; ++i) {
         settings->setArrayIndex(i);
         QVariant value = settings->value("SQProfile");
         SQProfile profile = value.value<SQProfile>();
@@ -244,6 +261,7 @@ void ConfigHelper::read(ConnectionTableModel *model)
         Connection *con = new Connection(profile, this);
         model->appendConnection(con);
     }
+
     settings->endArray();
     readGeneralSettings();
 }
@@ -262,27 +280,35 @@ void ConfigHelper::readGeneralSettings()
 void ConfigHelper::checkProfileDataUsageReset(SQProfile &profile)
 {
     QDate currentDate = QDate::currentDate();
-    if (profile.nextResetDate.isNull()){//invalid if the config.ini is old
-        //the default reset day is 1 of every month
+
+    if(profile.nextResetDate.isNull()) {
+        // invalid if the config.ini is old the
+        // default reset day is 1 of every month
         profile.nextResetDate = QDate(currentDate.year(), currentDate.month(), 1);
         qDebug() << "config.ini upgraded from old version";
-        profile.totalUsage += profile.currentUsage;//we used to use sent and received
+        // we used to use sent and received
+        profile.totalUsage += profile.currentUsage;
     }
 
-    if (profile.nextResetDate < currentDate) {//not <= because that'd casue multiple reset on this day
+    if(profile.nextResetDate <
+        currentDate) {
+        // not <= because that'd casue multiple reset on this day
         profile.currentUsage = 0;
-        while (profile.nextResetDate <= currentDate) {
+
+        while(profile.nextResetDate <= currentDate) {
             profile.nextResetDate = profile.nextResetDate.addMonths(1);
         }
     }
 }
 
-void ConfigHelper::startAllAutoStart(const ConnectionTableModel& model)
+void ConfigHelper::startAllAutoStart(const ConnectionTableModel &model)
 {
     int size = model.rowCount();
-    for (int i = 0; i < size; ++i) {
+
+    for(int i = 0; i < size; ++i) {
         Connection *con = model.getItem(i)->getConnection();
-        if (con->profile.autoStart) {
+
+        if(con->profile.autoStart) {
             con->start();
         }
     }
@@ -291,67 +317,75 @@ void ConfigHelper::startAllAutoStart(const ConnectionTableModel& model)
 void ConfigHelper::setStartAtLogin()
 {
     QString applicationName = "Shadowsocks-Qt5";
-    QString applicationFilePath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+    QString applicationFilePath =
+        QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+
 #if defined(Q_OS_WIN)
-    QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    QSettings settings(
+        "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        QSettings::NativeFormat
+    );
 #elif defined(Q_OS_LINUX)
-    QFile file(QDir::homePath() + "/.config/autostart/shadowsocks-qt5.desktop");
+    QFile file(QDir::homePath() + "/.config/autostart/shadowsocksqt.desktop");
     QString fileContent(
-            "[Desktop Entry]\n"
-            "Name=%1\n"
-            "Exec=%2\n"
-            "Type=Application\n"
-            "Terminal=false\n"
-            "X-GNOME-Autostart-enabled=true\n");
+        "[Desktop Entry]\n"
+        "Name=%1\n"
+        "Exec=%2\n"
+        "Type=Application\n"
+        "Terminal=false\n"
+        "X-GNOME-Autostart-enabled=true\n");
 #elif defined(Q_OS_MAC)
-    QFile file(QDir::homePath() + "/Library/LaunchAgents/org.shadowsocks.shadowsocks-qt5.launcher.plist");
+    QFile file(QDir::homePath() +
+        "/Library/LaunchAgents/org.shadowsocks.shadowsocksqt.launcher.plist"
+    );
     QString fileContent(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
-            "<plist version=\"1.0\">\n"
-            "<dict>\n"
-            "  <key>Label</key>\n"
-            "  <string>org.shadowsocks.shadowsocks-qt5.launcher</string>\n"
-            "  <key>LimitLoadToSessionType</key>\n"
-            "  <string>Aqua</string>\n"
-            "  <key>ProgramArguments</key>\n"
-            "  <array>\n"
-            "    <string>%2</string>\n"
-            "  </array>\n"
-            "  <key>RunAtLoad</key>\n"
-            "  <true/>\n"
-            "  <key>StandardErrorPath</key>\n"
-            "  <string>/dev/null</string>\n"
-            "  <key>StandardOutPath</key>\n"
-            "  <string>/dev/null</string>\n"
-            "</dict>\n"
-            "</plist>\n");
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN"
+        "http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
+        "<plist version=\"1.0\">\n"
+        "<dict>\n"
+        "  <key>Label</key>\n"
+        "  <string>org.shadowsocks.shadowsocksqt.launcher</string>\n"
+        "  <key>LimitLoadToSessionType</key>\n"
+        "  <string>Aqua</string>\n"
+        "  <key>ProgramArguments</key>\n"
+        "  <array>\n"
+        "    <string>%2</string>\n"
+        "  </array>\n"
+        "  <key>RunAtLoad</key>\n"
+        "  <true/>\n"
+        "  <key>StandardErrorPath</key>\n"
+        "  <string>/dev/null</string>\n"
+        "  <key>StandardOutPath</key>\n"
+        "  <string>/dev/null</string>\n"
+        "</dict>\n"
+        "</plist>\n"
+    );
 #else
     QFile file;
     QString fileContent;
 #endif
 
-    if (this->isStartAtLogin()) {
-        // Create start up item
+    if(this->isStartAtLogin()) { // Create start up item
     #if defined(Q_OS_WIN)
         settings.setValue(applicationName, applicationFilePath);
     #else
         fileContent.replace("%1", applicationName);
         fileContent.replace("%2", applicationFilePath);
-        if ( file.open(QIODevice::WriteOnly) ) {
+
+        if(file.open(QIODevice::WriteOnly)) {
             file.write(fileContent.toUtf8());
             file.close();
         }
     #endif
-    } else {
-        // Delete start up item
-        #if defined(Q_OS_WIN)
-            settings.remove(applicationName);
-        #else
-            if ( file.exists() ) {
-                file.remove();
-            }
-        #endif
+    } else { // Delete start up item
+    #if defined(Q_OS_WIN)
+        settings.remove(applicationName);
+    #else
+        if(file.exists()) {
+            file.remove();
+        }
+    #endif
     }
 }
 

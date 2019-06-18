@@ -5,23 +5,19 @@
 #include "portvalidator.h"
 
 EditDialog::EditDialog(Connection *_connection, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::EditDialog),
-    connection(_connection)
+    QDialog(parent), ui(new Ui::EditDialog), connection(_connection)
 {
     ui->setupUi(this);
-
-    /* initialisation and validator setup */
+    // initialisation and validator setup
     static const QStringList supportedMethodList =
-            SSValidator::supportedMethodList();
+        SSValidator::supportedMethodList();
     ui->encryptComboBox->addItems(supportedMethodList);
     IP4Validator *addrValidator = new IP4Validator(this);
     PortValidator *portValidator = new PortValidator(this);
     ui->serverPortEdit->setValidator(portValidator);
     ui->localPortEdit->setValidator(portValidator);
-    //Maybe we shouldn't validate local address using IPv4 format?
+    // Maybe we shouldn't validate local address using IPv4 format?
     ui->localAddrEdit->setValidator(addrValidator);
-
     ui->nameEdit->setText(connection->profile.name);
     ui->serverAddrEdit->setText(connection->profile.serverAddress);
     ui->serverPortEdit->setText(QString::number(connection->profile.serverPort));
@@ -34,9 +30,7 @@ EditDialog::EditDialog(Connection *_connection, QWidget *parent) :
     ui->resetDateEdit->setDate(connection->profile.nextResetDate);
     ui->resetDateEdit->setMinimumDate(QDate::currentDate());
     ui->autoStartCheckBox->setChecked(connection->profile.autoStart);
-
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &EditDialog::save);
-
     this->adjustSize();
 }
 
@@ -58,6 +52,5 @@ void EditDialog::save()
     connection->profile.timeout = ui->timeoutSpinBox->value();
     connection->profile.nextResetDate = ui->resetDateEdit->date();
     connection->profile.autoStart = ui->autoStartCheckBox->isChecked();
-
     this->accept();
 }

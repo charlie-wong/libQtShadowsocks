@@ -1,15 +1,16 @@
 #include "portvalidator.h"
 #include "ssvalidator.h"
 
-PortValidator::PortValidator(QObject *parent)
-    : QValidator(parent)
-{}
+PortValidator::PortValidator(QObject *parent) : QValidator(parent)
+{
+    // Nothing Todo
+}
 
 QValidator::State PortValidator::validate(QString &input, int &) const
 {
-    if (SSValidator::validatePort(input)) {
+    if(SSValidator::validatePort(input)) {
         return Acceptable;
-    }
-    else
+    } else {
         return Invalid;
+    }
 }

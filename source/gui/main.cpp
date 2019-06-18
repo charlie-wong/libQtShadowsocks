@@ -18,7 +18,7 @@ MainWindow *mainWindow = nullptr;
 
 static void onSignalRecv(int sig)
 {
-    if (sig == SIGINT || sig == SIGTERM) {
+    if(sig == SIGINT || sig == SIGTERM) {
         qApp->quit();
     } else {
         qWarning("Unhandled Signal: %d", sig);
@@ -29,18 +29,15 @@ static void setupApplication(QApplication &app)
 {
     signal(SIGINT, onSignalRecv);
     signal(SIGTERM, onSignalRecv);
-
     QApplication::setFallbackSessionManagementEnabled(false);
-
     app.setApplicationName(QString("ShadowSocks(GUI)"));
     app.setApplicationDisplayName(QString("ShadowSocksQt"));
     app.setApplicationVersion(SSQT_RELEASE_VERSION);
 
 #ifdef Q_OS_WIN
-    if (QLocale::system().country() == QLocale::China) {
+    if(QLocale::system().country() == QLocale::China) {
         app.setFont(QFont("Microsoft Yahei", 9, QFont::Normal, false));
-    }
-    else {
+    } else {
         app.setFont(QFont("Segoe UI", 9, QFont::Normal, false));
     }
 #endif
@@ -57,38 +54,36 @@ static void setupApplication(QApplication &app)
 int main(int argc, char *argv[])
 {
     qRegisterMetaTypeStreamOperators<SQProfile>("SQProfile");
-
     QApplication app(argc, argv);
     setupApplication(app);
-
     CmdArgs opts;
     opts.process(app);
-
     QString configFile = "";
-    if (configFile.isEmpty()) {
-#ifdef Q_OS_WIN
+
+    if(configFile.isEmpty()) {
+    #ifdef Q_OS_WIN
         configFile = app.applicationDirPath() + "/config.ini";
-#else
-        QDir configDir = QDir::homePath() + "/.config/shadowsocks-qt5";
+    #else
+        QDir configDir = QDir::homePath() + "/.config/ShadowSocksQt";
         configFile = configDir.absolutePath() + "/config.ini";
-        if (!configDir.exists()) {
+
+        if(!configDir.exists()) {
             configDir.mkpath(configDir.absolutePath());
         }
-#endif
+    #endif
     }
 
     ConfigHelper conf(configFile);
-
     MainWindow w(&conf);
     mainWindow = &w;
 
-    if (conf.isOnlyOneInstance() && w.isInstanceRunning()) {
+    if(conf.isOnlyOneInstance() && w.isInstanceRunning()) {
         return -1;
     }
 
     w.startAutoStartConnections();
 
-    if (!conf.isHideWindowOnStartup()) {
+    if(!conf.isHideWindowOnStartup()) {
         w.show();
     }
 
