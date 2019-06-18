@@ -8,11 +8,9 @@
 #include <vector>
 #include <string>
 
-#include "utils/export.h"
-
 namespace QSS {
 
-class QSS_EXPORT RC4 {
+class RC4 {
 public:
     // non-skip
     // This class implements so-called RC4-MD5 cipher instead

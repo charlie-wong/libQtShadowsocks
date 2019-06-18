@@ -11,7 +11,7 @@ option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" OFF)
 option(SSQT_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
 
 option(SSQT_BUILD_TUI "Build shadowsocks TUI server/client." ON)
-option(SSQT_BUILD_GUI "Build shadowsocks TUI server/client." ON)
+option(SSQT_BUILD_GUI "Build shadowsocks GUI server/client." ON)
 
 option(SSQT_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
 option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." OFF)

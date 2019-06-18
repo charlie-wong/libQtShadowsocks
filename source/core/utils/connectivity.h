@@ -3,16 +3,15 @@
 #ifndef UTILS_CONNECTIVITY_H
 #define UTILS_CONNECTIVITY_H
 
-#include "export.h"
-#include <QHostAddress>
-#include <QTcpSocket>
 #include <QTime>
 #include <QTimer>
+#include <QTcpSocket>
+#include <QHostAddress>
 
 namespace QSS {
 
 // This class is only meaningful for client-side applications
-class QSS_EXPORT Connectivity : public QObject {
+class Connectivity : public QObject {
     Q_OBJECT
 public:
     Connectivity(const QHostAddress &server_addr,

@@ -5,14 +5,13 @@
 #include <list>
 #include <memory>
 
-#include "utils/export.h"
 #include "network/address.h"
 
 namespace QSS {
 
 class TcpRelay;
 
-class QSS_EXPORT TcpServer : public QTcpServer {
+class TcpServer : public QTcpServer {
     Q_OBJECT
 public:
     ~TcpServer();

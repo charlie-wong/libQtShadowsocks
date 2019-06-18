@@ -11,7 +11,7 @@
 
 namespace QSS {
 
-class QSS_EXPORT UdpRelay : public QObject {
+class UdpRelay : public QObject {
     Q_OBJECT
 public:
     UdpRelay(const UdpRelay &) = delete;

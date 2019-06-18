@@ -4,11 +4,9 @@
 #include <QObject>
 #include <QAbstractSocket>
 
-#include "utils/export.h"
-
 namespace QSS {
 
-class QSS_EXPORT SocketStream : public QObject {
+class SocketStream : public QObject {
     Q_OBJECT
 public:
     // A light-weight class dedicated to stream data between two sockets

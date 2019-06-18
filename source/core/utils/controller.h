@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QHostAddress>
 
-#include "export.h"
 #include "utils/profile.h"
 #include "network/udprelay.h"
 #include "network/tcpserver.h"
@@ -12,7 +11,7 @@
 
 namespace QSS {
 
-class QSS_EXPORT Controller : public QObject {
+class Controller : public QObject {
     Q_OBJECT
 public:
     Controller(Profile _profile, bool is_local,

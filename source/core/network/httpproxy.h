@@ -7,11 +7,9 @@
 #include <QTcpServer>
 #include <QNetworkProxy>
 
-#include "utils/export.h"
-
 namespace QSS {
 
-class QSS_EXPORT HttpProxy : public QTcpServer {
+class HttpProxy : public QTcpServer {
     Q_OBJECT
 public:
     HttpProxy();

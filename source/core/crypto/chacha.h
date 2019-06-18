@@ -6,11 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "utils/export.h"
-
 namespace QSS {
 
-class QSS_EXPORT ChaCha {
+class ChaCha {
 public:
     // Key length must be 32 (16 is dropped)
     // IV length must be 8 or 12

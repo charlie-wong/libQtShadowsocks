@@ -11,11 +11,9 @@
 #include <memory>
 #include <vector>
 
-#include "utils/export.h"
-
 namespace QSS {
 
-class QSS_EXPORT DnsLookup : public QObject {
+class DnsLookup : public QObject {
     // A simple wrapper class to provide asynchronous DNS lookup
     Q_OBJECT
 public:
@@ -32,7 +30,7 @@ private:
     QList<QHostAddress> m_ips;
 };
 
-class QSS_EXPORT Address {
+class Address {
 public:
     explicit Address(const std::string &a = std::string(), uint16_t p = 0);
 

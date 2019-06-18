@@ -5,13 +5,11 @@
 #include <cstdint>
 #include <memory>
 
-#include "utils/export.h"
-
 namespace QSS {
 
 struct ProfilePrivate;
 
-class QSS_EXPORT Profile {
+class Profile {
 public:
     Profile();
     Profile(const Profile &);

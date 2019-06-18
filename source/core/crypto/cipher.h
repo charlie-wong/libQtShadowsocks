@@ -8,11 +8,11 @@
 #define CRYPTO_CIPHER_H
 
 #include <array>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+
 #include "rc4.h"
 #include "chacha.h"
-#include "utils/export.h"
 
 namespace Botan {
 class KDF;
@@ -22,7 +22,7 @@ class Keyed_Filter;
 
 namespace QSS {
 
-class QSS_EXPORT Cipher {
+class Cipher {
 public:
     ~Cipher();
     Cipher(Cipher &&) = default;

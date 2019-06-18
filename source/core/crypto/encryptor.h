@@ -10,11 +10,10 @@
 #include <memory>
 
 #include "cipher.h"
-#include "utils/export.h"
 
 namespace QSS {
 
-class QSS_EXPORT Encryptor {
+class Encryptor {
 public:
     /// @brief Encryptor
     ///

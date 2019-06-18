@@ -12,7 +12,7 @@
 namespace QSS {
 
 /// The abstract base class representing a Shadowsocks TCP connection
-class QSS_EXPORT TcpRelay : public QObject {
+class TcpRelay : public QObject {
     Q_OBJECT
 public:
     TcpRelay(QTcpSocket *localSocket, int timeout, Address server_addr,

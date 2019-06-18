@@ -5,7 +5,7 @@
 
 namespace QSS {
 
-class QSS_EXPORT TcpRelayServer : public TcpRelay {
+class TcpRelayServer : public TcpRelay {
     Q_OBJECT
 public:
     TcpRelayServer(QTcpSocket *localSocket, int timeout,
