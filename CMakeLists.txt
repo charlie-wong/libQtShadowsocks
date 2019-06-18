@@ -14,7 +14,7 @@ option(SSQT_BUILD_TUI "Build shadowsocks TUI server/client." ON)
 option(SSQT_BUILD_GUI "Build shadowsocks TUI server/client." ON)
 
 option(SSQT_BUILD_TEST "Build shadowsocks Qt5 testing case." ON)
-option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." ON)
+option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." OFF)
 
 # xmake setup configuration for mpack
 option(SSQT_ENABLE_CI "Enable CI build." OFF)
