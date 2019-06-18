@@ -6,8 +6,8 @@ set(SSQT_VERSION_MINOR 0)
 set(SSQT_VERSION_PATCH 0)
 set(SSQT_VERSION_TWEAK "") # Date/SHA1 Build Time Update
 
-option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." ON)
-option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" ON)
+option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." OFF)
+option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" OFF)
 option(SSQT_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
 
 option(SSQT_BUILD_TUI "Build shadowsocks TUI server/client." ON)
