@@ -56,8 +56,7 @@ int main(int argc, char *argv[])
     qRegisterMetaTypeStreamOperators<SQProfile>("SQProfile");
     QApplication app(argc, argv);
     setupApplication(app);
-    CmdArgs opts;
-    opts.process(app);
+    CmdArgs().process(app);
     QString configFile = "";
 
     if(configFile.isEmpty()) {

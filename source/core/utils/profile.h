@@ -11,10 +11,10 @@ struct ProfilePrivate;
 
 class Profile {
 public:
-    Profile();
-    Profile(const Profile &);
-    Profile(Profile &&);
     ~Profile();
+    Profile();
+    Profile(Profile &&);
+    Profile(const Profile &);
 
     const std::string &name() const;
     const std::string &method() const;
@@ -53,7 +53,7 @@ public:
     void setLocalAddress(const std::string &local);
     void setServerPort(uint16_t);
     void setLocalPort(uint16_t);
-    void setTimeout(int);
+    void setSocketTimeout(int);
     void setHttpProxy(bool);
     void enableDebug();
     void disableDebug();
@@ -65,20 +65,22 @@ public:
 
 private:
     WorkMode m_work_mode;
-    // For future extension, keep ABI compatible
-    std::unique_ptr<ProfilePrivate> d_private;
 
-    // Essential data are stored directly as members in this class. Don't
-    // remove or change any these members, which would break ABI compatiblity
-    int d_timeout;
-    uint16_t d_serverPort;
+    // Essential data are stored directly as members in this class.
     uint16_t d_localPort;
+    std::string d_localAddress;
 
-    std::string d_name;
+    uint16_t d_serverPort;
+    std::string d_serverAddress;
+
     std::string d_method;
     std::string d_password;
-    std::string d_serverAddress;
-    std::string d_localAddress;
+
+    int d_timeout;
+    std::string d_name;
+
+    // For future extension, keep ABI compatible
+    std::unique_ptr<ProfilePrivate> d_private;
 };
 
 } // namespace QSS

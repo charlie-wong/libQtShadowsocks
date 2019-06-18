@@ -4,21 +4,20 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "config/config.h"
 #include "config/configJson.h"
 
-bool configJsonParser(const QString &file, QSS::Profile &profile)
+bool configJsonApply(const QString &file, QSS::Profile &profile)
 {
     QFile config(file);
 
     if(!config.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QDebug(QtMsgType::QtCriticalMsg).noquote()
-            << "Can't open configuration file" << file;
+        qWarning() << "Can't open config file" << file;
         return false;
     }
 
     if(!config.isReadable()) {
-        QDebug(QtMsgType::QtCriticalMsg).noquote()
-            << "Configuration file" << file << "is not readable!";
+        qWarning() << "Config file" << file << "is not readable!";
         return false;
     }
 
@@ -28,28 +27,52 @@ bool configJsonParser(const QString &file, QSS::Profile &profile)
     config.close();
 
     if(status.error != QJsonParseError::NoError) {
-        qCritical() << "Failed to parse configuration file:" << status.errorString();
+        qWarning() << "Failed to parse config file" << status.errorString();
         return false;
     }
 
-    QString work_mode = jsonObj["mode"].toString();
-    if(work_mode.compare("server", Qt::CaseInsensitive) == 0) {
-        profile.setWorkMode(QSS::Profile::WorkMode::SERVER);
-    } else if(work_mode.compare("client", Qt::CaseInsensitive) == 0) {
-        profile.setWorkMode(QSS::Profile::WorkMode::CLIENT);
+    if(jsonObj.contains("mode")) {
+        QString mode = jsonObj["mode"].toString();
+        if(mode.compare("server", Qt::CaseInsensitive) == 0) {
+            profile.setWorkMode(QSS::Profile::WorkMode::SERVER);
+        } else if(mode.compare("client", Qt::CaseInsensitive) == 0) {
+            profile.setWorkMode(QSS::Profile::WorkMode::CLIENT);
+        }
     }
 
-    profile.setLocalPort((uint16_t)jsonObj["proxy_port"].toInt());
-    profile.setLocalAddress(jsonObj["proxy_addr"].toString().toStdString());
+    if(jsonObj.contains("proxy_port")) {
+        profile.setLocalPort((uint16_t)jsonObj["proxy_port"].toInt());
+    }
 
-    profile.setServerPort((uint16_t)jsonObj["server_port"].toInt());
-    profile.setServerAddress(jsonObj["server_addr"].toString().toStdString());
+    if(jsonObj.contains("proxy_addr")) {
+        profile.setLocalAddress(jsonObj["proxy_addr"].toString().toStdString());
+    }
 
-    profile.setMethod(jsonObj["algorithm"].toString().toStdString());
-    profile.setPassword(jsonObj["password"].toString().toStdString());
+    if(jsonObj.contains("server_port")) {
+        profile.setServerPort((uint16_t)jsonObj["server_port"].toInt());
+    }
 
-    profile.setTimeout(jsonObj["timeout"].toInt());
-    profile.setHttpProxy(jsonObj["http_proxy"].toBool());
+    if(jsonObj.contains("server_addr")) {
+        profile.setServerAddress(jsonObj["server_addr"].toString().toStdString());
+    }
+
+    if(jsonObj.contains("algorithm")) {
+        profile.setMethod(jsonObj["algorithm"].toString().toStdString());
+    }
+
+    if(jsonObj.contains("password")) {
+        profile.setPassword(jsonObj["password"].toString().toStdString());
+    }
+
+    if(jsonObj.contains("timeout")) {
+        profile.setSocketTimeout(jsonObj["timeout"].toInt());
+    }
+
+    if(jsonObj.contains("http_proxy")) {
+        profile.setHttpProxy(jsonObj["http_proxy"].toBool());
+    }
+
+    Config::setLogLevel(jsonObj["log_level"].toString());
 
     return true;
 }

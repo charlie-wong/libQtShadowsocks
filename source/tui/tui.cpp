@@ -12,29 +12,45 @@ QtSsTui::QtSsTui()
     // Nothing Todo
 }
 
-bool QtSsTui::parseConfigJson(const QString &file)
+bool QtSsTui::applyConfigJson(const QString &file)
 {
-    return configJsonParser(file, m_profile);
+    return configJsonApply(file, m_profile);
 }
 
 void QtSsTui::setup(const QString &remote_addr, const QString &remote_port,
     const QString &local_addr, const QString &local_port,
-    const QString &password, const QString &method,
-    const QString &timeout, const bool http_proxy)
+    const QString &password, const QString &algorithm,
+    const QString &socket_timeout, const bool http_proxy)
 {
-    m_profile.setServerAddress(remote_addr.toStdString());
-    m_profile.setServerPort((uint16_t)remote_port.toInt());
-    m_profile.setLocalAddress(local_addr.toStdString());
-    m_profile.setLocalPort((uint16_t)local_port.toInt());
-    m_profile.setPassword(password.toStdString());
-    m_profile.setMethod(method.toStdString());
-    m_profile.setTimeout(timeout.toInt());
-    m_profile.setHttpProxy(http_proxy);
-}
+    if(!remote_addr.isEmpty()) {
+        m_profile.setServerAddress(remote_addr.toStdString());
+    }
 
-void QtSsTui::setHttpMode(bool http)
-{
-    m_profile.setHttpProxy(http);
+    if(!remote_port.isEmpty()) {
+        m_profile.setServerPort((uint16_t)remote_port.toInt());
+    }
+
+    if(!local_addr.isEmpty()) {
+        m_profile.setLocalAddress(local_addr.toStdString());
+    }
+
+    if(!local_port.isEmpty()) {
+        m_profile.setLocalPort((uint16_t)local_port.toInt());
+    }
+
+    if(!algorithm.isEmpty()) {
+        m_profile.setMethod(algorithm.toStdString());
+    }
+
+    if(!password.isEmpty()) {
+        m_profile.setPassword(password.toStdString());
+    }
+
+    if(!socket_timeout.isEmpty()) {
+        m_profile.setSocketTimeout(socket_timeout.toInt());
+    }
+
+    m_profile.setHttpProxy(http_proxy);
 }
 
 void QtSsTui::setWorkMode(QSS::Profile::WorkMode mode) {
@@ -51,7 +67,7 @@ bool QtSsTui::start(void)
     }
 
     if(!m_profile.isValid()) {
-        qCritical() << "The m_profile is invalid, check it and try again!";
+        qCritical() << "server_addr, algorithm or password empty, STOP!";
         return false;
     }
 

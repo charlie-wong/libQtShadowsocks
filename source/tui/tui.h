@@ -6,20 +6,15 @@
 class QtSsTui {
 public:
     QtSsTui();
-    bool parseConfigJson(const QString &);
+    bool applyConfigJson(const QString &);
 
-    void setup(const QString &remote_addr,
-        const QString &remote_port,
-        const QString &local_addr,
-        const QString &local_port,
-        const QString &password,
-        const QString &method,
-        const QString &timeout,
-        const bool http_proxy
+    void setup(const QString &remote_addr, const QString &remote_port,
+        const QString &local_addr, const QString &local_port,
+        const QString &password, const QString &algorithm,
+        const QString &socket_timeout, const bool http_proxy
     );
 
     bool start(void);
-    void setHttpMode(bool http);
     const std::string &getMethod() const;
     void setWorkMode(QSS::Profile::WorkMode mode);
 private:

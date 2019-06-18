@@ -9,7 +9,7 @@ struct Config {
         DEBUG, INFO, WARN, ERROR, FATAL
     };
 
-    static LogLevel logLevel;
+    static void setLogLevel(const QString &logLevelName);
 
     // test data encrypt/decrypt speed. print result to terminal
     static void testSpeed(const std::string &method, uint32_t data_size_mb);

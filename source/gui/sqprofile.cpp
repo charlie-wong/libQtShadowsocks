@@ -47,7 +47,7 @@ QSS::Profile SQProfile::toProfile() const
     qssprofile.setLocalPort(localPort);
     qssprofile.setMethod(method.toLower().toStdString());
     qssprofile.setPassword(password.toStdString());
-    qssprofile.setTimeout(timeout);
+    qssprofile.setSocketTimeout(timeout);
     qssprofile.setHttpProxy(httpMode);
 
     if(debug) {

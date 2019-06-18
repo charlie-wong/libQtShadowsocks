@@ -1,6 +1,8 @@
-#include "profile.h"
 #include <QByteArray>
 #include <stdexcept>
+
+#include "profile.h"
+#include "config.generated.h"
 
 namespace QSS {
 
@@ -11,40 +13,44 @@ struct ProfilePrivate {
     std::string pluginOpts;
 };
 
-Profile::Profile() :
-    d_private(new ProfilePrivate())
-    , d_localAddress("127.0.0.1")
-    , d_serverPort(0), d_localPort(0)
-    , d_timeout(600)
+Profile::Profile() : m_work_mode(WorkMode::CLIENT)
+    , d_localPort(DEFAULT_PROXY_PORT)
+    , d_localAddress(DEFAULT_PROXY_ADDR)
+    , d_serverPort(DEFAULT_SERVER_PORT)
+    , d_serverAddress(DEFAULT_SERVER_ADDR)
+    , d_method(DEFAULT_ALGORITHM)
+    , d_password(DEFAULT_PASSWORD)
+    , d_timeout(DEFAULT_SOCKET_TIMEOUT)
+    , d_private(new ProfilePrivate())
+
 {
     // Nothing Todo
 }
 
-Profile::Profile(const Profile &b) :
-    d_private(new ProfilePrivate(*b.d_private))
-    , d_name(b.d_name)
-    , d_method(b.d_method)
-    , d_password(b.d_password)
-    , d_serverAddress(b.d_serverAddress)
+Profile::Profile(const Profile &b) : m_work_mode(WorkMode::CLIENT)
+    , d_localPort(b.d_localPort)
     , d_localAddress(b.d_localAddress)
     , d_serverPort(b.d_serverPort)
-    , d_localPort(b.d_localPort)
+    , d_serverAddress(b.d_serverAddress)
+    , d_method(b.d_method)
+    , d_password(b.d_password)
     , d_timeout(b.d_timeout)
+    , d_name(b.d_name)
+    , d_private(new ProfilePrivate(*b.d_private))
 {
     // Nothing Todo
 }
 
-Profile::Profile(Profile &&b) :
-    m_work_mode(WorkMode::CLIENT)
-    , d_private(std::move(b.d_private))
-    , d_name(std::move(b.d_name))
-    , d_method(std::move(b.d_method))
-    , d_password(std::move(b.d_password))
-    , d_serverAddress(std::move(b.d_serverAddress))
+Profile::Profile(Profile &&b) : m_work_mode(WorkMode::CLIENT)
+    , d_localPort(std::move(b.d_localPort))
     , d_localAddress(std::move(b.d_localAddress))
     , d_serverPort(std::move(b.d_serverPort))
-    , d_localPort(std::move(b.d_localPort))
+    , d_serverAddress(std::move(b.d_serverAddress))
+    , d_method(std::move(b.d_method))
+    , d_password(std::move(b.d_password))
     , d_timeout(std::move(b.d_timeout))
+    , d_name(std::move(b.d_name))
+    , d_private(std::move(b.d_private))
 {
     // Nothing Todo
 }
@@ -167,7 +173,7 @@ void Profile::setLocalPort(uint16_t p)
     d_localPort = p;
 }
 
-void Profile::setTimeout(int t)
+void Profile::setSocketTimeout(int t)
 {
     d_timeout = t;
 }

@@ -3,6 +3,6 @@
 
 #include <QtShadowsocks>
 
-bool configJsonParser(const QString &file, QSS::Profile &profile);
+bool configJsonApply(const QString &file, QSS::Profile &profile);
 
 #endif // CONFIG_CONFIGJSON_H

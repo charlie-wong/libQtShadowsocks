@@ -46,4 +46,13 @@
 #define SSQT_LOG_LEVEL              @SSQT_LOG_LEVEL@
 #define SSQT_LOG_TYPE              "@SSQT_LOG_TYPE@"
 
+// The default configuration
+#define DEFAULT_PROXY_ADDR      "127.0.0.1" // local proxy default IP
+#define DEFAULT_PROXY_PORT      1080 // SOCKS 5 default port number
+#define DEFAULT_SERVER_ADDR     ""
+#define DEFAULT_SERVER_PORT     12345
+#define DEFAULT_PASSWORD        "ShadowSocks"
+#define DEFAULT_ALGORITHM       "aes-256-cfb"
+#define DEFAULT_SOCKET_TIMEOUT  120 // 120s
+
 #endif // CONFIG_CONFIG_H

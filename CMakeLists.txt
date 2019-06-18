@@ -74,10 +74,6 @@ endif()
 #message(STATUS "Qt5Core_LIBRARIES=${Qt5Core_LIBRARIES}")
 #message(STATUS "Qt5Core_INCLUDE_DIRS=${Qt5Core_INCLUDE_DIRS}")
 
-add_subdirectory(source/core)
-include_directories(${PROJECT_SOURCE_DIR}/source)
-include_directories(${PROJECT_SOURCE_DIR}/source/core)
-
 # Use static shadowSocks core library by default
 set(SSQT_CoreLib static_LibQtShadowSocks)
 if(SSQT_BUILD_SHARED)

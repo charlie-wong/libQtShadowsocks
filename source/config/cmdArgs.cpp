@@ -1,25 +1,10 @@
 #include <iostream>
 
+#include <QDir>
+
 #include "config/config.h"
 #include "config/cmdArgs.h"
 #include "config.generated.h"
-
-static Config::LogLevel logLevelConv(const QString &str)
-{
-    if(str.compare("DEBUG", Qt::CaseInsensitive) == 0) {
-        return Config::LogLevel::DEBUG;
-    } else if(str.compare("INFO", Qt::CaseInsensitive) == 0) {
-        return Config::LogLevel::INFO;
-    } else if(str.compare("WARN", Qt::CaseInsensitive) == 0) {
-        return Config::LogLevel::WARN;
-    } else if(str.compare("ERROR", Qt::CaseInsensitive) == 0) {
-        return Config::LogLevel::ERROR;
-    } else if(str.compare("FATAL", Qt::CaseInsensitive) == 0) {
-        return Config::LogLevel::FATAL;
-    }
-
-    return Config::LogLevel::WARN; // default log level
-}
 
 CmdArgs::CmdArgs() :
     m_configFile("c",
@@ -99,16 +84,68 @@ CmdArgs::CmdArgs() :
 
 void CmdArgs::process(const QCoreApplication &app) {
     m_parser.process(app);
-    Config::logLevel = logLevelConv(m_parser.value(m_logLevel));
+    Config::setLogLevel(m_parser.value(m_logLevel));
 }
 
 void CmdArgs::process(const QStringList &args) {
     m_parser.process(args);
-    Config::logLevel = logLevelConv(m_parser.value(m_logLevel));
+    Config::setLogLevel(m_parser.value(m_logLevel));
 }
 
 QString CmdArgs::getConfigFile(void) const {
-    return m_parser.value(m_configFile);
+    // command line configuration come first
+    QString configJson = m_parser.value(m_configFile);
+    if(!configJson.isEmpty() && QFileInfo(configJson).isFile()) {
+        return configJson;
+    }
+
+    // whether current working directory has 'config.json'
+    configJson = QDir::currentPath() + QDir::separator() + "config.json";
+    if(QFileInfo(configJson).isFile()) {
+        return configJson;
+    }
+
+    // check the default 'config.json'
+#ifdef Q_OS_WIN
+    configJson = QCoreApplication::applicationDirPath() + "/config.json";
+#else
+    QDir configDir = QDir::homePath() + "/.config/ShadowSocksQt";
+    configJson = configDir.absolutePath() + "/config.json";
+
+    if(!configDir.exists()) {
+        configDir.mkpath(configDir.absolutePath());
+    }
+
+    // create the default one if not exist, see DEFAULT_* macros
+    if(!QFileInfo(configJson).isFile()) {
+        QFile file(configJson);
+        QString content(
+            "{\n"
+            "    \"mode\": \"client\",\n"
+            "\n"
+            "    \"server_port\": 12345,\n"
+            "    \"server_addr\": \"ServerAddr\",\n"
+            "\n"
+            "    \"proxy_port\": 1080,\n"
+            "    \"proxy_addr\": \"127.0.0.1\",\n"
+            "\n"
+            "    \"password\": \"ShadowSocks\",\n"
+            "    \"algorithm\": \"aes-256-cfb\",\n"
+            "\n"
+            "    \"timeout\": 120,\n"
+            "    \"http_proxy\": false,\n"
+            "\n"
+            "    \"log_level\": \"info\"\n"
+            "}\n"
+        );
+        if(file.open(QIODevice::WriteOnly)) {
+            file.write(content.toUtf8());
+            file.close();
+        }
+    }
+#endif
+
+    return configJson;
 }
 
 QString CmdArgs::getServerAddr(void) const {

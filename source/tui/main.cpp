@@ -1,13 +1,10 @@
 #include <signal.h>
 
-#include <QDir>
 #include <QCoreApplication>
 
 #include "tui/tui.h"
 #include "config/config.h"
 #include "config/cmdArgs.h"
-
-using namespace QSS;
 
 static void onSignalRecv(int sig)
 {
@@ -28,41 +25,19 @@ int main(int argc, char *argv[])
     signal(SIGINT, onSignalRecv);
     signal(SIGTERM, onSignalRecv);
 
+    QtSsTui tui;
     CmdArgs opts;
     opts.process(app);
 
-    QtSsTui tui;
-
+    // JSON configuration file
     QString configFile = opts.getConfigFile();
-    if(configFile.isEmpty() || !QFileInfo(configFile).isFile()) {
-        // whether application binary directory has 'config.json'
-        QString appDir = QCoreApplication::applicationDirPath();
-        configFile = appDir + QDir::separator() + "config.json";
+    if(!configFile.isEmpty()) {
+        tui.applyConfigJson(configFile);
     }
 
-    if(!QFileInfo(configFile).isFile()) {
-        // whether current working directory has 'config.json'
-        configFile = QDir::currentPath() + QDir::separator() + "config.json";
-    }
-
-    if(!QFileInfo(configFile).isFile()) {
-        qCritical() << "NOT found config.json, STOP!";
-        return -1;
-    }
-
-    if(!tui.parseConfigJson(configFile)) {
-        tui.setup(opts.getServerAddr(), opts.getServerPort(),
-            opts.getProxyAddr(), opts.getProxyPort(),
-            opts.getCryptoPassword(),
-            opts.getCryptoAlgorithm(),
-            opts.getSocketTimeout(),
-            opts.isSetHttpProxy()
-        );
-    }
-
-    // command-line option has a higher priority for S, C, H, T
-    if(opts.isSetHttpProxy()) {
-        tui.setHttpMode(true);
+    // command-line option has higher priority
+    if(!opts.getLogLevel().isEmpty()) {
+        Config::setLogLevel(opts.getLogLevel());
     }
 
     if(opts.isSetServerMode()) {
@@ -72,6 +47,13 @@ int main(int argc, char *argv[])
     if(opts.isSetClientMode()) {
         tui.setWorkMode(QSS::Profile::WorkMode::CLIENT);
     }
+
+    tui.setup(
+        opts.getServerAddr(), opts.getServerPort(),
+        opts.getProxyAddr(), opts.getProxyPort(),
+        opts.getCryptoPassword(), opts.getCryptoAlgorithm(),
+        opts.getSocketTimeout(), opts.isSetHttpProxy()
+    );
 
     if(opts.isSetSpeedTest()) {
         if(tui.getMethod().empty()) {
