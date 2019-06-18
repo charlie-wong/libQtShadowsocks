@@ -18,14 +18,18 @@ Building
 
 Dependencies
 - [botan](https://github.com/randombit/botan)
-  * $ pacman -S mingw-w64-i686-libbotan2.10.0-1
-  * $ pacman -S mingw-w64-x86_64-libbotan2.10.0-1
+  * $ pacman -S mingw-w64-i686-libbotan
+  * $ pacman -S mingw-w64-x86_64-libbotan
 
 - [bzar](http://zbar.sourceforge.net/)
   * $ sudo apt install libzbar-dev
+  * $ pacman -S mingw-w64-i686-zbar
+  * $ pacman -S mingw-w64-x86_64-zbar
 
 - [libqrencode](https://fukuchi.org/works/qrencode)
   * $ sudo apt install libqrencode-dev
+  * $ pacman -S mingw-w64-i686-qrencode
+  * $ pacman -S mingw-w64-x86_64-qrencode
 
 - [Qt]http://download.qt.io/official_releases/qt 5.6 or later
   * $ pacman -S mingw-w64-i686-qt5

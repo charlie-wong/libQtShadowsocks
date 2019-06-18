@@ -2,7 +2,7 @@
 if(SSQT_DBI_QRENCODE)
     set(qrencode_TARGET libqrencode)
     XmakeDepTarballBuild(${qrencode_TARGET}
-        VERSION     2.10.0
+        VERSION     4.0.2
         URL         https://fukuchi.org/works/qrencode/qrencode-4.0.2.tar.gz
         SHA256      dbabe79c07614625d1f74d8c0ae2ee5358c4e27eab8fd8fe31f9365f821a3b1d
         CONFIG_CMD  ./configure --prefix=${DEPS_INSTALL_DIR}
@@ -15,7 +15,7 @@ if(SSQT_DBI_QRENCODE)
 else()
     # Try to find the libqrencode library
     XmakeSearchLibrary(PREFIX qrencode
-        NAME qrencode VERSION 2.10.0
+        NAME libqrencode VERSION 4.0.2
         REQUIRED # STATIC VERBOSE
     )
 endif()

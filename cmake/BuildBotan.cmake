@@ -28,7 +28,7 @@ if(SSQT_DBI_BOTAN2)
     set(botan2_INCLUDE_DIRS ${DEPS_INSTALL_DIR}/include/botan-2)
 else() # Try to find the system wide botan2 library
     XmakeSearchLibrary(PREFIX botan2
-        NAME botan-2 VERSION 2.3.0
+        NAME botan-2 VERSION 2.10.0
         STATIC REQUIRED # VERBOSE
     )
 endif()
