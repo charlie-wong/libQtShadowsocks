@@ -15,7 +15,7 @@ namespace QSS {
 class QSS_EXPORT Connectivity : public QObject {
     Q_OBJECT
 public:
-    Connectivity(const QHostAddress &server_address,
+    Connectivity(const QHostAddress &server_addr,
         const uint16_t &server_port, QObject *parent = 0
     );
 
@@ -24,42 +24,45 @@ public:
     static const int LAG_ERROR = -2;
     static const int LAG_TIMEOUT = -1;
 
-    // Connectivity test will try to establish a shadowsocks connection with
-    // the server. The result is passed by signal connectivityFinished().
+    // Connectivity test will try to establish a shadowsocks connection
+    // with the server. The result is passed by signal connTestFinished().
     // If the server times out, the connectivity will be passed as false.
     //
     // Calling this function does lag (latency) test as well. Therefore, it's
     // the recommended way to do connectivity and latency test with just one
     // function call.
     //
-    // Don't call the same Connectivity instance's startConnectivityTest()
-    // and startLagTest() at the same time!
-    void startConnectivityTest(const std::string &method,
+    // Don't call the same Connectivity instance's connTestStart()
+    // and lagTestStart() at the same time!
+    void connTestStart(const std::string &method,
         const std::string &password, int timeout = 3000
     );
 
 signals:
     void lagTestFinished(int);
-    void testErrorString(const QString &);
-    void connectivityFinished(bool);
+    void connTestFinished(bool);
+    void testResult(const QString &);
 
 public slots:
     // The lag test only tests if the server port is open and listeninig
     // bind lagTestFinished() signal to get the test result
-    void startLagTest(int timeout = 3000); // 3000 msec by default
+    void lagTestStart(int timeout = 3000); // 3000 msec by default
 
 private:
-    QHostAddress address;
-    uint16_t port;
-    QTime time;
-    QTcpSocket socket;
-    QTimer timer;
-    bool testingConnectivity;
+    void connectToServer(int timeout);
+
+private:
+    uint16_t m_server_port;
+    QHostAddress m_server_addr;
+
+    QTimer m_timer;
+    QTime m_timestamp;
+
+    QTcpSocket m_socket;
+    bool m_do_connectivity_test;
 
     std::string encryptionMethod;
     std::string encryptionPassword;
-
-    void connectToServer(int timeout);
 
 private slots:
     void onTimeout();

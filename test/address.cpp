@@ -1,7 +1,8 @@
-#include "types/address.h"
-#include <QHostAddress>
-#include <QString>
 #include <QtTest>
+#include <QString>
+#include <QHostAddress>
+
+#include "network/address.h"
 
 class Address : public QObject {
     Q_OBJECT

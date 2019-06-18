@@ -1,11 +1,12 @@
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#ifndef NETWORK_TCPSERVER_H
+#define NETWORK_TCPSERVER_H
 
 #include <QTcpServer>
 #include <list>
 #include <memory>
-#include "types/address.h"
+
 #include "utils/export.h"
+#include "network/address.h"
 
 namespace QSS {
 
@@ -42,4 +43,4 @@ private:
 
 } // namespace QSS
 
-#endif // TCPSERVER_H
+#endif // NETWORK_TCPSERVER_H

@@ -1,12 +1,15 @@
-#include <QtShadowsocks>
-#include <QDateTime>
-#include <QTime>
 #include <iostream>
-#include "utils.h"
 
-Utils::LogLevel Utils::logLevel = Utils::LogLevel::INFO;
+#include <QTime>
+#include <QDateTime>
 
-void Utils::testSpeed(const std::string &method, uint32_t data_size_mb)
+#include <QtShadowsocks>
+
+#include "config/config.h"
+
+Config::LogLevel Config::logLevel = Config::LogLevel::WARN;
+
+void Config::testSpeed(const std::string &method, uint32_t data_size_mb)
 {
     const std::string test(1024 * 32, '#'); // 32KB
     uint32_t loops = 32 * data_size_mb;
@@ -24,7 +27,7 @@ void Utils::testSpeed(const std::string &method, uint32_t data_size_mb)
         << startTime.msecsTo(QTime::currentTime()) << "ms\n" << std::endl;
 }
 
-void Utils::testSpeed(uint32_t data_size_mb)
+void Config::testSpeed(uint32_t data_size_mb)
 {
     std::vector<std::string> allMethods = QSS::Cipher::supportedMethods();
     std::sort(allMethods.begin(), allMethods.end());
@@ -34,8 +37,8 @@ void Utils::testSpeed(uint32_t data_size_mb)
     }
 }
 
-void Utils::messageHandler(QtMsgType type, const QMessageLogContext &,
-    const QString &msg)
+void Config::logMsgHandler(QtMsgType type,
+    const QMessageLogContext &, const QString &msg)
 {
     const std::string message = msg.toStdString();
     const QDateTime now = QDateTime::currentDateTime();
@@ -43,36 +46,36 @@ void Utils::messageHandler(QtMsgType type, const QMessageLogContext &,
         now.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();
 
     switch(type) {
-        case QtDebugMsg:
-            if(Utils::logLevel <= LogLevel::DEBUG) {
+        case QtDebugMsg: // qDebug()
+            if(Config::logLevel <= LogLevel::DEBUG) {
                 std::cout << timestamp << " DEBUG: " << message << std::endl;
             }
 
             break;
 
-        case QtInfoMsg:
-            if(Utils::logLevel <= LogLevel::INFO) {
+        case QtInfoMsg: // qInfo()
+            if(Config::logLevel <= LogLevel::INFO) {
                 std::cout << timestamp << " INFO: " << message << std::endl;
             }
 
             break;
 
-        case QtWarningMsg:
-            if(Utils::logLevel <= LogLevel::WARN) {
+        case QtWarningMsg: // qWarning()
+            if(Config::logLevel <= LogLevel::WARN) {
                 std::cerr << timestamp << " WARN: " << message << std::endl;
             }
 
             break;
 
-        case QtCriticalMsg:
-            if(Utils::logLevel <= LogLevel::ERROR) {
+        case QtCriticalMsg: // qCritical()
+            if(Config::logLevel <= LogLevel::ERROR) {
                 std::cerr << timestamp << " ERROR: " << message << std::endl;
             }
 
             break;
 
-        case QtFatalMsg: // FATAL is not allowed to skip
+        case QtFatalMsg: // qFatal()
             std::cerr << timestamp << " FATAL: " << message << std::endl;
-            abort();
+            abort(); // fatal error, abort
     }
 }

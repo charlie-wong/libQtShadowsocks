@@ -4,27 +4,31 @@
 
 #include "common.h"
 #include "connectivity.h"
-#include "types/address.h"
+#include "network/address.h"
 #include "crypto/encryptor.h"
 
 namespace QSS {
 
-Connectivity::Connectivity(const QHostAddress &_address,
-    const uint16_t &_port, QObject *parent) :
+Connectivity::Connectivity(const QHostAddress &server_addr,
+    const uint16_t &server_port, QObject *parent) :
     QObject(parent)
-    , address(_address)
-    , port(_port)
-    , testingConnectivity(false)
+    , m_server_addr(server_addr)
+    , m_server_port(server_port)
+    , m_do_connectivity_test(false)
 {
-    timer.setSingleShot(true);
-    time = QTime::currentTime();
-    socket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(&timer, &QTimer::timeout, this, &Connectivity::onTimeout);
-    connect(&socket, &QTcpSocket::connected, this, &Connectivity::onConnected);
-    connect(&socket, &QTcpSocket::readyRead,
+    m_timestamp = QTime::currentTime();
+
+    m_timer.setSingleShot(true);
+    connect(&m_timer, &QTimer::timeout, this, &Connectivity::onTimeout);
+
+    m_socket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
+    connect(&m_socket, &QTcpSocket::connected,
+        this, &Connectivity::onConnected
+    );
+    connect(&m_socket, &QTcpSocket::readyRead,
         this, &Connectivity::onSocketReadyRead
     );
-    connect(&socket,
+    connect(&m_socket,
         static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
         (&QTcpSocket::error), this, &Connectivity::onSocketError
     );
@@ -32,21 +36,21 @@ Connectivity::Connectivity(const QHostAddress &_address,
 
 void Connectivity::connectToServer(int timeout)
 {
-    time = QTime::currentTime();
-    timer.start(timeout);
-    socket.connectToHost(address, port);
+    m_timestamp = QTime::currentTime();
+    m_timer.start(timeout);
+    m_socket.connectToHost(m_server_addr, m_server_port);
 }
 
-void Connectivity::startLagTest(int timeout)
+void Connectivity::lagTestStart(int timeout)
 {
-    testingConnectivity = false;
+    m_do_connectivity_test = false;
     connectToServer(timeout);
 }
 
-void Connectivity::startConnectivityTest(const std::string &method,
+void Connectivity::connTestStart(const std::string &method,
     const std::string &password, int timeout)
 {
-    testingConnectivity = true;
+    m_do_connectivity_test = true;
     encryptionMethod = method;
     encryptionPassword = password;
     connectToServer(timeout);
@@ -54,51 +58,51 @@ void Connectivity::startConnectivityTest(const std::string &method,
 
 void Connectivity::onTimeout()
 {
-    socket.abort();
-    emit connectivityFinished(false);
+    m_socket.abort();
+    emit connTestFinished(false);
     emit lagTestFinished(LAG_TIMEOUT);
 }
 
 void Connectivity::onSocketError(QAbstractSocket::SocketError)
 {
-    timer.stop();
-    socket.abort();
-    emit connectivityFinished(false);
-    emit testErrorString(socket.errorString());
+    m_timer.stop();
+    m_socket.abort();
+    emit connTestFinished(false);
+    emit testResult(m_socket.errorString());
     emit lagTestFinished(LAG_ERROR);
 }
 
 void Connectivity::onConnected()
 {
-    timer.stop();
-    emit lagTestFinished(time.msecsTo(QTime::currentTime()));
+    m_timer.stop();
+    emit lagTestFinished(m_timestamp.msecsTo(QTime::currentTime()));
 
-    if(testingConnectivity) {
-        Encryptor encryptor(encryptionMethod, encryptionPassword);
-        // A http request to Google to test
-        // connectivity The payload is dumped from
+    if(m_do_connectivity_test) {
+        /// @todo: find a better way to check connectivity
+        // A http request to Google to test the connectivity.
+        // The payload is dumped from
         // `curl http://www.google.com --socks5 127.0.0.1:1080`
-        // TODO: find a better way to check connectivity
+        Encryptor encryptor(encryptionMethod, encryptionPassword);
         std::string dest =
-            Common::packAddress(Address("www.baidu.com", 80));
+            Common::packAddress(Address("www.google.com", 80));
         static const QByteArray expected = QByteArray::fromHex(
-                "474554202f20485454502f312e310d0a486f73743a"
-                "207777772e676f6f676c652e636f6d0d0a55736572"
-                "2d4167656e743a206375726c2f372e34332e300d0a"
-                "4163636570743a202a2f2a0d0a0d0a"
+            "474554202f20485454502f312e310d0a486f73743a"
+            "207777772e676f6f676c652e636f6d0d0a55736572"
+            "2d4167656e743a206375726c2f372e34332e300d0a"
+            "4163636570743a202a2f2a0d0a0d0a"
         );
         std::string payload(expected.data(), expected.length());
         std::string toWrite = encryptor.encrypt(dest + payload);
-        socket.write(toWrite.data(), toWrite.size());
+        m_socket.write(toWrite.data(), toWrite.size());
     } else {
-        socket.abort();
+        m_socket.abort();
     }
 }
 
 void Connectivity::onSocketReadyRead()
 {
-    emit connectivityFinished(true);
-    socket.abort();
+    emit connTestFinished(true);
+    m_socket.abort();
 }
 
 } // namespace QSS

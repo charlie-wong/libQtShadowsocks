@@ -1,7 +1,7 @@
 // Communicate with lower-level encrytion library
 
-#ifndef ADDRESS_H
-#define ADDRESS_H
+#ifndef NETWORK_ADDRESS_H
+#define NETWORK_ADDRESS_H
 
 #include <QString>
 #include <QHostAddress>
@@ -107,6 +107,6 @@ private:
     std::shared_ptr<DnsLookup> dns;
 };
 
-}
+} // namespace QSS
 
-#endif // ADDRESS_H
+#endif // NETWORK_ADDRESS_H

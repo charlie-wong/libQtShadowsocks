@@ -1,5 +1,5 @@
-#ifndef PROFILE_H
-#define PROFILE_H
+#ifndef UTILS_PROFILE_H
+#define UTILS_PROFILE_H
 
 #include <string>
 #include <cstdint>
@@ -32,6 +32,11 @@ public:
     bool debug() const;
     bool hasPlugin() const;
 
+    enum class WorkMode { SERVER, CLIENT };
+
+    WorkMode getWorkMode(void);
+    void setWorkMode(WorkMode mode);
+
     /// @brief isValid Whether this profile has essential information.
     ///
     /// The validation only checks if essential fields such as method,
@@ -61,20 +66,23 @@ public:
     static Profile fromUri(const std::string &);
 
 private:
-    std::unique_ptr<ProfilePrivate>
-    d_private; // For future extension (to keep ABI compatible)
+    WorkMode m_work_mode;
+    // For future extension, keep ABI compatible
+    std::unique_ptr<ProfilePrivate> d_private;
 
     // Essential data are stored directly as members in this class. Don't
     // remove or change any these members, which would break ABI compatiblity
+    int d_timeout;
+    uint16_t d_serverPort;
+    uint16_t d_localPort;
+
     std::string d_name;
     std::string d_method;
     std::string d_password;
     std::string d_serverAddress;
     std::string d_localAddress;
-    uint16_t d_serverPort;
-    uint16_t d_localPort;
-    int d_timeout;
 };
 
-}
-#endif // PROFILE_H
+} // namespace QSS
+
+#endif // UTILS_PROFILE_H

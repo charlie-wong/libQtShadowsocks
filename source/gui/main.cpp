@@ -1,14 +1,18 @@
-#include <QApplication>
-#include <QTranslator>
-#include <QLibraryInfo>
+#include <signal.h>
+
+#include <QDir>
+#include <QDebug>
 #include <QLocale>
 #include <QMessageBox>
-#include <QDebug>
-#include <QDir>
+#include <QTranslator>
+#include <QLibraryInfo>
+#include <QApplication>
 #include <QCommandLineParser>
-#include <signal.h>
+
 #include "mainwindow.h"
 #include "confighelper.h"
+#include "config/config.h"
+#include "config/cmdArgs.h"
 
 MainWindow *mainWindow = nullptr;
 
@@ -17,58 +21,53 @@ static void onSignalRecv(int sig)
     if (sig == SIGINT || sig == SIGTERM) {
         qApp->quit();
     } else {
-        qWarning("Unhandled signal %d", sig);
+        qWarning("Unhandled Signal: %d", sig);
     }
 }
 
-void setupApplication(QApplication &a)
+static void setupApplication(QApplication &app)
 {
     signal(SIGINT, onSignalRecv);
     signal(SIGTERM, onSignalRecv);
 
     QApplication::setFallbackSessionManagementEnabled(false);
 
-    a.setApplicationName(QString("shadowsocks-qt5"));
-    a.setApplicationDisplayName(QString("Shadowsocks-Qt5"));
-    a.setApplicationVersion(SSQT_RELEASE_VERSION);
+    app.setApplicationName(QString("ShadowSocks(GUI)"));
+    app.setApplicationDisplayName(QString("ShadowSocksQt"));
+    app.setApplicationVersion(SSQT_RELEASE_VERSION);
 
 #ifdef Q_OS_WIN
     if (QLocale::system().country() == QLocale::China) {
-        a.setFont(QFont("Microsoft Yahei", 9, QFont::Normal, false));
+        app.setFont(QFont("Microsoft Yahei", 9, QFont::Normal, false));
     }
     else {
-        a.setFont(QFont("Segoe UI", 9, QFont::Normal, false));
+        app.setFont(QFont("Segoe UI", 9, QFont::Normal, false));
     }
 #endif
+
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     QIcon::setThemeName("Breeze");
 #endif
 
-    QTranslator *ssqt5t = new QTranslator(&a);
-    ssqt5t->load(QLocale::system(), "ss-qt5", "_", ":/i18n");
-    a.installTranslator(ssqt5t);
+    QTranslator *trans = new QTranslator(&app);
+    trans->load(QLocale::system(), "ssqt", "_", ":/i18n");
+    app.installTranslator(trans);
 }
 
 int main(int argc, char *argv[])
 {
     qRegisterMetaTypeStreamOperators<SQProfile>("SQProfile");
 
-    QApplication a(argc, argv);
-    setupApplication(a);
+    QApplication app(argc, argv);
+    setupApplication(app);
 
-    QCommandLineParser parser;
-    parser.addHelpOption();
-    parser.addVersionOption();
-    QCommandLineOption configFileOption("c",
-                                        "specify configuration file.",
-                                        "config.ini");
-    parser.addOption(configFileOption);
-    parser.process(a);
+    CmdArgs opts;
+    opts.process(app);
 
-    QString configFile = parser.value(configFileOption);
+    QString configFile = "";
     if (configFile.isEmpty()) {
 #ifdef Q_OS_WIN
-        configFile = a.applicationDirPath() + "/config.ini";
+        configFile = app.applicationDirPath() + "/config.ini";
 #else
         QDir configDir = QDir::homePath() + "/.config/shadowsocks-qt5";
         configFile = configDir.absolutePath() + "/config.ini";
@@ -77,6 +76,7 @@ int main(int argc, char *argv[])
         }
 #endif
     }
+
     ConfigHelper conf(configFile);
 
     MainWindow w(&conf);
@@ -92,5 +92,5 @@ int main(int argc, char *argv[])
         w.show();
     }
 
-    return a.exec();
+    return app.exec();
 }

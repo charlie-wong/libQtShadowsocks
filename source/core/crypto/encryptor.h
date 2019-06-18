@@ -4,8 +4,8 @@
 // Instead, it should use Cipher class as much as possible.
 // The only exception for this rule is the deprecated TABLE method.
 
-#ifndef ENCRYPTOR_H
-#define ENCRYPTOR_H
+#ifndef CRYPTO_ENCRYPTOR_H
+#define CRYPTO_ENCRYPTOR_H
 
 #include <memory>
 
@@ -71,4 +71,4 @@ protected:
 
 } // namespace QSS
 
-#endif // ENCRYPTOR_H
+#endif // CRYPTO_ENCRYPTOR_H

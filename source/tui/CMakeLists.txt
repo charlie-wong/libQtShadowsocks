@@ -1,10 +1,13 @@
-file(GLOB SSTUI_HEADERS *.h)
-file(GLOB SSTUI_SOURCES *.cpp)
+# Shadowsocks TUI Client/Server Name
+set(APP_NAME "shadowsocksqt-tui")
 
-# Shadowsocks Client/Server TUI Name
-set(APP_NAME "shadowsocks-tui")
+file(GLOB TUI_APP_HEADERS *.h)
+file(GLOB TUI_APP_SOURCES *.cpp)
 
-add_executable(${APP_NAME} ${SSTUI_HEADERS} ${SSTUI_SOURCES}
+list(APPEND TUI_APP_HEADERS ${CONFIG_HEADERS})
+list(APPEND TUI_APP_SOURCES ${CONFIG_SOURCES})
+
+add_executable(${APP_NAME} ${TUI_APP_HEADERS} ${TUI_APP_SOURCES}
     ${SSQT_AUTO_QT5_SOURCES}
 )
 add_dependencies(${APP_NAME} ${SSQT_CoreLib})

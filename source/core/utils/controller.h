@@ -5,10 +5,10 @@
 #include <QHostAddress>
 
 #include "export.h"
+#include "utils/profile.h"
+#include "network/udprelay.h"
 #include "network/tcpserver.h"
 #include "network/httpproxy.h"
-#include "types/profile.h"
-#include "network/udprelay.h"
 
 namespace QSS {
 

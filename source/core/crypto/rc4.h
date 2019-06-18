@@ -2,8 +2,8 @@
 // unaligned memory. Therefore, I reimplemented RC4 here to get around
 // the crashes by not using unaligned memory xor.
 
-#ifndef RC4_H
-#define RC4_H
+#ifndef CRYPTO_RC4_H
+#define CRYPTO_RC4_H
 
 #include <vector>
 #include <string>
@@ -36,4 +36,4 @@ private:
 
 } // namespace QSS
 
-#endif // RC4_H
+#endif // CRYPTO_RC4_H

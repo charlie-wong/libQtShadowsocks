@@ -1,0 +1,49 @@
+#ifndef CONFIG_CONFIG_H
+#define CONFIG_CONFIG_H
+
+#cmakedefine HOST_LINUX
+#cmakedefine HOST_MACOS
+#cmakedefine HOST_WINDOWS
+#cmakedefine HOST_WINDOWS_MSYS
+#cmakedefine HOST_WINDOWS_MINGW
+#cmakedefine HOST_WINDOWS_CYGWIN
+
+#cmakedefine HOST_ARCH_32
+#cmakedefine HOST_ARCH_64
+#cmakedefine HOST_BIG_ENDIAN
+
+#define HOST_NAME                   "@HOST_NAME@"
+#define HOST_USER                   "@HOST_USER@"
+#define HOST_ARCH                   "@HOST_ARCH@"
+#define HOST_SYSTEM_NAME            "@HOST_SYSTEM_NAME@"
+#define HOST_SYSTEM_VERSION         "@HOST_SYSTEM_VERSION@"
+#define HOST_OS_DIST_NAME           "@HOST_OS_DIST_NAME@"
+#define HOST_OS_DIST_VERSION        "@HOST_OS_DIST_VERSION@"
+
+#define SSQT_VERSION_MAJOR          @SSQT_VERSION_MAJOR@
+#define SSQT_VERSION_MINOR          @SSQT_VERSION_MINOR@
+#define SSQT_VERSION_PATCH          @SSQT_VERSION_PATCH@
+#define SSQT_VERSION_TWEAK         "@SSQT_VERSION_TWEAK@"
+
+/// Combine semantic version(major, minor, patch) into a number
+#define SEMVER(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
+#define SSQT_VERSION_NUMBER        @SSQT_VERSION_NUMBER@
+
+#define SSQT_RELEASE_TYPE          "@CMAKE_BUILD_TYPE@"
+#define SSQT_RELEASE_VERSION       "@SSQT_RELEASE_VERSION@"
+
+#define SSQT_RELEASE_YEAR          "@SSQT_RELEASE_YEAR@"
+#define SSQT_RELEASE_MONTH         "@SSQT_RELEASE_MONTH@"
+#define SSQT_RELEASE_DAY           "@SSQT_RELEASE_DAY@"
+#define SSQT_RELEASE_TIMESTAMP     "@SSQT_RELEASE_TIMESTAMP@"
+
+#define SSQT_COMMIT_ZONE           "@SSQT_COMMIT_ZONE@"
+#define SSQT_COMMIT_TIME           "@SSQT_COMMIT_TIME@"
+#define SSQT_COMMIT_DATE           "@SSQT_COMMIT_DATE@"
+#define SSQT_COMMIT_HASH           "@SSQT_COMMIT_HASH@"
+#define SSQT_COMMIT_MDTZ           "@SSQT_COMMIT_MDTZ@"
+
+#define SSQT_LOG_LEVEL              @SSQT_LOG_LEVEL@
+#define SSQT_LOG_TYPE              "@SSQT_LOG_TYPE@"
+
+#endif // CONFIG_CONFIG_H

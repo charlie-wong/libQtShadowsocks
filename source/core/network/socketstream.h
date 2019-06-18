@@ -1,5 +1,5 @@
-#ifndef SOCKETSTREAM_H
-#define SOCKETSTREAM_H
+#ifndef NETWORK_SOCKETSTREAM_H
+#define NETWORK_SOCKETSTREAM_H
 
 #include <QObject>
 #include <QAbstractSocket>
@@ -28,4 +28,4 @@ private slots:
 
 } // namespace QSS
 
-#endif // SOCKETSTREAM_H
+#endif // NETWORK_SOCKETSTREAM_H

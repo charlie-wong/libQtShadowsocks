@@ -1,5 +1,5 @@
-#ifndef TCPRELAYCLIENT_H
-#define TCPRELAYCLIENT_H
+#ifndef NETWORK_TCPRELAYCLIENT_H
+#define NETWORK_TCPRELAYCLIENT_H
 
 #include "tcprelay.h"
 
@@ -20,4 +20,4 @@ protected:
 };
 
 }
-#endif // TCPRELAYCLIENT_H
+#endif // NETWORK_TCPRELAYCLIENT_H

@@ -31,7 +31,7 @@ Dependencies
   * $ pacman -S mingw-w64-i686-qrencode
   * $ pacman -S mingw-w64-x86_64-qrencode
 
-- [Qt]http://download.qt.io/official_releases/qt 5.6 or later
+- [Qt](http://download.qt.io/official_releases/qt) 5.6 or later
   * $ pacman -S mingw-w64-i686-qt5
   * $ pacman -S mingw-w64-i686-qt5-static
   * $ pacman -S mingw-w64-x86_64-qt5

@@ -4,8 +4,8 @@
 // If there is a modification associated with encryption/decryption, it's
 // this class that needs changes instead of messing up lots of classes.
 
-#ifndef CIPHER_H
-#define CIPHER_H
+#ifndef CRYPTO_CIPHER_H
+#define CRYPTO_CIPHER_H
 
 #include <array>
 #include <unordered_map>
@@ -106,6 +106,6 @@ private:
     const CipherInfo cipherInfo;
 };
 
-}
+} // namespace QSS
 
-#endif // CIPHER_H
+#endif // CRYPTO_CIPHER_H

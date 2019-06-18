@@ -75,6 +75,7 @@ endif()
 #message(STATUS "Qt5Core_INCLUDE_DIRS=${Qt5Core_INCLUDE_DIRS}")
 
 add_subdirectory(source/core)
+include_directories(${PROJECT_SOURCE_DIR}/source)
 include_directories(${PROJECT_SOURCE_DIR}/source/core)
 
 # Use static shadowSocks core library by default
@@ -83,14 +84,7 @@ if(SSQT_BUILD_SHARED)
     set(SSQT_CoreLib shared_LibQtShadowSocks)
 endif()
 
-if(SSQT_BUILD_TUI)
-    add_subdirectory(source/tui)
-endif()
-
-if(SSQT_BUILD_GUI)
-    add_subdirectory(source/gui)
-endif()
-
+add_subdirectory(source)
 
 if(SSQT_BUILD_TEST)
     find_package(Qt5Test)

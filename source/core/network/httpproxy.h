@@ -1,8 +1,8 @@
 // This class enables transparent HTTP proxy that handles data transfer
 // and send/recv them via upper-level SOCKS5 proxy
 
-#ifndef HTTPPROXY_H
-#define HTTPPROXY_H
+#ifndef NETWORK_HTTPPROXY_H
+#define NETWORK_HTTPPROXY_H
 
 #include <QTcpServer>
 #include <QNetworkProxy>
@@ -41,4 +41,4 @@ private slots:
 
 } // namespace QSS
 
-#endif // HTTPPROXY_H
+#endif // NETWORK_HTTPPROXY_H

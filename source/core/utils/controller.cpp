@@ -72,7 +72,7 @@ bool Controller::start()
     bool listen_ret = false;
 
     if(isLocal) {
-        qInfo("Running in local mode.");
+        qInfo("Running in client mode.");
         QHostAddress localAddress = profile.httpProxy()
             ? QHostAddress::LocalHost : getLocalAddr();
         listen_ret = tcpServer->listen(

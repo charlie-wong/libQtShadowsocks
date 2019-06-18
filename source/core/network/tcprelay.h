@@ -1,11 +1,12 @@
-#ifndef TCPRELAY_H
-#define TCPRELAY_H
+#ifndef NETWORK_TCPRELAY_H
+#define NETWORK_TCPRELAY_H
 
+#include <QTime>
+#include <QTimer>
 #include <QObject>
 #include <QTcpSocket>
-#include <QTimer>
-#include <QTime>
-#include "types/address.h"
+
+#include "network/address.h"
 #include "crypto/encryptor.h"
 
 namespace QSS {
@@ -65,4 +66,4 @@ protected slots:
 
 } // namespace QSS
 
-#endif // TCPRELAY_H
+#endif // NETWORK_TCPRELAY_H

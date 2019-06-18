@@ -1,11 +1,12 @@
 #include "confighelper.h"
-#include <QCoreApplication>
+
 #include <QDir>
 #include <QFile>
-#include <QJsonParseError>
-#include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QCoreApplication>
 
 ConfigHelper::ConfigHelper(const QString &configuration, QObject *parent) :
     QObject(parent),
@@ -88,17 +89,15 @@ void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model, const QStrin
                 p.localAddress = QString("0.0.0.0");
             }
         } else {
-            /*
-             * Otherwise, the gui-config is from legacy shadowsocks-qt5 (v0.x)
-             */
+            // Otherwise, the gui-config is from legacy shadowsocks-qt5 (v0.x)
             p.name = json["profile"].toString();
             p.serverPort = json["server_port"].toString().toUShort();
-            p.localAddress = json["local"].toString();
-            p.localPort = json["local_port"].toString().toUShort();
+            p.localAddress = json["proxy_addr"].toString();
+            p.localPort = json["proxy_port"].toString().toUShort();
             p.timeout = json["timeout"].toString().toInt();
         }
-        p.serverAddress = json["server"].toString();
-        p.method = json["method"].toString();
+        p.serverAddress = json["server_addr"].toString();
+        p.method = json["algorithm"].toString();
         p.password = json["password"].toString();
         Connection *con = new Connection(p, this);
         model->appendConnection(con);
@@ -113,10 +112,10 @@ void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model, const 
         Connection *con = model.getItem(i)->getConnection();
         QJsonObject json;
         json["remarks"] = QJsonValue(con->profile.name);
-        json["method"] = QJsonValue(con->profile.method.toLower());
+        json["algorithm"] = QJsonValue(con->profile.method.toLower());
         json["password"] = QJsonValue(con->profile.password);
         json["server_port"] = QJsonValue(con->profile.serverPort);
-        json["server"] = QJsonValue(con->profile.serverAddress);
+        json["server_addr"] = QJsonValue(con->profile.serverAddress);
         confArray.append(QJsonValue(json));
     }
 
@@ -165,11 +164,11 @@ Connection* ConfigHelper::configJsonToConnection(const QString &file)
     }
     QJsonObject configObj = JSONDoc.object();
     SQProfile p;
-    p.serverAddress = configObj["server"].toString();
+    p.serverAddress = configObj["server_addr"].toString();
     p.serverPort = configObj["server_port"].toInt();
-    p.localAddress = configObj["local"].toString();
-    p.localPort = configObj["local_port"].toInt();
-    p.method = configObj["method"].toString();
+    p.localAddress = configObj["proxy_addr"].toString();
+    p.localPort = configObj["proxy_port"].toInt();
+    p.method = configObj["algorithm"].toString();
     p.password = configObj["password"].toString();
     p.timeout = configObj["timeout"].toInt();
     Connection *con = new Connection(p, this);

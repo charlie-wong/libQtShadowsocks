@@ -1,12 +1,12 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef TUI_TUI_H
+#define TUI_TUI_H
 
 #include <QtShadowsocks>
 
-class Client {
+class QtSsTui {
 public:
-    Client();
-    bool readConfig(const QString &);
+    QtSsTui();
+    bool parseConfigJson(const QString &);
 
     void setup(const QString &remote_addr,
         const QString &remote_port,
@@ -19,21 +19,15 @@ public:
     );
 
     bool start(void);
-
-    enum WorkMode { SERVER, CLIENT };
-
-    void setAutoBan(bool ban);
     void setHttpMode(bool http);
-    void setWorkMode(WorkMode mode);
     const std::string &getMethod() const;
+    void setWorkMode(QSS::Profile::WorkMode mode);
 private:
     bool headerTest();
 
-    bool autoBan;
-    WorkMode m_work_mode;
     QSS::Profile m_profile;
     std::unique_ptr<QSS::Controller> m_ctrl;
-    std::unique_ptr<QSS::Connectivity> m_tester;
+    std::unique_ptr<QSS::Connectivity> m_conn;
 };
 
-#endif // CLIENT_H
+#endif // TUI_TUI_H

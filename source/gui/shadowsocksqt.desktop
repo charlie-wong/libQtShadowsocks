@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=ShadowSocksQt
+GenericName=ShadowSocksQt
+Comment=Shadowsocks GUI Server/Client
+Exec=shadowsocksqt-gui
+Icon=shadowsocksqt
+Terminal=false
+Type=Application
+Categories=Network;
+StartupNotify=true
