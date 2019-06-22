@@ -67,20 +67,20 @@ private:
     WorkMode m_work_mode;
 
     // Essential data are stored directly as members in this class.
-    uint16_t d_localPort;
-    std::string d_localAddress;
+    uint16_t m_local_port;
+    std::string m_local_addr;
 
-    uint16_t d_serverPort;
-    std::string d_serverAddress;
+    uint16_t m_server_port;
+    std::string m_server_addr;
 
-    std::string d_method;
-    std::string d_password;
+    std::string m_method;
+    std::string m_password;
 
-    int d_timeout;
-    std::string d_name;
+    int m_timeout;
+    std::string m_name;
 
     // For future extension, keep ABI compatible
-    std::unique_ptr<ProfilePrivate> d_private;
+    std::unique_ptr<ProfilePrivate> m_private;
 };
 
 } // namespace QSS

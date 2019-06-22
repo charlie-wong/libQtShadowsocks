@@ -110,9 +110,9 @@ bool Address::blockingLookUp()
 void Address::setAddress(const std::string &a)
 {
     m_ap.first = QString::fromStdString(a).trimmed().toStdString();
-    m_ipaddrs.clear();
-    QHostAddress ipAddress(QString::fromStdString(a));
+    m_ipaddrs.clear(); // erases all the elements
 
+    QHostAddress ipAddress(QString::fromStdString(a));
     if(!ipAddress.isNull()) {
         m_ipaddrs.push_back(ipAddress);
     }

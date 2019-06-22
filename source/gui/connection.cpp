@@ -87,7 +87,7 @@ void Connection::start()
         emit stateChanged(run);
     });
 
-    connect(controller.get(), &QSS::Controller::tcpLatencyAvailable,
+    connect(controller.get(), &QSS::Controller::onTcpLatencyAvailable,
         this, &Connection::onLatencyAvailable
     );
     connect(controller.get(), &QSS::Controller::newBytesReceived,

@@ -8,61 +8,69 @@
 
 namespace QSS {
 
-Controller::Controller(Profile _profile, bool is_local,
+Controller::Controller(Profile profile, bool is_local,
     bool auto_ban, QObject *parent) :
     QObject(parent)
-    , bytesReceived(0)
-    , bytesSent(0)
-    , profile(std::move(_profile))
-    , isLocal(is_local)
     , autoBan(auto_ban)
+    , m_sent_bytes(0)
+    , m_received_bytes(0)
+    , m_profile(std::move(profile))
+    , m_is_local(is_local)
 {
-    qInfo("Initialising cipher: %s", profile.method().data());
+    qInfo("Initialising cipher: %s", m_profile.method().data());
 
     // the default QHostAddress constructor will construct "::"
     // as AnyIPv6 we explicitly use Any to enable dual stack
     // which is the case in other shadowsocks ports
-    if(profile.serverAddress() == "::") {
-        serverAddress = Address(QHostAddress::Any, profile.serverPort());
+    if(m_profile.serverAddress() == "::") {
+        m_server_addr = Address(QHostAddress::Any, m_profile.serverPort());
     } else {
-        serverAddress = Address(profile.serverAddress(), profile.serverPort());
+        m_server_addr = Address(m_profile.serverAddress(), m_profile.serverPort());
 
-        if(!serverAddress.blockingLookUp()) {
+        if(!m_server_addr.blockingLookUp()) {
             QDebug(QtMsgType::QtCriticalMsg).noquote().nospace()
                 << "Cannot look up the host records of server address "
-                << serverAddress << ". Please make sure your Internet "
+                << m_server_addr << ". Please make sure your Internet "
                 << "connection is good and the configuration is correct";
         }
     }
 
-    tcpServer = std::make_unique<QSS::TcpServer>(profile.method(),
-        profile.password(), profile.timeout(),
-        isLocal, autoBan, serverAddress
+    m_tcp_server = std::make_unique<QSS::TcpServer>(m_profile.method(),
+        m_profile.password(), m_profile.timeout(),
+        m_is_local, autoBan, m_server_addr
     );
 
-    // FD_SETSIZE which is the maximum value on *nix platforms. (1024 by default)
-    tcpServer->setMaxPendingConnections(FD_SETSIZE);
-    udpRelay = std::make_unique<QSS::UdpRelay>(profile.method(),
-        profile.password(), isLocal, autoBan, serverAddress
+    // FD_SETSIZE which is the maximum value on *nix platforms, 1024 by default
+    m_tcp_server->setMaxPendingConnections(FD_SETSIZE);
+
+    m_udp_relay = std::make_unique<QSS::UdpRelay>(m_profile.method(),
+        m_profile.password(), m_is_local, autoBan, m_server_addr
     );
 
-    connect(tcpServer.get(), &TcpServer::acceptError,
-        this, &Controller::onTcpServerError);
-    connect(tcpServer.get(), &TcpServer::bytesRead,
-        this, &Controller::onBytesRead);
-    connect(tcpServer.get(), &TcpServer::bytesSend,
-        this, &Controller::onBytesSend);
-    connect(tcpServer.get(), &TcpServer::latencyAvailable,
-        this, &Controller::tcpLatencyAvailable);
-    connect(udpRelay.get(), &UdpRelay::bytesRead,
-        this, &Controller::onBytesRead);
-    connect(udpRelay.get(), &UdpRelay::bytesSend,
-        this, &Controller::onBytesSend);
+    connect(m_tcp_server.get(), &TcpServer::readBytes,
+        this, &Controller::onReadBytes
+    );
+    connect(m_tcp_server.get(), &TcpServer::sendBytes,
+        this, &Controller::onSendBytes
+    );
+    connect(m_tcp_server.get(), &TcpServer::acceptError,
+        this, &Controller::onTcpServerError
+    );
+    connect(m_tcp_server.get(), &TcpServer::latencyAvailable,
+        this, &Controller::onTcpLatencyAvailable
+    );
+
+    connect(m_udp_relay.get(), &UdpRelay::readBytes,
+        this, &Controller::onReadBytes
+    );
+    connect(m_udp_relay.get(), &UdpRelay::sendBytes,
+        this, &Controller::onSendBytes
+    );
 }
 
 Controller::~Controller()
 {
-    if(tcpServer->isListening()) {
+    if(m_tcp_server->isListening()) {
         stop();
     }
 }
@@ -71,24 +79,24 @@ bool Controller::start()
 {
     bool listen_ret = false;
 
-    if(isLocal) {
+    if(m_is_local) {
         qInfo("Running in client mode.");
-        QHostAddress localAddress = profile.httpProxy()
-            ? QHostAddress::LocalHost : getLocalAddr();
-        listen_ret = tcpServer->listen(
-            localAddress, profile.httpProxy() ? 0 : profile.localPort()
+        QHostAddress localAddr =
+            m_profile.httpProxy() ? QHostAddress::LocalHost : getLocalAddr();
+        listen_ret = m_tcp_server->listen(
+            localAddr, m_profile.httpProxy() ? 0 : m_profile.localPort()
         );
 
         if(listen_ret) {
-            listen_ret = udpRelay->listen(localAddress, profile.localPort());
+            listen_ret = m_udp_relay->listen(localAddr, m_profile.localPort());
 
-            if(profile.httpProxy() && listen_ret) {
-                QDebug(QtMsgType::QtInfoMsg) << "SOCKS5 port is"
-                    << tcpServer->serverPort();
-                httpProxy = std::make_unique<QSS::HttpProxy>();
+            if(m_profile.httpProxy() && listen_ret) {
+                QDebug(QtMsgType::QtInfoMsg).noquote()
+                    << "SOCKS5 port is" << m_tcp_server->serverPort();
+                m_http_proxy = std::make_unique<QSS::HttpProxy>();
 
-                if(httpProxy->httpListen(getLocalAddr(),
-                    profile.localPort(), tcpServer->serverPort())) {
+                if(m_http_proxy->httpListen(getLocalAddr(),
+                    m_profile.localPort(), m_tcp_server->serverPort())) {
                     qInfo("Running as a HTTP proxy server");
                 } else {
                     listen_ret = false;
@@ -98,23 +106,24 @@ bool Controller::start()
         }
     } else {
         qInfo("Running in server mode.");
-        listen_ret = tcpServer->listen(serverAddress.getFirstIP(),
-            profile.serverPort()
+        listen_ret = m_tcp_server->listen(m_server_addr.getFirstIP(),
+            m_profile.serverPort()
         );
 
         if(listen_ret) {
-            listen_ret = udpRelay->listen(serverAddress.getFirstIP(),
-                profile.serverPort()
+            listen_ret = m_udp_relay->listen(m_server_addr.getFirstIP(),
+                m_profile.serverPort()
             );
         }
     }
 
     if(listen_ret) {
         QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
-            << "TCP server listening at " << (isLocal
-               ? getLocalAddr().toString()
-               : serverAddress.getFirstIP().toString())
-            << ":" << (isLocal ? profile.localPort() : profile.serverPort());
+            << "TCP server listening at "
+            << (m_is_local ? getLocalAddr().toString()
+               : m_server_addr.getFirstIP().toString())
+            << ":"
+            << (m_is_local ? m_profile.localPort() : m_profile.serverPort());
         emit runningStateChanged(true);
     } else {
         qCritical("TCP server listen failed.");
@@ -125,27 +134,27 @@ bool Controller::start()
 
 void Controller::stop()
 {
-    if(httpProxy) {
-        httpProxy->close();
+    if(m_http_proxy) {
+        m_http_proxy->close();
     }
 
-    tcpServer->close();
-    udpRelay->close();
+    m_tcp_server->close();
+    m_udp_relay->close();
     emit runningStateChanged(false);
     qInfo("Stopped.");
 }
 
 QHostAddress Controller::getLocalAddr()
 {
-    QHostAddress addr(QString::fromStdString(profile.localAddress()));
+    QHostAddress addr(QString::fromStdString(m_profile.localAddress()));
 
     if(!addr.isNull()) {
         return addr;
     }
 
-    QDebug(QtMsgType::QtInfoMsg).noquote()
+    QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
         << "Can't get address from "
-        << QString::fromStdString(profile.localAddress())
+        << QString::fromStdString(m_profile.localAddress())
         << ". Using localhost instead.";
     return QHostAddress::LocalHost;
 }
@@ -153,7 +162,7 @@ QHostAddress Controller::getLocalAddr()
 void Controller::onTcpServerError(QAbstractSocket::SocketError err)
 {
     QDebug(QtMsgType::QtWarningMsg).noquote()
-        << "TCP server error: " << tcpServer->errorString();
+        << "TCP server error:" << m_tcp_server->errorString();
 
     // can't continue if address is already in use
     if(err == QAbstractSocket::AddressInUseError) {
@@ -161,21 +170,23 @@ void Controller::onTcpServerError(QAbstractSocket::SocketError err)
     }
 }
 
-void Controller::onBytesRead(quint64 r)
+void Controller::onReadBytes(quint64 r)
 {
-    if(r != static_cast<quint64>(-1)) { // -1 means read failed. don't count
-        bytesReceived += r;
+    // -1 means read failed, don't count
+    if(r != static_cast<quint64>(-1)) {
+        m_received_bytes += r;
         emit newBytesReceived(r);
-        emit bytesReceivedChanged(bytesReceived);
+        emit bytesReceivedChanged(m_received_bytes);
     }
 }
 
-void Controller::onBytesSend(quint64 s)
+void Controller::onSendBytes(quint64 s)
 {
-    if(s != static_cast<quint64>(-1)) { // -1 means write failed. don't count
-        bytesSent += s;
+    // -1 means write failed, don't count
+    if(s != static_cast<quint64>(-1)) {
+        m_sent_bytes += s;
         emit newBytesSent(s);
-        emit bytesSentChanged(bytesSent);
+        emit bytesSentChanged(m_sent_bytes);
     }
 }
 

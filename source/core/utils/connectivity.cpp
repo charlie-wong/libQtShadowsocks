@@ -14,7 +14,7 @@ Connectivity::Connectivity(const QHostAddress &server_addr,
     QObject(parent)
     , m_server_port(server_port)
     , m_server_addr(server_addr)
-    , m_do_connectivity_test(false)
+    , m_run_connectivity_test(false)
 {
     m_timestamp = QTime::currentTime();
 
@@ -43,16 +43,16 @@ void Connectivity::connectToServer(int timeout)
 
 void Connectivity::lagTestStart(int timeout)
 {
-    m_do_connectivity_test = false;
+    m_run_connectivity_test = false;
     connectToServer(timeout);
 }
 
 void Connectivity::connTestStart(const std::string &method,
     const std::string &password, int timeout)
 {
-    m_do_connectivity_test = true;
-    encryptionMethod = method;
-    encryptionPassword = password;
+    m_run_connectivity_test = true;
+    m_encrypt_method = method;
+    m_encrypt_password = password;
     connectToServer(timeout);
 }
 
@@ -77,12 +77,12 @@ void Connectivity::onConnected()
     m_timer.stop();
     emit lagTestFinished(m_timestamp.msecsTo(QTime::currentTime()));
 
-    if(m_do_connectivity_test) {
+    if(m_run_connectivity_test) {
         /// @todo: find a better way to check connectivity
         // A http request to Google to test the connectivity.
         // The payload is dumped from
         // `curl http://www.google.com --socks5 127.0.0.1:1080`
-        Encryptor encryptor(encryptionMethod, encryptionPassword);
+        Encryptor encryptor(m_encrypt_method, m_encrypt_password);
         std::string dest =
             Common::packAddress(Address("www.google.com", 80));
         static const QByteArray expected = QByteArray::fromHex(

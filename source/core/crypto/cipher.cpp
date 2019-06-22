@@ -66,8 +66,8 @@ Cipher::Cipher(const std::string &method, std::string key,
         // we shouldn't deallocate filter externally
         m_pipe = std::make_unique<Botan::Pipe>(m_filter);
     } catch(const Botan::Exception &e) {
-        QDebug(QtMsgType::QtFatalMsg)
-            << "Failed to initialise cipher: " << e.what();
+        QDebug(QtMsgType::QtFatalMsg).noquote()
+            << "Failed to initialise cipher:" << e.what();
     }
 }
 

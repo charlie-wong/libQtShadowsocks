@@ -14,43 +14,43 @@ struct ProfilePrivate {
 };
 
 Profile::Profile() : m_work_mode(WorkMode::CLIENT)
-    , d_localPort(DEFAULT_PROXY_PORT)
-    , d_localAddress(DEFAULT_PROXY_ADDR)
-    , d_serverPort(DEFAULT_SERVER_PORT)
-    , d_serverAddress(DEFAULT_SERVER_ADDR)
-    , d_method(DEFAULT_ALGORITHM)
-    , d_password(DEFAULT_PASSWORD)
-    , d_timeout(DEFAULT_SOCKET_TIMEOUT)
-    , d_private(new ProfilePrivate())
+    , m_local_port(DEFAULT_PROXY_PORT)
+    , m_local_addr(DEFAULT_PROXY_ADDR)
+    , m_server_port(DEFAULT_SERVER_PORT)
+    , m_server_addr(DEFAULT_SERVER_ADDR)
+    , m_method(DEFAULT_ALGORITHM)
+    , m_password(DEFAULT_PASSWORD)
+    , m_timeout(DEFAULT_SOCKET_TIMEOUT)
+    , m_private(new ProfilePrivate())
 
 {
     // Nothing Todo
 }
 
 Profile::Profile(const Profile &b) : m_work_mode(WorkMode::CLIENT)
-    , d_localPort(b.d_localPort)
-    , d_localAddress(b.d_localAddress)
-    , d_serverPort(b.d_serverPort)
-    , d_serverAddress(b.d_serverAddress)
-    , d_method(b.d_method)
-    , d_password(b.d_password)
-    , d_timeout(b.d_timeout)
-    , d_name(b.d_name)
-    , d_private(new ProfilePrivate(*b.d_private))
+    , m_local_port(b.m_local_port)
+    , m_local_addr(b.m_local_addr)
+    , m_server_port(b.m_server_port)
+    , m_server_addr(b.m_server_addr)
+    , m_method(b.m_method)
+    , m_password(b.m_password)
+    , m_timeout(b.m_timeout)
+    , m_name(b.m_name)
+    , m_private(new ProfilePrivate(*b.m_private))
 {
     // Nothing Todo
 }
 
 Profile::Profile(Profile &&b) : m_work_mode(WorkMode::CLIENT)
-    , d_localPort(std::move(b.d_localPort))
-    , d_localAddress(std::move(b.d_localAddress))
-    , d_serverPort(std::move(b.d_serverPort))
-    , d_serverAddress(std::move(b.d_serverAddress))
-    , d_method(std::move(b.d_method))
-    , d_password(std::move(b.d_password))
-    , d_timeout(std::move(b.d_timeout))
-    , d_name(std::move(b.d_name))
-    , d_private(std::move(b.d_private))
+    , m_local_port(std::move(b.m_local_port))
+    , m_local_addr(std::move(b.m_local_addr))
+    , m_server_port(std::move(b.m_server_port))
+    , m_server_addr(std::move(b.m_server_addr))
+    , m_method(std::move(b.m_method))
+    , m_password(std::move(b.m_password))
+    , m_timeout(std::move(b.m_timeout))
+    , m_name(std::move(b.m_name))
+    , m_private(std::move(b.m_private))
 {
     // Nothing Todo
 }
@@ -70,62 +70,62 @@ void Profile::setWorkMode(WorkMode mode) {
 
 const std::string &Profile::name() const
 {
-    return d_name;
+    return m_name;
 }
 
 const std::string &Profile::method() const
 {
-    return d_method;
+    return m_method;
 }
 
 const std::string &Profile::password() const
 {
-    return d_password;
+    return m_password;
 }
 
 const std::string &Profile::serverAddress() const
 {
-    return d_serverAddress;
+    return m_server_addr;
 }
 
 const std::string &Profile::localAddress() const
 {
-    return d_localAddress;
+    return m_local_addr;
 }
 
 const std::string &Profile::pluginExec() const
 {
-    return d_private->pluginExec;
+    return m_private->pluginExec;
 }
 
 const std::string &Profile::pluginOpts() const
 {
-    return d_private->pluginOpts;
+    return m_private->pluginOpts;
 }
 
 uint16_t Profile::serverPort() const
 {
-    return d_serverPort;
+    return m_server_port;
 }
 
 uint16_t Profile::localPort() const
 {
-    return d_localPort;
+    return m_local_port;
 }
 
 int Profile::timeout() const
 {
-    return d_timeout;
+    return m_timeout;
 }
 
 bool Profile::debug() const
 {
-    return d_private->debug;
+    return m_private->debug;
 }
 
 bool Profile::httpProxy() const
 {
-    return d_private->httpProxy;
+    return m_private->httpProxy;
 }
 
 bool Profile::isValid() const
@@ -135,74 +135,74 @@ bool Profile::isValid() const
 
 bool Profile::hasPlugin() const
 {
-    return !d_private->pluginExec.empty();
+    return !m_private->pluginExec.empty();
 }
 
 void Profile::setName(const std::string &name)
 {
-    d_name = name;
+    m_name = name;
 }
 
 void Profile::setMethod(const std::string &method)
 {
-    d_method = method;
+    m_method = method;
 }
 
 void Profile::setPassword(const std::string &password)
 {
-    d_password = password;
+    m_password = password;
 }
 
 void Profile::setServerAddress(const std::string &server)
 {
-    d_serverAddress = server;
+    m_server_addr = server;
 }
 
 void Profile::setLocalAddress(const std::string &local)
 {
-    d_localAddress = local;
+    m_local_addr = local;
 }
 
 void Profile::setServerPort(uint16_t p)
 {
-    d_serverPort = p;
+    m_server_port = p;
 }
 
 void Profile::setLocalPort(uint16_t p)
 {
-    d_localPort = p;
+    m_local_port = p;
 }
 
 void Profile::setSocketTimeout(int t)
 {
-    d_timeout = t;
+    m_timeout = t;
 }
 
 void Profile::setHttpProxy(bool e)
 {
-    d_private->httpProxy = e;
+    m_private->httpProxy = e;
 }
 
 void Profile::enableDebug()
 {
-    d_private->debug = true;
+    m_private->debug = true;
 }
 
 void Profile::disableDebug()
 {
-    d_private->debug = false;
+    m_private->debug = false;
 }
 
 void Profile::setPlugin(std::string exec, std::string opts)
 {
-    d_private->pluginExec = std::move(exec);
-    d_private->pluginOpts = std::move(opts);
+    m_private->pluginExec = std::move(exec);
+    m_private->pluginOpts = std::move(opts);
 }
 
 void Profile::unsetPlugin()
 {
-    d_private->pluginExec.clear();
-    d_private->pluginOpts.clear();
+    m_private->pluginExec.clear();
+    m_private->pluginOpts.clear();
 }
 
 Profile Profile::fromUri(const std::string &ssUri)
@@ -309,7 +309,7 @@ std::string Profile::toUri() const
         .toBase64(QByteArray::Base64Option::OmitTrailingEquals);
     uri.prepend("ss://");
     uri.append("#");
-    uri.append(d_name.data(), d_name.length());
+    uri.append(m_name.data(), m_name.length());
     return std::string(uri.data(), uri.length());
 }
 

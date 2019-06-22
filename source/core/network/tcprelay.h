@@ -28,8 +28,8 @@ signals:
     // Count only remote socket's traffic. Either in local or server mode,
     // the remote socket is used to communicate with other-side shadowsocks
     // instance (a local or a server)
-    void bytesRead(quint64);
-    void bytesSend(quint64);
+    void readBytes(quint64);
+    void sendBytes(quint64);
 
     // Time used for remote to connect to the host (msec)
     void latencyAvailable(int);

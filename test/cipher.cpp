@@ -18,13 +18,13 @@ void Cipher::testMd5Hash()
 {
     std::string in("abc");
     QCOMPARE(QSS::Cipher::md5Hash(in),
-        QSS::Common::stringFromHex("900150983CD24FB0D6963F7D28E17F72")
+        QSS::Common::hexToStr("900150983CD24FB0D6963F7D28E17F72")
     );
     in = std::string(
         "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
     );
     QCOMPARE(QSS::Cipher::md5Hash(in),
-        QSS::Common::stringFromHex("8215EF0796A20BCAAAE116D3876C664A")
+        QSS::Common::hexToStr("8215EF0796A20BCAAAE116D3876C664A")
     );
 }
 

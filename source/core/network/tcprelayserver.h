@@ -14,7 +14,7 @@ public:
     );
 
 protected:
-    const bool autoBan;
+    const bool autoBan; /// @todo remove it
 
     void handleStageAddr(std::string &data) final;
     void handleLocalTcpData(std::string &data) final;

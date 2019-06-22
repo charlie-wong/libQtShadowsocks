@@ -9,14 +9,14 @@
 #include "utils/common.h"
 #include "network/address.h"
 
+#define ADDRESS_MASK    0x0F
+
 namespace {
 std::vector<QHostAddress> bannedAddresses;
 std::mutex bannedAddressMutex;
 } // namespace
 
 namespace  QSS {
-
-const uint8_t Common::ADDRESS_MASK = 0b00001111; // 0xf
 
 const char *Common::version()
 {
@@ -155,7 +155,7 @@ bool Common::isAddressBanned(const QHostAddress &addr)
     return banned;
 }
 
-std::string Common::stringFromHex(const std::string &hex)
+std::string Common::hexToStr(const std::string &hex)
 {
     QByteArray res = QByteArray::fromHex(QByteArray(hex.data(), hex.length()));
     return std::string(res.data(), res.length());

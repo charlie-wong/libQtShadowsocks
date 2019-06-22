@@ -47,7 +47,8 @@ void TcpRelayClient::handleStageAddr(std::string &data)
         return;
     }
 
-    qInfo() << "Connecting " << m_remote_addr << " from "
+    QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
+        << "Connecting " << m_remote_addr << " from "
         << m_local->peerAddress().toString() << ":" << m_local->peerPort();
 
     m_stage = DNS;
@@ -63,8 +64,7 @@ void TcpRelayClient::handleStageAddr(std::string &data)
                 m_server_addr.getFirstIP(), m_server_addr.getPort()
             );
         } else {
-            QDebug(QtMsgType::QtDebugMsg).noquote()
-                << "Failed to lookup server address. Closing TCP connection.";
+            qDebug() << "Failed to lookup server address. Closing TCP connection.";
             close();
         }
     });

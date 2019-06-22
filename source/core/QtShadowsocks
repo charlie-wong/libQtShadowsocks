@@ -3,3 +3,8 @@
 #include "utils/controller.h"
 #include "utils/connectivity.h"
 #include "network/socketstream.h"
+
+#define qssDebug()      QDebug(QtMsgType::QtDebugMsg).noquote().nospace()
+#define qssInfo()       QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
+#define qssWarn()       QDebug(QtMsgType::QtWarningMsg).noquote().nospace()
+#define qssError()      QDebug(QtMsgType::QtCriticalMsg).noquote().nospace()

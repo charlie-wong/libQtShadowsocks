@@ -16,7 +16,7 @@ class UdpRelay : public QObject {
 public:
     UdpRelay(const UdpRelay &) = delete;
     UdpRelay(const std::string &method, const std::string &password,
-        bool is_local, bool auto_ban, Address serverAddress
+        bool is_local, bool auto_ban, Address server_addr
     );
 
     bool isListening() const;
@@ -28,25 +28,25 @@ public slots:
 signals:
     // The same situation here.
     // We only count "listen" socket's read and written bytes
-    void bytesRead(quint64);
-    void bytesSend(quint64);
+    void readBytes(quint64);
+    void sendBytes(quint64);
 
 private:
     // 64KB, same as shadowsocks-python (udprelay)
     static const int64_t RemoteRecvSizeMax = 65536;
 
-    const bool isLocal;
     const bool autoBan;
-    QUdpSocket listenSocket;
-    const Address serverAddress;
-    std::unique_ptr<Encryptor> encryptor;
+    const bool m_is_local;
+    QUdpSocket m_listen_socket;
+    const Address m_server_addr;
+    std::unique_ptr<Encryptor> m_encryptor;
 
     std::map<Address, std::shared_ptr<QUdpSocket> > m_cache;
 
 private slots:
     void onSocketError();
-    void onListenStateChanged(QAbstractSocket::SocketState);
     void onServerUdpSocketReadyRead();
+    void onListenStateChanged(QAbstractSocket::SocketState);
 };
 
 } // namespace QSS

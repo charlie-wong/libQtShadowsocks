@@ -14,8 +14,6 @@
 #include "config/config.h"
 #include "config/cmdArgs.h"
 
-MainWindow *mainWindow = nullptr;
-
 static void onSignalRecv(int sig)
 {
     if(sig == SIGINT || sig == SIGTERM) {
@@ -56,7 +54,10 @@ int main(int argc, char *argv[])
     qRegisterMetaTypeStreamOperators<SQProfile>("SQProfile");
     QApplication app(argc, argv);
     setupApplication(app);
-    CmdArgs().process(app);
+
+    CmdArgs opts;
+    opts.process(app);
+
     QString configFile = "";
 
     if(configFile.isEmpty()) {
@@ -73,17 +74,16 @@ int main(int argc, char *argv[])
     }
 
     ConfigHelper conf(configFile);
-    MainWindow w(&conf);
-    mainWindow = &w;
+    MainWindow mw(&conf);
 
-    if(conf.isOnlyOneInstance() && w.isInstanceRunning()) {
+    if(conf.isOnlyOneInstance() && mw.isInstanceRunning()) {
         return -1;
     }
 
-    w.startAutoStartConnections();
+    mw.startAutoStartConnections();
 
     if(!conf.isHideWindowOnStartup()) {
-        w.show();
+        mw.show();
     }
 
     return app.exec();

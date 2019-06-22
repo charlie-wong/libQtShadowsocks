@@ -45,7 +45,7 @@ TcpRelay::TcpRelay(QTcpSocket *local_socket, int timeout, Address server_addr,
         m_timer.get(), static_cast<void (QTimer::*)()> (&QTimer::start)
     );
     connect(m_remote.get(), &QTcpSocket::bytesWritten,
-        this, &TcpRelay::bytesSend
+        this, &TcpRelay::sendBytes
     );
     m_local->setReadBufferSize(RemoteRecvSizeMax);
     m_local->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -154,12 +154,12 @@ void TcpRelay::onRemoteTcpSocketReadyRead()
         return;
     }
 
-    emit bytesRead(buf.size());
+    emit readBytes(buf.size());
 
     try {
         handleRemoteTcpData(buf);
     } catch(const std::exception &e) {
-        QDebug(QtMsgType::QtCriticalMsg) << "Remote:" << e.what();
+        QDebug(QtMsgType::QtCriticalMsg).noquote() << "Remote:" << e.what();
         close();
         return;
     }

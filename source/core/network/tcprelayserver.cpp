@@ -32,7 +32,8 @@ void TcpRelayServer::handleStageAddr(std::string &data)
     }
 
     m_stage = DNS;
-    qInfo() << "Connecting " << m_remote_addr << " from "
+    QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
+        << "Connecting " << m_remote_addr << " from "
         << m_local->peerAddress().toString() << ":" << m_local->peerPort();
 
     if(data.size() > static_cast<size_t>(header_length)) {
@@ -48,8 +49,7 @@ void TcpRelayServer::handleStageAddr(std::string &data)
                 m_remote_addr.getPort()
             );
         } else {
-            QDebug(QtMsgType::QtDebugMsg).noquote()
-                << "Failed to lookup remote address. Closing TCP connection.";
+            qDebug() << "Failed to lookup remote address. Closing TCP connection.";
             close();
         }
     });
@@ -60,7 +60,7 @@ void TcpRelayServer::handleLocalTcpData(std::string &data)
     try {
         data = m_encryptor->decrypt(data);
     } catch(const std::exception &e) {
-        QDebug(QtMsgType::QtCriticalMsg) << "Local:" << e.what();
+        QDebug(QtMsgType::QtCriticalMsg).noquote() << "Local:" << e.what();
         close();
         return;
     }

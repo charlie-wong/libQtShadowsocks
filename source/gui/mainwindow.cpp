@@ -500,18 +500,20 @@ void MainWindow::checkCurrentIndex(const QModelIndex &_index)
 
 void MainWindow::onAbout()
 {
-    QString text = QString("<h1>Shadowsocks-Qt5</h1><p><b>Version %1</b><br />"
-        "Using libQtShadowsocks %2</p>"
-        "<p>Copyright © 2014-2018 Symeon Huang "
-        "(<a href='https://twitter.com/librehat'>"
-        "@librehat</a>)</p>"
-        "<p>License: <a href='http://www.gnu.org/licenses/lgpl.html'>"
-        "GNU Lesser General Public License Version 3</a><br />"
-        "Project Hosted at "
+    QString text = QString(
+        "<h1>ShadowSocksQt</h1>"
+
+        "Hosted By "
         "<a href='https://github.com/charlie-wong/ShadowSocksQt'>"
-        "GitHub</a></p>"
-    ).arg(QStringLiteral(SSQT_RELEASE_VERSION))
-     .arg(QSS::Common::version());
+        "GitHub</a><br/>"
+
+        "Version %1<br/>"
+        "Copyright © 2019 Charlie WONG "
+        "(<a href='https://twitter.com/charlie-wong'>charlie-wong</a>)<br/>"
+
+        "License: <a href='https://www.gnu.org/licenses/gpl-3.0.html'>"
+        "GNU General Public License Version 3</a><br/>"
+    ).arg(QSS::Common::version());
 
     QMessageBox::about(this, tr("About"), text);
 }

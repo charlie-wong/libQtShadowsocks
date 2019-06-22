@@ -97,7 +97,8 @@ bool QtSsTui::start(void)
 
         QObject::connect(m_conn.get(), &QSS::Connectivity::testResult,
         [](const QString & error) {
-            qWarning() << "Connectivity testing error:" << error;
+            QDebug(QtMsgType::QtWarningMsg).noquote().nospace()
+                << "Connectivity testing error: " << error;
         });
 
         m_conn->connTestStart(m_profile.method(), m_profile.password());

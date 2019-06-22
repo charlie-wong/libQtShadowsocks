@@ -58,16 +58,17 @@ private:
     QTime m_timestamp;
 
     QTcpSocket m_socket;
-    bool m_do_connectivity_test;
 
-    std::string encryptionMethod;
-    std::string encryptionPassword;
+    std::string m_encrypt_method;
+    std::string m_encrypt_password;
+
+    bool m_run_connectivity_test;
 
 private slots:
     void onTimeout();
-    void onSocketError(QAbstractSocket::SocketError);
     void onConnected();
     void onSocketReadyRead();
+    void onSocketError(QAbstractSocket::SocketError);
 };
 
 }

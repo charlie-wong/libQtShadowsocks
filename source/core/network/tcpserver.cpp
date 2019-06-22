@@ -9,13 +9,14 @@
 namespace QSS {
 
 TcpServer::TcpServer(std::string method, std::string password, int timeout,
-    bool is_local, bool auto_ban, Address serverAddress) :
-    method(std::move(method))
-    , password(std::move(password))
-    , isLocal(is_local)
-    , autoBan(auto_ban)
-    , serverAddress(std::move(serverAddress))
-    , timeout(timeout)
+    bool is_local, bool auto_ban, Address server_addr) :
+    autoBan(auto_ban)
+    , m_timeout(timeout)
+    , m_is_local(is_local)
+    , m_method(std::move(method))
+    , m_password(std::move(password))
+    , m_server_addr(std::move(server_addr))
+
 {
     // Nothing Todo
 }
@@ -32,8 +33,7 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
     auto local_socket = std::make_unique<QTcpSocket>();
     local_socket->setSocketDescriptor(socketDescriptor);
 
-    if(!isLocal
-       && autoBan
+    if(!m_is_local && autoBan
        && Common::isAddressBanned(local_socket->peerAddress())) {
         QDebug(QtMsgType::QtInfoMsg).noquote()
             << "A banned IP" << local_socket->peerAddress()
@@ -44,24 +44,24 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
     // timeout * 1000: convert sec to msec
     std::shared_ptr<TcpRelay> con;
 
-    if(isLocal) {
+    if(m_is_local) {
         con = std::make_shared<TcpRelayClient> (local_socket.release(),
-            timeout * 1000, serverAddress, method, password
+            m_timeout * 1000, m_server_addr, m_method, m_password
         );
     } else {
         con = std::make_shared<TcpRelayServer>(local_socket.release(),
-            timeout * 1000, serverAddress, method, password, autoBan
+            m_timeout * 1000, m_server_addr, m_method, m_password, autoBan
         );
     }
 
-    conList.push_back(con);
-    connect(con.get(), &TcpRelay::bytesRead, this, &TcpServer::bytesRead);
-    connect(con.get(), &TcpRelay::bytesSend, this, &TcpServer::bytesSend);
+    m_con_list.push_back(con);
+    connect(con.get(), &TcpRelay::readBytes, this, &TcpServer::readBytes);
+    connect(con.get(), &TcpRelay::sendBytes, this, &TcpServer::sendBytes);
     connect(con.get(), &TcpRelay::latencyAvailable,
         this, &TcpServer::latencyAvailable
     );
     connect(con.get(), &TcpRelay::finished, this, [con, this]() {
-        conList.remove(con);
+        m_con_list.remove(con);
     });
 }
 
