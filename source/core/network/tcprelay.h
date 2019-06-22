@@ -24,6 +24,7 @@ public:
     enum Stage { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
 
 signals:
+    void finished();
     // Count only remote socket's traffic. Either in local or server mode,
     // the remote socket is used to communicate with other-side shadowsocks
     // instance (a local or a server)
@@ -32,10 +33,18 @@ signals:
 
     // Time used for remote to connect to the host (msec)
     void latencyAvailable(int);
-    void finished();
+
+protected slots:
+    void close();
+    void onTimeout();
+    void onLocalTcpSocketError();
+    void onLocalTcpSocketReadyRead();
+    void onRemoteConnected();
+    void onRemoteTcpSocketError();
+    void onRemoteTcpSocketReadyRead();
 
 protected:
-    static const int64_t RemoteRecvSize = 65536;
+    static const int64_t RemoteRecvSizeMax = 65536;
 
     Stage m_stage;
     Address m_remote_addr;
@@ -53,15 +62,6 @@ protected:
     virtual void handleStageAddr(std::string &data) = 0;
     virtual void handleLocalTcpData(std::string &data) = 0;
     virtual void handleRemoteTcpData(std::string &data) = 0;
-
-protected slots:
-    void close();
-    void onTimeout();
-    void onLocalTcpSocketError();
-    void onLocalTcpSocketReadyRead();
-    void onRemoteConnected();
-    void onRemoteTcpSocketError();
-    void onRemoteTcpSocketReadyRead();
 };
 
 } // namespace QSS

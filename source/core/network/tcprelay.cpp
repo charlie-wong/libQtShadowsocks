@@ -47,10 +47,10 @@ TcpRelay::TcpRelay(QTcpSocket *local_socket, int timeout, Address server_addr,
     connect(m_remote.get(), &QTcpSocket::bytesWritten,
         this, &TcpRelay::bytesSend
     );
-    m_local->setReadBufferSize(RemoteRecvSize);
+    m_local->setReadBufferSize(RemoteRecvSizeMax);
     m_local->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     m_local->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
-    m_remote->setReadBufferSize(RemoteRecvSize);
+    m_remote->setReadBufferSize(RemoteRecvSizeMax);
     m_remote->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     m_remote->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 }
@@ -114,7 +114,7 @@ void TcpRelay::onRemoteTcpSocketError()
 void TcpRelay::onLocalTcpSocketReadyRead()
 {
     std::string data;
-    data.resize(RemoteRecvSize);
+    data.resize(RemoteRecvSizeMax);
     int64_t readSize = m_local->read(&data[0], data.size());
 
     if(readSize == -1) {
@@ -137,7 +137,7 @@ void TcpRelay::onLocalTcpSocketReadyRead()
 void TcpRelay::onRemoteTcpSocketReadyRead()
 {
     std::string buf;
-    buf.resize(RemoteRecvSize);
+    buf.resize(RemoteRecvSizeMax);
     int64_t readSize = m_remote->read(&buf[0], buf.size());
 
     if(readSize == -1) {

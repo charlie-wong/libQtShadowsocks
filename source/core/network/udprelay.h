@@ -33,7 +33,7 @@ signals:
 
 private:
     // 64KB, same as shadowsocks-python (udprelay)
-    static const int64_t RemoteRecvSize = 65536;
+    static const int64_t RemoteRecvSizeMax = 65536;
 
     const bool isLocal;
     const bool autoBan;

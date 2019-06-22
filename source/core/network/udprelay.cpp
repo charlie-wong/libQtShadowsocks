@@ -13,7 +13,7 @@ UdpRelay::UdpRelay(const std::string &method, const std::string &password,
     , serverAddress(std::move(serverAddress))
     , encryptor(new Encryptor(method, password))
 {
-    listenSocket.setReadBufferSize(RemoteRecvSize);
+    listenSocket.setReadBufferSize(RemoteRecvSizeMax);
     listenSocket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(&listenSocket, &QUdpSocket::stateChanged,
         this, &UdpRelay::onListenStateChanged
@@ -77,7 +77,7 @@ void UdpRelay::onServerUdpSocketReadyRead()
 {
     const size_t packetSize = listenSocket.pendingDatagramSize();
 
-    if(packetSize > RemoteRecvSize) {
+    if(packetSize > RemoteRecvSizeMax) {
         qWarning("[UDP] Datagram is too large. discarded.");
         return;
     }
@@ -130,7 +130,7 @@ void UdpRelay::onServerUdpSocketReadyRead()
 
     if(clientIt == m_cache.end()) {
         std::shared_ptr<QUdpSocket> client(new QUdpSocket());
-        client->setReadBufferSize(RemoteRecvSize);
+        client->setReadBufferSize(RemoteRecvSizeMax);
         client->setSocketOption(QAbstractSocket::LowDelayOption, 1);
         clientIt = m_cache.insert(clientIt, std::make_pair(remoteAddr, client));
         connect(client.get(), &QUdpSocket::readyRead,
@@ -138,7 +138,7 @@ void UdpRelay::onServerUdpSocketReadyRead()
             std::shared_ptr<QUdpSocket> sock = m_cache.at(remoteAddr);
             const size_t packetSize = sock->pendingDatagramSize();
 
-            if(packetSize > RemoteRecvSize) {
+            if(packetSize > RemoteRecvSizeMax) {
                 qWarning("[UDP] Datagram is too large. Discarded.");
                 return;
             }
