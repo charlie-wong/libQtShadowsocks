@@ -12,7 +12,7 @@
 StatusNotifier::StatusNotifier(MainWindow *w, bool startHiden, QObject *parent) :
     QObject(parent), window(w)
 {
-    systray.setIcon(QIcon(":/icons/icons/shadowsocksqt.png"));
+    systray.setIcon(QIcon(":/icons/logo/shadowsocksqt.png"));
     systray.setToolTip(QString("ShadowSocksQt(GUI)"));
 
     connect(&systray, &QSystemTrayIcon::activated, [this](

@@ -27,10 +27,11 @@ static void setupApplication(QApplication &app)
 {
     signal(SIGINT, onSignalRecv);
     signal(SIGTERM, onSignalRecv);
-    QApplication::setFallbackSessionManagementEnabled(false);
+
+    app.setApplicationVersion(SSQT_RELEASE_VERSION);
     app.setApplicationName(QString("ShadowSocks(GUI)"));
     app.setApplicationDisplayName(QString("ShadowSocksQt"));
-    app.setApplicationVersion(SSQT_RELEASE_VERSION);
+    app.setWindowIcon(QIcon(":/icons/logo/shadowsocksqt.png"));
 
 #ifdef Q_OS_WIN
     if(QLocale::system().country() == QLocale::China) {

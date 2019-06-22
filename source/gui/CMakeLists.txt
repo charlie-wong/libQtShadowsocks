@@ -15,7 +15,7 @@ list(APPEND GUI_APP_SOURCES ${CONFIG_SOURCES})
 
 list(APPEND GUI_APP_SOURCES icons.qrc translations.qrc)
 
-if (WIN32)
+if(WIN32)
     list(APPEND GUI_APP_SOURCES ssqt.rc)
 endif()
 
