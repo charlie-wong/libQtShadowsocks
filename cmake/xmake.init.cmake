@@ -199,6 +199,9 @@ macro(XmakeInit)
         else()
             xmakeI_InitTarball(xm_VERSION xm_SHA256)
         endif()
+        # xmake just setup, CMakeCache.txt may not correct, just
+        # exit the current cmake process, makefile will remove it.
+        return()
     endif()
 
     include(xmake) # include the xmake MAIN ENTRY

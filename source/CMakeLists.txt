@@ -1,11 +1,8 @@
-set(GENERATED_DIR  "${CMAKE_BINARY_DIR}/generated")
-set(GENERATED_CONFIG_H  "${GENERATED_DIR}/config.generated.h")
-
+set(GENERATED_CONFIG_H "${SSQT_GENERATED_DIR}/config.generated.h")
 configure_file(
     "${CMAKE_CURRENT_LIST_DIR}/config/config.h.in" "${GENERATED_CONFIG_H}"
 )
-
-include_directories(${GENERATED_DIR})
+include_directories(${SSQT_GENERATED_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/source)
 include_directories(${PROJECT_SOURCE_DIR}/source/core)
 add_subdirectory(core)

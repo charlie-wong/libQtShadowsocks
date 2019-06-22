@@ -7,8 +7,9 @@ set(SSQT_VERSION_PATCH 0)
 set(SSQT_VERSION_TWEAK "") # Date/SHA1 Build Time Update
 
 option(SSQT_DBI_BOTAN2 "Enable botan2 download/build/install." OFF)
-option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" OFF)
+option(SSQT_DBI_QRENCODE "Enable libqrencode download/build/install" ON)
 option(SSQT_AUTOMATIC_QT5 "Enable Qt5 auto search support by xmake." ON)
+option(SSQT_WIN_USE_STATIC_GCC_LIBS "Use static GCC for windows build" ON)
 
 option(SSQT_BUILD_TUI "Build shadowsocks TUI server/client." ON)
 option(SSQT_BUILD_GUI "Build shadowsocks GUI server/client." ON)
@@ -20,7 +21,8 @@ option(SSQT_BUILD_SHARED "Build shared shadowsocks core library." OFF)
 option(SSQT_ENABLE_CI "Enable CI build." OFF)
 option(SSQT_ENABLE_GCOV "Enable code coverage." ON)
 option(SSQT_ENABLE_ASSERTION "Enable assertion." ON)
-if(SSQT_DBI_BOTAN2)
+
+if(SSQT_DBI_BOTAN2 OR SSQT_DBI_QRENCODE)
     option(SSQT_ENABLE_DEPENDENCY "Enable deps support." ON)
 endif()
 

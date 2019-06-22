@@ -21,9 +21,8 @@ endif()
 
 add_executable(${APP_NAME} WIN32
     ${GUI_APP_HEADERS} ${GUI_APP_SOURCES}
-    ${SSQT_AUTO_QT5_SOURCES}
 )
-
+XmakeQt5StaticPluginSrcAdd(${APP_NAME})
 target_include_directories(${APP_NAME}
     PRIVATE ${botan2_INCLUDE_DIRS}
     PRIVATE ${qrencode_INCLUDE_DIRS}
@@ -36,7 +35,6 @@ target_link_libraries(${APP_NAME}
     Qt5::Network
     ${SSQT_CoreLib}
     ${Qt5DBus_LIBRARIES}
-    ${SSQT_AUTO_QT5_LIBRARIES}
     ${zbar_LIBRARIES}
     ${botan2_LIBRARIES}
     ${qrencode_LIBRARIES}

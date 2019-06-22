@@ -65,7 +65,9 @@ endif
 	$(XmakeDownloadUrl)/$(XmakeVersion)/$(XmakeTarball) && $(UNTGZ) && \
 	mv xmake-$(XmakeVersion)/cmake/* ./ && rm -rf xmake-$(XmakeVersion)*
 endif
-	@make # run make for the project default target
+	@echo "*********************************************************"
+	@echo "* xmake init done, run make again to build the project. *"
+	@echo "*********************************************************"
 endif
 
 # The xmake user-friendly template

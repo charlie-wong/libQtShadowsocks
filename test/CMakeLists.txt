@@ -3,7 +3,7 @@ include_directories(${PROJECT_SOURCE_DIR}/source/core)
 macro(qss_add_test component)
     set(tname "test-${component}")
     set(tprog "test-${component}")
-    add_executable(${tprog} ${component}.cpp ${SSQT_AUTO_QT5_SOURCES})
+    add_executable(${tprog} ${component}.cpp)
     add_dependencies(${tprog} ${SSQT_CoreLib})
     target_link_libraries(${tprog}
         Qt5::Core Qt5::Network Qt5::Test
