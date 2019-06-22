@@ -55,17 +55,17 @@ public:
 
 private:
     std::string m_method;
-    const Cipher::CipherInfo cipherInfo;
-    std::string masterKey;
-    std::string incompleteChunk;
-    uint16_t incompleteLength;
+    const Cipher::CipherInfo m_cipher;
+    std::string m_master_key;
+    std::string m_incomplete_chunk;
+    uint16_t m_incomplete_length;
 
     void initEncipher(std::string *header);
     void initDecipher(const char *data, size_t length, size_t *offset);
 
 protected:
-    std::unique_ptr<Cipher> enCipher;
-    std::unique_ptr<Cipher> deCipher;
+    std::unique_ptr<Cipher> m_en_cipher;
+    std::unique_ptr<Cipher> m_de_cipher;
 };
 
 } // namespace QSS

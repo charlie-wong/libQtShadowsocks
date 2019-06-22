@@ -15,13 +15,13 @@ namespace QSS {
 class TcpRelay : public QObject {
     Q_OBJECT
 public:
-    TcpRelay(QTcpSocket *localSocket, int timeout, Address server_addr,
+    TcpRelay(QTcpSocket *local_socket, int timeout, Address server_addr,
         const std::string &method, const std::string &password
     );
 
     TcpRelay(const TcpRelay &) = delete;
 
-    enum STAGE { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
+    enum Stage { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
 
 signals:
     // Count only remote socket's traffic. Either in local or server mode,
@@ -37,16 +37,16 @@ signals:
 protected:
     static const int64_t RemoteRecvSize = 65536;
 
-    STAGE stage;
-    Address remoteAddress;
-    Address serverAddress;
-    std::string dataToWrite;
+    Stage m_stage;
+    Address m_remote_addr;
+    Address m_server_addr;
+    std::string m_data2write;
 
-    std::unique_ptr<Encryptor> encryptor;
-    std::unique_ptr<QTcpSocket> local;
-    std::unique_ptr<QTcpSocket> remote;
-    std::unique_ptr<QTimer> timer;
-    QTime startTime;
+    std::unique_ptr<Encryptor> m_encryptor;
+    std::unique_ptr<QTcpSocket> m_local;
+    std::unique_ptr<QTcpSocket> m_remote;
+    std::unique_ptr<QTimer> m_timer;
+    QTime m_start_time;
 
     bool writeToRemote(const char *data, size_t length);
 
@@ -55,13 +55,13 @@ protected:
     virtual void handleRemoteTcpData(std::string &data) = 0;
 
 protected slots:
-    void onRemoteConnected();
-    void onRemoteTcpSocketError();
+    void close();
+    void onTimeout();
     void onLocalTcpSocketError();
     void onLocalTcpSocketReadyRead();
+    void onRemoteConnected();
+    void onRemoteTcpSocketError();
     void onRemoteTcpSocketReadyRead();
-    void onTimeout();
-    void close();
 };
 
 } // namespace QSS

@@ -6,10 +6,10 @@
 
 namespace QSS {
 
-TcpRelayServer::TcpRelayServer(QTcpSocket *localSocket, int timeout,
+TcpRelayServer::TcpRelayServer(QTcpSocket *local_socket, int timeout,
     Address server_addr, const std::string &method,
     const std::string &password, bool autoBan) :
-    TcpRelay(localSocket, timeout, server_addr, method, password)
+    TcpRelay(local_socket, timeout, server_addr, method, password)
     , autoBan(autoBan)
 {
     // Nothing Todo
@@ -18,36 +18,34 @@ TcpRelayServer::TcpRelayServer(QTcpSocket *localSocket, int timeout,
 void TcpRelayServer::handleStageAddr(std::string &data)
 {
     int header_length = 0;
-    Common::parseHeader(data, remoteAddress, header_length);
+    Common::parseHeader(data, m_remote_addr, header_length);
 
     if(header_length == 0) {
         qCritical("Can't parse header. Wrong encryption method or password?");
 
         if(autoBan) {
-            Common::banAddress(local->peerAddress());
+            Common::banAddress(m_local->peerAddress());
         }
 
         close();
         return;
     }
 
-    QDebug(QtMsgType::QtInfoMsg).noquote().nospace()
-        << "Connecting " << remoteAddress << " from "
-        << local->peerAddress().toString() << ":" << local->peerPort();
-
-    stage = DNS;
+    m_stage = DNS;
+    qInfo() << "Connecting " << m_remote_addr << " from "
+        << m_local->peerAddress().toString() << ":" << m_local->peerPort();
 
     if(data.size() > static_cast<size_t>(header_length)) {
         data = data.substr(header_length);
-        dataToWrite += data;
+        m_data2write += data;
     }
 
-    remoteAddress.lookUp([this](bool success) {
+    m_remote_addr.lookUp([this](bool success) {
         if(success) {
-            stage = CONNECTING;
-            startTime = QTime::currentTime();
-            remote->connectToHost(remoteAddress.getFirstIP(),
-                remoteAddress.getPort()
+            m_stage = CONNECTING;
+            m_start_time = QTime::currentTime();
+            m_remote->connectToHost(m_remote_addr.getFirstIP(),
+                m_remote_addr.getPort()
             );
         } else {
             QDebug(QtMsgType::QtDebugMsg).noquote()
@@ -60,7 +58,7 @@ void TcpRelayServer::handleStageAddr(std::string &data)
 void TcpRelayServer::handleLocalTcpData(std::string &data)
 {
     try {
-        data = encryptor->decrypt(data);
+        data = m_encryptor->decrypt(data);
     } catch(const std::exception &e) {
         QDebug(QtMsgType::QtCriticalMsg) << "Local:" << e.what();
         close();
@@ -72,12 +70,12 @@ void TcpRelayServer::handleLocalTcpData(std::string &data)
         return;
     }
 
-    if(stage == STREAM) {
+    if(m_stage == STREAM) {
         writeToRemote(data.data(), data.size());
-    } else if(stage == CONNECTING || stage == DNS) {
+    } else if(m_stage == CONNECTING || m_stage == DNS) {
         // take DNS into account, otherwise some data will get lost
-        dataToWrite += data;
-    } else if(stage == INIT) {
+        m_data2write += data;
+    } else if(m_stage == INIT) {
         handleStageAddr(data);
     } else {
         qCritical("Local unknown stage.");
@@ -86,7 +84,7 @@ void TcpRelayServer::handleLocalTcpData(std::string &data)
 
 void TcpRelayServer::handleRemoteTcpData(std::string &data)
 {
-    data = encryptor->encrypt(data);
+    data = m_encryptor->encrypt(data);
 }
 
 }  // namespace QSS

@@ -28,7 +28,7 @@ std::string Common::packAddress(const Address &addr)
 {
     std::string portNs(2, '\0');
     qToBigEndian(addr.getPort(), reinterpret_cast<uchar *>(&portNs[0]));
-    const Address::ATYP type = addr.addressType();
+    const Address::AddrType type = addr.addrType();
     std::string addrBin;
 
     if(type == Address::HOST) {

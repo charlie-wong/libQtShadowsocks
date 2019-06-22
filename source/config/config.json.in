@@ -1,7 +1,7 @@
 {
     "mode": "server",
 
-    "server_addr": "@USR_HOST_NAME@",
+    "server_addr": "@HOST_NAME@",
     "server_port": 8388,
 
     "proxy_addr": "127.0.0.1",

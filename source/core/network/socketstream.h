@@ -11,13 +11,13 @@ class SocketStream : public QObject {
 public:
     // A light-weight class dedicated to stream data between two sockets
     // all available data from socket a will be written to socket b vice versa
-    SocketStream(QAbstractSocket *a, QAbstractSocket *b, QObject *parent = 0);
+    SocketStream(QAbstractSocket *a, QAbstractSocket *b, QObject *parent=0);
 
     SocketStream(const SocketStream &) = delete;
 
 private:
-    QAbstractSocket *as;
-    QAbstractSocket *bs;
+    QAbstractSocket *m_as;
+    QAbstractSocket *m_bs;
 
 private slots:
     void onSocketAReadyRead();

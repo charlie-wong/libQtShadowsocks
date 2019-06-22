@@ -29,14 +29,14 @@ TcpServer::~TcpServer()
 
 void TcpServer::incomingConnection(qintptr socketDescriptor)
 {
-    auto localSocket = std::make_unique<QTcpSocket>();
-    localSocket->setSocketDescriptor(socketDescriptor);
+    auto local_socket = std::make_unique<QTcpSocket>();
+    local_socket->setSocketDescriptor(socketDescriptor);
 
     if(!isLocal
        && autoBan
-       && Common::isAddressBanned(localSocket->peerAddress())) {
+       && Common::isAddressBanned(local_socket->peerAddress())) {
         QDebug(QtMsgType::QtInfoMsg).noquote()
-            << "A banned IP" << localSocket->peerAddress()
+            << "A banned IP" << local_socket->peerAddress()
             << "attempted to access this server";
         return;
     }
@@ -45,11 +45,11 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
     std::shared_ptr<TcpRelay> con;
 
     if(isLocal) {
-        con = std::make_shared<TcpRelayClient> (localSocket.release(),
+        con = std::make_shared<TcpRelayClient> (local_socket.release(),
             timeout * 1000, serverAddress, method, password
         );
     } else {
-        con = std::make_shared<TcpRelayServer>(localSocket.release(),
+        con = std::make_shared<TcpRelayServer>(local_socket.release(),
             timeout * 1000, serverAddress, method, password, autoBan
         );
     }

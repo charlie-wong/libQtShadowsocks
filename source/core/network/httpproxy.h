@@ -29,12 +29,12 @@ private:
     QNetworkProxy upstreamProxy;
 
 private slots:
-    void onSocketError(QAbstractSocket::SocketError);
     void onSocketReadyRead();
     void onProxySocketConnected();
     // This function is used for HTTPS transparent proxy
     void onProxySocketConnectedHttps();
     void onProxySocketReadyRead();
+    void onSocketError(QAbstractSocket::SocketError);
 };
 
 } // namespace QSS

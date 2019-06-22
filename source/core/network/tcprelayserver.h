@@ -8,7 +8,7 @@ namespace QSS {
 class TcpRelayServer : public TcpRelay {
     Q_OBJECT
 public:
-    TcpRelayServer(QTcpSocket *localSocket, int timeout,
+    TcpRelayServer(QTcpSocket *local_socket, int timeout,
         Address server_addr, const std::string &method,
         const std::string &password, bool autoBan
     );

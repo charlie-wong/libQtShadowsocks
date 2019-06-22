@@ -97,13 +97,13 @@ public:
     );
 
 private:
-    Botan::Keyed_Filter *filter;
-    std::unique_ptr<Botan::Pipe> pipe;
-    std::unique_ptr<RC4> rc4;
-    std::unique_ptr<ChaCha> chacha;
+    Botan::Keyed_Filter *m_filter;
+    std::unique_ptr<Botan::Pipe> m_pipe;
+    std::unique_ptr<RC4> m_rc4;
+    std::unique_ptr<ChaCha> m_chacha;
     const std::string m_key; // preshared key
     std::string m_iv; // nonce
-    const CipherInfo cipherInfo;
+    const CipherInfo m_cipher;
 };
 
 } // namespace QSS

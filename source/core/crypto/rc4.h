@@ -25,11 +25,11 @@ public:
 private:
     void generate();
 
-    unsigned char x;
-    unsigned char y;
-    uint32_t position;
-    std::vector<unsigned char> state;
-    std::vector<unsigned char> buffer;
+    unsigned char m_x;
+    unsigned char m_y;
+    uint32_t m_position;
+    std::vector<unsigned char> m_state;
+    std::vector<unsigned char> m_buffer;
 };
 
 } // namespace QSS

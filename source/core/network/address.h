@@ -41,7 +41,7 @@ public:
 
     const std::string &getAddress() const;
 
-    /// Because the ipAddrList might include both IPv4 and IPv6 addresses
+    /// Because the m_ipaddrs might include both IPv4 and IPv6 addresses
     /// getRandomIP() will literally return a random IP address (IPv4 or IPv6)
     /// If there is no valid IP, a default constructed QHostAddress is returned.
     ///
@@ -73,18 +73,18 @@ public:
     void setIPAddress(const QHostAddress &);
     void setPort(uint16_t);
 
-    enum ATYP { IPV4 = 1, IPV6 = 4, HOST = 3 };
+    enum AddrType { IPV4 = 1, IPV6 = 4, HOST = 3 };
 
-    ATYP addressType() const;
+    AddrType addrType() const;
 
     std::string toString() const;
 
     inline bool operator< (const Address &o) const {
-        return this->data < o.data;
+        return this->m_ap < o.m_ap;
     }
 
     inline bool operator== (const Address &o) const {
-        return this->data == o.data;
+        return this->m_ap == o.m_ap;
     }
 
     friend inline QDataStream &operator<< (QDataStream &os,
@@ -97,10 +97,9 @@ public:
     }
 
 private:
-    // first: address string; second: port
-    std::pair<std::string, uint16_t> data;
-    std::vector<QHostAddress> ipAddrList;
-    std::shared_ptr<DnsLookup> dns;
+    std::shared_ptr<DnsLookup> m_dns;
+    std::vector<QHostAddress> m_ipaddrs;
+    std::pair<std::string, uint16_t> m_ap; // addr, port
 };
 
 } // namespace QSS
