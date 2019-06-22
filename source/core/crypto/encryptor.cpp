@@ -2,18 +2,19 @@
 #include <QDebug>
 #include <QtEndian>
 
-namespace {
-const size_t AEAD_CHUNK_SIZE_LEN = 2;
-const uint16_t AEAD_CHUNK_SIZE_MASK = 0x3FFF;
+#define AEAD_CHUNK_SIZE_LEN     2
+#define AEAD_CHUNK_SIZE_MASK    0x3FFF
 
-std::string evpBytesToKey(const QSS::Cipher::CipherInfo &cipherInfo,
+namespace {
+
+std::string evpBytesToKey(const QSS::Cipher::CipherInfo &cipher,
     const std::string &password)
 {
-    std::vector<std::string> m;
-    std::string data;
     int i = 0;
+    std::string data;
+    std::vector<std::string> m;
 
-    while(m.size() < cipherInfo.keyLen + cipherInfo.ivLen) {
+    while(m.size() < static_cast<size_t>(cipher.keyLen + cipher.ivLen)) {
         if(i == 0) {
             data = password;
         } else {
@@ -28,7 +29,7 @@ std::string evpBytesToKey(const QSS::Cipher::CipherInfo &cipherInfo,
     std::for_each(m.begin(), m.end(), [&ms](const std::string & bytes) {
         ms += bytes;
     });
-    return ms.substr(0, cipherInfo.keyLen);
+    return ms.substr(0, cipher.keyLen);
 }
 
 }  // namespace
@@ -77,7 +78,7 @@ void Encryptor::initDecipher(const char *data, size_t length, size_t *offset)
     if(cipherInfo.type == Cipher::CipherType::AEAD) {
         iv = std::string(cipherInfo.ivLen, static_cast<char>(0));
 
-        if(length < cipherInfo.saltLen) {
+        if(length < static_cast<size_t>(cipherInfo.saltLen)) {
             throw std::length_error(
                 "Data chunk is too small to initialise an AEAD decipher"
             );
@@ -88,7 +89,7 @@ void Encryptor::initDecipher(const char *data, size_t length, size_t *offset)
         );
         *offset = cipherInfo.saltLen;
     } else {
-        if(length < cipherInfo.ivLen) {
+        if(length < static_cast<size_t>(cipherInfo.ivLen)) {
             throw std::length_error(
                 "Data chunk is too small to initialise a stream decipher"
             );

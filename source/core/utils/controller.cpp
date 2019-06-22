@@ -163,7 +163,7 @@ void Controller::onTcpServerError(QAbstractSocket::SocketError err)
 
 void Controller::onBytesRead(quint64 r)
 {
-    if(r != -1) { // -1 means read failed. don't count
+    if(r != static_cast<quint64>(-1)) { // -1 means read failed. don't count
         bytesReceived += r;
         emit newBytesReceived(r);
         emit bytesReceivedChanged(bytesReceived);
@@ -172,7 +172,7 @@ void Controller::onBytesRead(quint64 r)
 
 void Controller::onBytesSend(quint64 s)
 {
-    if(s != -1) { // -1 means write failed. don't count
+    if(s != static_cast<quint64>(-1)) { // -1 means write failed. don't count
         bytesSent += s;
         emit newBytesSent(s);
         emit bytesSentChanged(bytesSent);

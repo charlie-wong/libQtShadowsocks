@@ -1,3 +1,5 @@
+add_compile_options(-Wno-conversion)
+
 set(GENERATED_CONFIG_H "${SSQT_GENERATED_DIR}/config.generated.h")
 configure_file(
     "${CMAKE_CURRENT_LIST_DIR}/config/config.h.in" "${GENERATED_CONFIG_H}"

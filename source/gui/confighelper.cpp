@@ -251,7 +251,7 @@ void ConfigHelper::setShowFilterBar(bool show)
 void ConfigHelper::read(ConnectionTableModel *model)
 {
     int size = settings->beginReadArray(profilePrefix);
-    qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
+    // qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
 
     for(int i = 0; i < size; ++i) {
         settings->setArrayIndex(i);

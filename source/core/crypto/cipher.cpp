@@ -16,9 +16,10 @@
 #include <QDebug>
 #include <QMessageAuthenticationCode>
 
+#define DataOfSecureByteArray(sba) sba.data()
+
 namespace {
-    using SecureByteArray = Botan::secure_vector<Botan::byte>;
-    #define DataOfSecureByteArray(sba) sba.data()
+using SecureByteArray = Botan::secure_vector<Botan::byte>;
 
 // Copied from libsodium's sodium_increment
 void nonceIncrement(unsigned char *n, const size_t nlen)
@@ -35,6 +36,8 @@ void nonceIncrement(unsigned char *n, const size_t nlen)
 }  // namespace
 
 namespace QSS {
+
+Cipher::~Cipher() = default;
 
 Cipher::Cipher(const std::string &method, std::string key,
     std::string iv, bool encrypt) :
@@ -68,8 +71,6 @@ Cipher::Cipher(const std::string &method, std::string key,
     }
 }
 
-Cipher::~Cipher() = default;
-
 const std::unordered_map<std::string, Cipher::CipherInfo>
 Cipher::cipherInfoMap = {
     {"aes-128-cfb", {"AES-128/CFB", 16, 16, Cipher::CipherType::STREAM}},
@@ -94,7 +95,7 @@ Cipher::cipherInfoMap = {
     {"chacha20-ietf-poly1305", {"ChaCha20Poly1305", 32, 12, Cipher::CipherType::AEAD, 32, 16}},
     {"aes-128-gcm", {"AES-128/GCM", 16, 12, Cipher::CipherType::AEAD, 16, 16}},
     {"aes-192-gcm", {"AES-192/GCM", 24, 12, Cipher::CipherType::AEAD, 24, 16}},
-    {"aes-256-gcm", {"AES-256/GCM", 32, 12, Cipher::CipherType::AEAD, 32, 16}}
+    {"aes-256-gcm", {"AES-256/GCM", 32, 12, Cipher::CipherType::AEAD, 32, 16}},
 };
 
 const std::string Cipher::kdfLabel = {"ss-subkey"};

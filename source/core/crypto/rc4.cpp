@@ -5,7 +5,7 @@
 using namespace QSS;
 
 RC4::RC4(const std::string &_key, const std::string &_iv) :
-    position(0), x(0), y(0)
+    x(0), y(0), position(0)
 {
     Q_ASSERT(!_iv.empty());
     state.resize(256);
@@ -61,7 +61,7 @@ void RC4::generate()
 {
     unsigned char sx, sy;
 
-    for(int i = 0; i < buffer.size(); i += 4) {
+    for(unsigned i = 0; i < buffer.size(); i += 4) {
         sx = state[x + 1];
         y = (y + sx) % 256;
         sy = state[y];

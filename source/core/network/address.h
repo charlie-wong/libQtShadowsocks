@@ -32,13 +32,11 @@ private:
 
 class Address {
 public:
-    explicit Address(const std::string &a = std::string(), uint16_t p = 0);
+    explicit Address(const std::string &a=std::string(), uint16_t p=0);
 
-    Address(const QHostAddress &ip, uint16_t p);
-
-    Address(const Address &) = default;
     Address(Address &&) = default;
-
+    Address(const Address &) = default;
+    Address(const QHostAddress &ip, uint16_t p);
     Address &operator=(const Address &) = default;
 
     const std::string &getAddress() const;

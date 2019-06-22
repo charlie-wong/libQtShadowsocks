@@ -16,16 +16,16 @@ static inline void chacha_quarter_round(uint32_t &a,
 {
     a += b;
     d ^= a;
-    d = rotate_left(d, 16);
+    d = rotl_var(d, 16);
     c += d;
     b ^= c;
-    b = rotate_left(b, 12);
+    b = rotl_var(b, 12);
     a += b;
     d ^= a;
-    d = rotate_left(d, 8);
+    d = rotl_var(d, 8);
     c += d;
     b ^= c;
-    b = rotate_left(b, 7);
+    b = rotl_var(b, 7);
 }
 
 }

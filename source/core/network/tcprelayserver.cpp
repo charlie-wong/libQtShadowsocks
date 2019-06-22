@@ -37,7 +37,7 @@ void TcpRelayServer::handleStageAddr(std::string &data)
 
     stage = DNS;
 
-    if(data.size() > header_length) {
+    if(data.size() > static_cast<size_t>(header_length)) {
         data = data.substr(header_length);
         dataToWrite += data;
     }

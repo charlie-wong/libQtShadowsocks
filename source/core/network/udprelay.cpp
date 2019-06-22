@@ -8,9 +8,9 @@ namespace QSS {
 
 UdpRelay::UdpRelay(const std::string &method, const std::string &password,
     bool is_local, bool auto_ban, Address serverAddress) :
-    serverAddress(std::move(serverAddress))
-    , isLocal(is_local)
+    isLocal(is_local)
     , autoBan(auto_ban)
+    , serverAddress(std::move(serverAddress))
     , encryptor(new Encryptor(method, password))
 {
     listenSocket.setReadBufferSize(RemoteRecvSize);

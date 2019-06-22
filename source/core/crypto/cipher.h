@@ -47,7 +47,7 @@ public:
     /// each encryption/decryption
     void incrementIv();
 
-    enum CipherType { STREAM, AEAD };
+    enum CipherType { STREAM, AEAD, NONE };
 
     struct CipherInfo {
         std::string internalName; // internal implementation name in Botan

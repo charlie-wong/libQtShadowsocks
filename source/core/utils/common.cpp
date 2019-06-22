@@ -79,7 +79,7 @@ void Common::parseHeader(const std::string &data,
         if(data.length() > 2) {
             uint8_t addrlen = static_cast<uint8_t>(data[1]);
 
-            if(data.size() >= 2 + addrlen) {
+            if(data.size() >= static_cast<size_t>(2 + addrlen)) {
                 dest.setPort(qFromBigEndian(*reinterpret_cast<const uint16_t *>
                     (data.data() + 2 + addrlen))
                 );

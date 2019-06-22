@@ -12,8 +12,8 @@ namespace QSS {
 Connectivity::Connectivity(const QHostAddress &server_addr,
     const uint16_t &server_port, QObject *parent) :
     QObject(parent)
-    , m_server_addr(server_addr)
     , m_server_port(server_port)
+    , m_server_addr(server_addr)
     , m_do_connectivity_test(false)
 {
     m_timestamp = QTime::currentTime();

@@ -22,6 +22,7 @@ list(APPEND SSCL_SOURCES
 )
 
 include_directories(${botan2_INCLUDE_DIRS})
+add_compile_options(-Wno-missing-field-initializers)
 
 add_library(static_LibQtShadowSocks STATIC ${SSCL_HEADERS} ${SSCL_SOURCES})
 target_link_libraries(static_LibQtShadowSocks Qt5::Core Qt5::Network)
