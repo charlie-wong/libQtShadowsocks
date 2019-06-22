@@ -71,18 +71,18 @@ bool QtSsTui::start(void)
         return false;
     }
 
-    bool server_mode = false;
+    bool client_mode = true;
     if(QSS::Profile::WorkMode::SERVER == m_profile.getWorkMode()) {
-        server_mode = true;
+        client_mode = false;
     }
 
-    m_ctrl.reset(new QSS::Controller(m_profile, !server_mode, false));
+    m_ctrl.reset(new QSS::Controller(m_profile, client_mode, false));
 
-    if(!server_mode) {
-        QSS::Address server(m_profile.serverAddress(), m_profile.serverPort());
-        server.blockingLookUp();
+    if(client_mode) {
+        QSS::Address proxy(m_profile.serverAddress(), m_profile.serverPort());
+        proxy.blockingLookUp();
         m_conn.reset(
-            new QSS::Connectivity(server.getFirstIP(), server.getPort())
+            new QSS::Connectivity(proxy.getFirstIP(), proxy.getPort())
         );
 
         QObject::connect(m_conn.get(), &QSS::Connectivity::connTestFinished,
