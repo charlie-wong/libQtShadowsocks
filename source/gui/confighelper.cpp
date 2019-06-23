@@ -394,6 +394,8 @@ void ConfigHelper::setStartAtLogin()
     }
 }
 
+// RFC4648 is for Base64 Encode/Decode
+// https://www.ietf.org/rfc/rfc4648.txt
 QByteArray ConfigHelper::getUiState(const QString &key) const
 {
     if(!isFileValid()) {
@@ -403,13 +405,13 @@ QByteArray ConfigHelper::getUiState(const QString &key) const
     m_settings->beginGroup(SEC_UIState);
     QByteArray data = m_settings->value(key).toByteArray();
     m_settings->endGroup();
-    return data;
+    return QByteArray::fromBase64(data);
 }
 
 void ConfigHelper::setUiState(const QString &key, const QByteArray &data)
 {
     m_settings->beginGroup(SEC_UIState);
-    m_settings->setValue(key, QVariant(data));
+    m_settings->setValue(key, QString(data.toBase64()));
     m_settings->endGroup();
 }
 
