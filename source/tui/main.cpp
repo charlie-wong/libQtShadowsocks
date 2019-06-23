@@ -31,9 +31,12 @@ int main(int argc, char *argv[])
 
     // JSON configuration file
     QString configFile = opts.getConfigFile();
-    if(!configFile.isEmpty()) {
-        tui.applyConfigJson(configFile);
+    if(configFile.isEmpty()) {
+        qCritical() << "config.json missing, and can't not create!";
+        return -1;
     }
+
+    tui.applyConfigJson(configFile);
 
     // command-line option has higher priority
     if(!opts.getLogLevel().isEmpty()) {

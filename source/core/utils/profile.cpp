@@ -14,8 +14,8 @@ struct ProfilePrivate {
 };
 
 Profile::Profile() : m_work_mode(WorkMode::CLIENT)
-    , m_local_port(DEFAULT_PROXY_PORT)
-    , m_local_addr(DEFAULT_PROXY_ADDR)
+    , m_local_port(DEFAULT_CLIENT_PORT)
+    , m_local_addr(DEFAULT_CLIENT_ADDR)
     , m_server_port(DEFAULT_SERVER_PORT)
     , m_server_addr(DEFAULT_SERVER_ADDR)
     , m_method(DEFAULT_ALGORITHM)

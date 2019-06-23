@@ -43,150 +43,136 @@ void ConfigHelper::save(const ConnectionTableModel &model)
 void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model,
     const QString &file)
 {
-    QFile JSONFile(file);
-    JSONFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QFile jsonFile(file);
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    if(!JSONFile.isOpen()) {
-        qCritical() << "Error: cannot open " << file;
+    if(!jsonFile.isOpen()) {
+        qWarning() << "Warning: can not open" << file;
         return;
     }
 
-    if(!JSONFile.isReadable()) {
-        qCritical() << "Error: cannot read " << file;
+    if(!jsonFile.isReadable()) {
+        qWarning() << "Warning: can not read" << file;
         return;
     }
 
     QJsonParseError pe;
-    QJsonDocument JSONDoc = QJsonDocument::fromJson(JSONFile.readAll(), &pe);
-    JSONFile.close();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll(), &pe);
+    jsonFile.close();
 
     if(pe.error != QJsonParseError::NoError) {
-        qCritical() << pe.errorString();
-    }
-
-    if(JSONDoc.isEmpty()) {
-        qCritical() << "JSON Document" << file << "is empty!";
+        qWarning() << "Warning: JSON document invalid" << pe.errorString();
         return;
     }
 
-    QJsonObject JSONObj = JSONDoc.object();
-    QJsonArray CONFArray = JSONObj["configs"].toArray();
-
-    if(CONFArray.isEmpty()) {
-        qWarning() << "configs in " << file << " is empty.";
+    if(jsonDoc.isEmpty()) {
+        qWarning() << "Warning: JSON document" << file << "is empty!";
         return;
     }
 
-    for(QJsonArray::iterator it = CONFArray.begin(); it != CONFArray.end(); ++it) {
+    QJsonObject jsonObj = jsonDoc.object();
+    QJsonArray connArray = jsonObj["Connections"].toArray();
+    if(connArray.isEmpty()) {
+        qWarning() << "Warning: 'Connections' of" << file << "is empty.";
+        return;
+    }
+
+    for(auto it = connArray.begin(); it != connArray.end(); it++) {
+        SQProfile profile;
         QJsonObject json = (*it).toObject();
-        SQProfile p;
-
-        if(!json["server_port"].isString()) {
-            // shadowsocks-csharp uses integers to store ports directly.
-            p.name = json["remarks"].toString();
-            p.serverPort = json["server_port"].toInt();
-            // shadowsocks-csharp has only global local port
-            // all profiles use the same port
-            p.localPort = JSONObj["localPort"].toInt();
-
-            if(JSONObj["shareOverLan"].toBool()) {
-                // it can only configure share over LAN or not, also a global
-                // value, which is basically 0.0.0.0 or 127.0.0.1, which is
-                // the default
-                p.localAddress = QString("0.0.0.0");
-            }
-        } else {
-            p.name = json["profile"].toString();
-            p.serverPort = json["server_port"].toString().toUShort();
-            p.localAddress = json["proxy_addr"].toString();
-            p.localPort = json["proxy_port"].toString().toUShort();
-            p.timeout = json["timeout"].toString().toInt();
-        }
-
-        p.serverAddress = json["server_addr"].toString();
-        p.method = json["algorithm"].toString();
-        p.password = json["password"].toString();
-        Connection *con = new Connection(p, this);
-        model->appendConnection(con);
+        profile.name = json["ProfileName"].toString();
+        profile.timeout = json["Timeout"].toString().toInt();
+        profile.method = json["Algorithm"].toString();
+        profile.password = json["Password"].toString();
+        profile.serverAddress = json["ServerAddr"].toString();
+        profile.serverPort = json["ServerPort"].toString().toUShort();
+        profile.localAddress = json["ClientAddr"].toString();
+        profile.localPort = json["ClientPort"].toString().toUShort();
+        Connection *conn = new Connection(profile, this);
+        model->appendConnection(conn);
     }
 }
 
 void ConfigHelper::exportGuiConfigJson(const ConnectionTableModel &model,
     const QString &file)
 {
-    QJsonArray confArray;
-    int size = model.rowCount();
+    QFile jsonFile(file);
+    jsonFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
-    for(int i = 0; i < size; ++i) {
-        QJsonObject json;
-        Connection *con = model.getItem(i)->getConnection();
-        json["remarks"] = QJsonValue(con->profile.name);
-        json["algorithm"] = QJsonValue(con->profile.method.toLower());
-        json["password"] = QJsonValue(con->profile.password);
-        json["server_port"] = QJsonValue(con->profile.serverPort);
-        json["server_addr"] = QJsonValue(con->profile.serverAddress);
-        confArray.append(QJsonValue(json));
-    }
-
-    QJsonObject JSONObj;
-    JSONObj["configs"] = QJsonValue(confArray);
-    JSONObj["localPort"] = QJsonValue(1080);
-    JSONObj["shareOverLan"] = QJsonValue(false);
-    QJsonDocument JSONDoc(JSONObj);
-    QFile JSONFile(file);
-    JSONFile.open(QIODevice::WriteOnly | QIODevice::Text);
-
-    if(!JSONFile.isOpen()) {
-        qCritical() << "Error: cannot open " << file;
+    if(!jsonFile.isOpen()) {
+        qWarning() << "Warning: can not open" << file;
         return;
     }
 
-    if(!JSONFile.isWritable()) {
-        qCritical() << "Error: cannot write into " << file;
+    if(!jsonFile.isWritable()) {
+        qWarning() << "Warning: can not write" << file;
         return;
     }
 
-    JSONFile.write(JSONDoc.toJson());
-    JSONFile.close();
+    QJsonArray conArray;
+
+    for(int i = 0; i < model.rowCount(); ++i) {
+        QJsonObject jsonObj;
+        Connection *conn = model.getItem(i)->getConnection();
+        jsonObj["ProfileName"] = QJsonValue(conn->profile.name);
+        jsonObj["Timeout"] = QJsonValue(conn->profile.timeout);
+        jsonObj["Algorithm"] = QJsonValue(conn->profile.method.toLower());
+        jsonObj["Password"] = QJsonValue(conn->profile.password);
+        jsonObj["ServerPort"] = QJsonValue(conn->profile.serverPort);
+        jsonObj["ServerAddr"] = QJsonValue(conn->profile.serverAddress);
+        jsonObj["ClientPort"] = QJsonValue(conn->profile.localPort);
+        jsonObj["ClientAddr"] = QJsonValue(conn->profile.localAddress);
+        conArray.append(QJsonValue(jsonObj)); // connection JSON object
+    }
+
+    QJsonObject jsonObj;
+    jsonObj["Connections"] = QJsonValue(conArray);
+
+    QJsonDocument jsonDoc(jsonObj);
+    jsonFile.write(jsonDoc.toJson());
+    jsonFile.close();
 }
 
 Connection *ConfigHelper::configJsonToConnection(const QString &file)
 {
-    QFile JSONFile(file);
-    JSONFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QFile jsonFile(file);
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    if(!JSONFile.isOpen()) {
-        qCritical() << "Error: cannot open " << file;
+    if(!jsonFile.isOpen()) {
+        qCritical() << "Error: can not open" << file;
+        return nullptr;
     }
 
-    if(!JSONFile.isReadable()) {
-        qCritical() << "Error: cannot read " << file;
+    if(!jsonFile.isReadable()) {
+        qCritical() << "Error: can not read" << file;
+        return nullptr;
     }
 
     QJsonParseError pe;
-    QJsonDocument JSONDoc = QJsonDocument::fromJson(JSONFile.readAll(), &pe);
-    JSONFile.close();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll(), &pe);
+    jsonFile.close();
 
     if(pe.error != QJsonParseError::NoError) {
-        qCritical() << pe.errorString();
+        qCritical() << "Error: JSON format invalid" << pe.errorString();
+        return nullptr;
     }
 
-    if(JSONDoc.isEmpty()) {
+    if(jsonDoc.isEmpty()) {
         qCritical() << "JSON Document" << file << "is empty!";
         return nullptr;
     }
 
-    SQProfile p;
-    QJsonObject configObj = JSONDoc.object();
-    p.serverAddress = configObj["server_addr"].toString();
-    p.serverPort = configObj["server_port"].toInt();
-    p.localAddress = configObj["proxy_addr"].toString();
-    p.localPort = configObj["proxy_port"].toInt();
-    p.method = configObj["algorithm"].toString();
-    p.password = configObj["password"].toString();
-    p.timeout = configObj["timeout"].toInt();
-    Connection *con = new Connection(p, this);
-    return con;
+    SQProfile profile;
+    QJsonObject jsonObj = jsonDoc.object();
+    profile.serverAddress = jsonObj["ServerAddr"].toString();
+    profile.serverPort = jsonObj["ServerPort"].toInt();
+    profile.localAddress = jsonObj["ClientAddr"].toString();
+    profile.localPort = jsonObj["ClientPort"].toInt();
+    profile.method = jsonObj["Algorithm"].toString();
+    profile.password = jsonObj["Password"].toString();
+    profile.timeout = jsonObj["Timeout"].toInt();
+
+    return new Connection(profile, this);
 }
 
 int ConfigHelper::getToolbarStyle() const
@@ -316,7 +302,7 @@ void ConfigHelper::startAllAutoStart(const ConnectionTableModel &model)
 
 void ConfigHelper::setStartAtLogin()
 {
-    QString applicationName = "Shadowsocks-Qt5";
+    QString applicationName = "ShadowSocksQt";
     QString applicationFilePath =
         QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
 

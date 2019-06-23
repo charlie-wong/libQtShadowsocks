@@ -1,17 +1,18 @@
 {
-    "mode": "server",
+    "Mode": "server",
 
-    "server_addr": "@HOST_NAME@",
-    "server_port": 8388,
+    "ServerPort": 12345,
+    "ServerAddr": "@HOST_NAME@",
 
-    "proxy_addr": "127.0.0.1",
-    "proxy_port": 1080,
+    "ClientPort": 1080,
+    "ClientAddr": "127.0.0.1",
 
-    "password": "password",
-    "algorithm": "aes-256-cfb",
+    "Password": "ShadowSocksQt",
+    "Algorithm": "aes-256-cfb",
 
-    "timeout": 600,
-    "log_level": "info",
+    "Timeout": 120,
+    "HttpProxy": false,
+    "HttpsProxy": false,
 
-    "http_proxy": false
+    "LogLevel": "info"
 }

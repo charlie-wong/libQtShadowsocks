@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/icons/icons/shadowsocks-qt5.png</normaloff>:/icons/icons/shadowsocks-qt5.png</iconset>
+    <normaloff>:/icons/logo/shadowsocksqt.png</normaloff>:/icons/icons/shadowsocks-qt5.png</iconset>
   </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonFollowStyle</enum>
@@ -110,7 +110,7 @@
      <x>0</x>
      <y>0</y>
      <width>480</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -292,10 +292,10 @@
   </action>
   <action name="actionImportGUIJson">
    <property name="text">
-    <string>&amp;Import Connections from gui-config.json</string>
+    <string>&amp;Import GUI config.json</string>
    </property>
    <property name="toolTip">
-    <string>Import connections from old version configuration file</string>
+    <string>Import connections from JSON configuration file</string>
    </property>
   </action>
   <action name="actionFromConfigJson">
@@ -353,7 +353,10 @@
   </action>
   <action name="actionExportGUIJson">
    <property name="text">
-    <string>&amp;Export as gui-config.json</string>
+    <string>&amp;Export GUI config.json</string>
+   </property>
+   <property name="toolTip">
+    <string>Export connections to JSON configuration file</string>
    </property>
   </action>
   <action name="actionScanQRCodeCapturer">

@@ -4,6 +4,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "config.generated.h"
+
 #include "config/config.h"
 #include "config/configJson.h"
 
@@ -31,8 +33,8 @@ bool configJsonApply(const QString &file, QSS::Profile &profile)
         return false;
     }
 
-    if(jsonObj.contains("mode")) {
-        QString mode = jsonObj["mode"].toString();
+    if(jsonObj.contains("Mode")) {
+        QString mode = jsonObj["Mode"].toString();
         if(mode.compare("server", Qt::CaseInsensitive) == 0) {
             profile.setWorkMode(QSS::Profile::WorkMode::SERVER);
         } else if(mode.compare("client", Qt::CaseInsensitive) == 0) {
@@ -40,39 +42,83 @@ bool configJsonApply(const QString &file, QSS::Profile &profile)
         }
     }
 
-    if(jsonObj.contains("proxy_port")) {
-        profile.setLocalPort((uint16_t)jsonObj["proxy_port"].toInt());
+    if(jsonObj.contains("ClientPort")) {
+        profile.setLocalPort((uint16_t)jsonObj["ClientPort"].toInt());
     }
 
-    if(jsonObj.contains("proxy_addr")) {
-        profile.setLocalAddress(jsonObj["proxy_addr"].toString().toStdString());
+    if(jsonObj.contains("ClientAddr")) {
+        profile.setLocalAddress(jsonObj["ClientAddr"].toString().toStdString());
     }
 
-    if(jsonObj.contains("server_port")) {
-        profile.setServerPort((uint16_t)jsonObj["server_port"].toInt());
+    if(jsonObj.contains("ServerPort")) {
+        profile.setServerPort((uint16_t)jsonObj["ServerPort"].toInt());
     }
 
-    if(jsonObj.contains("server_addr")) {
-        profile.setServerAddress(jsonObj["server_addr"].toString().toStdString());
+    if(jsonObj.contains("ServerAddr")) {
+        profile.setServerAddress(jsonObj["ServerAddr"].toString().toStdString());
     }
 
-    if(jsonObj.contains("algorithm")) {
-        profile.setMethod(jsonObj["algorithm"].toString().toStdString());
+    if(jsonObj.contains("Algorithm")) {
+        profile.setMethod(jsonObj["Algorithm"].toString().toStdString());
     }
 
-    if(jsonObj.contains("password")) {
-        profile.setPassword(jsonObj["password"].toString().toStdString());
+    if(jsonObj.contains("Password")) {
+        profile.setPassword(jsonObj["Password"].toString().toStdString());
     }
 
-    if(jsonObj.contains("timeout")) {
-        profile.setSocketTimeout(jsonObj["timeout"].toInt());
+    if(jsonObj.contains("Timeout")) {
+        profile.setSocketTimeout(jsonObj["Timeout"].toInt());
     }
 
-    if(jsonObj.contains("http_proxy")) {
-        profile.setHttpProxy(jsonObj["http_proxy"].toBool());
+    if(jsonObj.contains("HttpProxy")) {
+        profile.setHttpProxy(jsonObj["HttpProxy"].toBool());
     }
 
-    Config::setLogLevel(jsonObj["log_level"].toString());
+    Config::setLogLevel(jsonObj["LogLevel"].toString());
+
+    return true;
+}
+
+bool configJsonDefault(const QString &configJson, bool clientMode)
+{
+    QJsonObject jsonObj;
+
+    if(clientMode) {
+        jsonObj["Mode"] = "client";
+    } else {
+        jsonObj["Mode"] = "server";
+    }
+
+    jsonObj["LogLevel"] = "info";
+    jsonObj["HttpProxy"] = "false";
+    jsonObj["HttpsProxy"] = "false";
+
+    jsonObj["Password"] = DEFAULT_PASSWORD;
+    jsonObj["Algorithm"] = DEFAULT_ALGORITHM;
+
+    jsonObj["ServerPort"] = DEFAULT_SERVER_PORT;
+    jsonObj["ServerAddr"] = DEFAULT_SERVER_ADDR;
+    jsonObj["ClientPort"] = DEFAULT_CLIENT_PORT;
+    jsonObj["ClientAddr"] = DEFAULT_CLIENT_ADDR;
+
+    jsonObj["Timeout"] = DEFAULT_SOCKET_TIMEOUT;
+
+    QFile configFile(configJson);
+    configFile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    if(!configFile.isOpen()) {
+        qCritical() << "Error: cannot open " << configJson;
+        return false;
+    }
+
+    if(!configFile.isWritable()) {
+        qCritical() << "Error: cannot write into " << configJson;
+        return false;
+    }
+
+    QJsonDocument jsonDoc(jsonObj);
+    configFile.write(jsonDoc.toJson());
+    configFile.close();
 
     return true;
 }

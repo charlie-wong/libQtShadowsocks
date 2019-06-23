@@ -2,47 +2,49 @@
 
 #include <QDir>
 
+#include "config.generated.h"
+
 #include "config/config.h"
 #include "config/cmdArgs.h"
-#include "config.generated.h"
+#include "config/configJson.h"
 
 CmdArgs::CmdArgs() :
     m_configFile("c",
         "specify config.json file.",
-        "config_file"
+        "ConfigJson"
     ),
     m_serverAddr("s",
         "host name or IP address for the remote server.",
-        "server_addr"
+        "ServerAddr"
     ),
     m_serverPort("p",
         "port number of the remote server.",
-        "server_port"
+        "ServerPort"
     ),
     m_localAddr("b",
-        "local proxy address to bind. ignored in server mode.",
-        "proxy_addr",
+        "local client address to bind. ignored in server mode.",
+        "ClientAddr",
         "127.0.0.1"
     ),
     m_localPort("n",
-        "port number of the local proxy. ignored in server mode.",
-        "proxy_port"
+        "port number of the local client. ignored in server mode.",
+        "ClientPort"
     ),
     m_cryptoPassword("k",
         "password for crypto algorithm.",
-        "password"
+        "Password"
     ),
     m_cryptoAlgorithm("m",
         "crypto algorithm method.",
-        "algorithm"
+        "Algorithm"
     ),
     m_socketTimeout("t",
         "socket timeout in seconds.",
-        "timeout"
+        "Timeout"
     ),
     m_logLevel("L",
-        "logging level: debug, info, warn, error, fatal.",
-        "log_level",
+        "log level: debug, info, warn, error, fatal.",
+        "LogLevel",
         "info"
     ),
     m_serverMode(QStringList() << "S" << "server-mode",
@@ -115,35 +117,14 @@ QString CmdArgs::getConfigFile(void) const {
     if(!configDir.exists()) {
         configDir.mkpath(configDir.absolutePath());
     }
+#endif
 
     // create the default one if not exist, see DEFAULT_* macros
     if(!QFileInfo(configJson).isFile()) {
-        QFile file(configJson);
-        QString content(
-            "{\n"
-            "    \"mode\": \"client\",\n"
-            "\n"
-            "    \"server_port\": 12345,\n"
-            "    \"server_addr\": \"ServerAddr\",\n"
-            "\n"
-            "    \"proxy_port\": 1080,\n"
-            "    \"proxy_addr\": \"127.0.0.1\",\n"
-            "\n"
-            "    \"password\": \"ShadowSocks\",\n"
-            "    \"algorithm\": \"aes-256-cfb\",\n"
-            "\n"
-            "    \"timeout\": 120,\n"
-            "    \"http_proxy\": false,\n"
-            "\n"
-            "    \"log_level\": \"info\"\n"
-            "}\n"
-        );
-        if(file.open(QIODevice::WriteOnly)) {
-            file.write(content.toUtf8());
-            file.close();
+        if(!configJsonDefault(configJson, false)) {
+            return ""; // can't create the default config.json
         }
     }
-#endif
 
     return configJson;
 }

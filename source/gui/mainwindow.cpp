@@ -212,9 +212,10 @@ void MainWindow::startAutoStartConnections()
 
 void MainWindow::onImportGuiJson()
 {
-    QString file = QFileDialog::getOpenFileName(
-        this, tr("Import Connections from gui-config.json"),
-        QString(), "GUI Configuration (gui-config.json)"
+    QString file = QFileDialog::getOpenFileName(this,
+        tr("Import GUI config.json"), // dialog's caption to display
+        QString("gui-config.json"), // default selected file if exists
+        "GUI Config(*.json)" // files match the given filter are shown
     );
 
     if(!file.isNull()) {
@@ -224,9 +225,10 @@ void MainWindow::onImportGuiJson()
 
 void MainWindow::onExportGuiJson()
 {
-    QString file = QFileDialog::getSaveFileName(
-        this, tr("Export Connections as gui-config.json"),
-        QString("gui-config.json"), "GUI Configuration (gui-config.json)"
+    QString file = QFileDialog::getSaveFileName(this,
+        tr("Export GUI config.json"), // dialog's caption to display
+        QString("gui-config.json"), // default file name for saving
+        "GUI Config(*.json)" // files match the given filter are shown
     );
 
     if(!file.isNull()) {

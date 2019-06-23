@@ -8,6 +8,7 @@ find_package(PkgConfig)
 pkg_check_modules(zbar REQUIRED zbar)
 
 file(GLOB GUI_APP_HEADERS *.h)
+file(GLOB GUI_APP_UIFILES *.ui)
 file(GLOB GUI_APP_SOURCES *.cpp)
 
 list(APPEND GUI_APP_HEADERS ${CONFIG_HEADERS})
@@ -20,7 +21,7 @@ if(WIN32)
 endif()
 
 add_executable(${APP_NAME} WIN32
-    ${GUI_APP_HEADERS} ${GUI_APP_SOURCES}
+    ${GUI_APP_HEADERS} ${GUI_APP_SOURCES} ${GUI_APP_UIFILES}
 )
 XmakeQt5StaticPluginSrcAdd(${APP_NAME})
 target_include_directories(${APP_NAME}
