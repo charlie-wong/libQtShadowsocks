@@ -8,36 +8,39 @@
 
 #include "confighelper.h"
 
+#define FILE_VERSION    1.0
+#define SEC_General     "General"
+#define SEC_UIState     "UIState"
 #define SEC_Profile     "Profile"
 
-ConfigHelper::ConfigHelper(const QString &configuration, QObject *parent) :
-    QObject(parent), configFile(configuration)
+ConfigHelper::ConfigHelper(const QString &config, QObject *parent) :
+    QObject(parent), m_configFile(config)
 {
-    settings = new QSettings(configFile, QSettings::IniFormat, this);
+    m_settings = new QSettings(m_configFile, QSettings::IniFormat, this);
     readGeneralSettings();
 }
 
 void ConfigHelper::save(const ConnectionTableModel &model)
 {
-    int size = model.rowCount();
-    settings->beginWriteArray(SEC_Profile);
+    // m_settings->beginGroup(SEC_General);
+    m_settings->setValue("FileVersion", QVariant(FILE_VERSION));
+    m_settings->setValue("ToolbarStyle", QVariant(m_toolbarStyle));
+    m_settings->setValue("HideOnStartup", QVariant(m_hideOnStartup));
+    m_settings->setValue("StartAtLogin", QVariant(m_startOnLogin));
+    m_settings->setValue("IsOneInstance", QVariant(m_isOneInstace));
+    m_settings->setValue("ShowToolbar", QVariant(m_showToolbar));
+    m_settings->setValue("ShowFilterBar", QVariant(m_showFilterBar));
+    m_settings->setValue("UseNativeMenu", QVariant(m_useNativeMenu));
+    // m_settings->endGroup();
 
-    for(int i = 0; i < size; ++i) {
-        settings->setArrayIndex(i);
+    m_settings->beginWriteArray(SEC_Profile);
+    for(int i = 0; i < model.rowCount(); ++i) {
+        m_settings->setArrayIndex(i);
         Connection *con = model.getItem(i)->getConnection();
         QVariant value = QVariant::fromValue<SQProfile>(con->getProfile());
-        settings->setValue("SQProfile", value);
+        m_settings->setValue("SQProfile", value);
     }
-
-    settings->endArray();
-    settings->setValue("ToolbarStyle", QVariant(toolbarStyle));
-    settings->setValue("HideWindowOnStartup", QVariant(hideWindowOnStartup));
-    settings->setValue("StartAtLogin", QVariant(startAtLogin));
-    settings->setValue("OnlyOneInstance", QVariant(onlyOneInstace));
-    settings->setValue("ShowToolbar", QVariant(showToolbar));
-    settings->setValue("ShowFilterBar", QVariant(showFilterBar));
-    settings->setValue("NativeMenuBar", QVariant(nativeMenuBar));
-    settings->setValue("ConfigVersion", QVariant(2.6));
+    m_settings->endArray();
 }
 
 void ConfigHelper::importGuiConfigJson(ConnectionTableModel *model,
@@ -177,90 +180,106 @@ Connection *ConfigHelper::configJsonToConnection(const QString &file)
 
 int ConfigHelper::getToolbarStyle() const
 {
-    return toolbarStyle;
+    return m_toolbarStyle;
 }
 
 bool ConfigHelper::isHideWindowOnStartup() const
 {
-    return hideWindowOnStartup;
+    return m_hideOnStartup;
 }
 
 bool ConfigHelper::isStartAtLogin() const
 {
-    return startAtLogin;
+    return m_startOnLogin;
 }
 
 bool ConfigHelper::isOnlyOneInstance() const
 {
-    return onlyOneInstace;
+    return m_isOneInstace;
 }
 
 bool ConfigHelper::isShowToolbar() const
 {
-    return showToolbar;
+    return m_showToolbar;
 }
 
 bool ConfigHelper::isShowFilterBar() const
 {
-    return showFilterBar;
+    return m_showFilterBar;
 }
 
 bool ConfigHelper::isNativeMenuBar() const
 {
-    return nativeMenuBar;
+    return m_useNativeMenu;
 }
 
 void ConfigHelper::setGeneralSettings(int ts, bool hide, bool sal,
     bool oneInstance, bool nativeMB)
 {
-    if(toolbarStyle != ts) {
+    if(m_toolbarStyle != ts) {
         emit toolbarStyleChanged(static_cast<Qt::ToolButtonStyle>(ts));
     }
 
-    toolbarStyle = ts;
-    hideWindowOnStartup = hide;
-    startAtLogin = sal;
-    onlyOneInstace = oneInstance;
-    nativeMenuBar = nativeMB;
+    m_toolbarStyle = ts;
+    m_hideOnStartup = hide;
+    m_startOnLogin = sal;
+    m_isOneInstace = oneInstance;
+    m_useNativeMenu = nativeMB;
 }
 
 void ConfigHelper::setShowToolbar(bool show)
 {
-    showToolbar = show;
+    m_showToolbar = show;
 }
 
 void ConfigHelper::setShowFilterBar(bool show)
 {
-    showFilterBar = show;
+    m_showFilterBar = show;
+}
+
+bool ConfigHelper::isFileValid(void) const
+{
+    qreal fileVersion = m_settings->value("FileVersion").toReal();
+
+    if(fileVersion >= FILE_VERSION) {
+        return true;
+    }
+
+    return false;
 }
 
 void ConfigHelper::read(ConnectionTableModel *model)
 {
-    int size = settings->beginReadArray(SEC_Profile);
-    // qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
+    if(!isFileValid()) {
+        return;
+    }
 
-    for(int i = 0; i < size; ++i) {
-        settings->setArrayIndex(i);
-        QVariant value = settings->value("SQProfile");
+    for(int i = 0; i < m_settings->beginReadArray(SEC_Profile); ++i) {
+        m_settings->setArrayIndex(i);
+        QVariant value = m_settings->value("SQProfile");
         SQProfile profile = value.value<SQProfile>();
         checkProfileDataUsageReset(profile);
         Connection *con = new Connection(profile, this);
         model->appendConnection(con);
     }
 
-    settings->endArray();
+    m_settings->endArray();
     readGeneralSettings();
 }
 
 void ConfigHelper::readGeneralSettings()
 {
-    toolbarStyle = settings->value("ToolbarStyle", QVariant(4)).toInt();
-    startAtLogin = settings->value("StartAtLogin").toBool();
-    hideWindowOnStartup = settings->value("HideWindowOnStartup").toBool();
-    onlyOneInstace = settings->value("OnlyOneInstance", QVariant(true)).toBool();
-    showToolbar = settings->value("ShowToolbar", QVariant(true)).toBool();
-    showFilterBar = settings->value("ShowFilterBar", QVariant(true)).toBool();
-    nativeMenuBar = settings->value("NativeMenuBar", QVariant(false)).toBool();
+    if(!isFileValid()) {
+        return;
+    }
+
+    m_startOnLogin = m_settings->value("StartAtLogin").toBool();
+    m_hideOnStartup = m_settings->value("HideOnStartup").toBool();
+    m_showToolbar = m_settings->value("ShowToolbar", QVariant(true)).toBool();
+    m_toolbarStyle = m_settings->value("ToolbarStyle", QVariant(4)).toInt();
+    m_isOneInstace = m_settings->value("IsOneInstance", QVariant(true)).toBool();
+    m_showFilterBar = m_settings->value("ShowFilterBar", QVariant(true)).toBool();
+    m_useNativeMenu = m_settings->value("UseNativeMenu", QVariant(false)).toBool();
 }
 
 void ConfigHelper::checkProfileDataUsageReset(SQProfile &profile)
@@ -307,7 +326,7 @@ void ConfigHelper::setStartAtLogin()
         QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
 
 #if defined(Q_OS_WIN)
-    QSettings settings(
+    QSettings win_settings(
         "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
         QSettings::NativeFormat
     );
@@ -354,7 +373,7 @@ void ConfigHelper::setStartAtLogin()
 
     if(this->isStartAtLogin()) { // Create start up item
     #if defined(Q_OS_WIN)
-        settings.setValue(applicationName, applicationFilePath);
+        win_settings.setValue(applicationName, applicationFilePath);
     #else
         fileContent.replace("%1", applicationName);
         fileContent.replace("%2", applicationFilePath);
@@ -366,7 +385,7 @@ void ConfigHelper::setStartAtLogin()
     #endif
     } else { // Delete start up item
     #if defined(Q_OS_WIN)
-        settings.remove(applicationName);
+        win_settings.remove(applicationName);
     #else
         if(file.exists()) {
             file.remove();
@@ -375,42 +394,61 @@ void ConfigHelper::setStartAtLogin()
     }
 }
 
-QByteArray ConfigHelper::getMainWindowGeometry() const
+QByteArray ConfigHelper::getUiState(const QString &key) const
 {
-    return settings->value("MainWindowGeometry").toByteArray();
+    if(!isFileValid()) {
+        return QByteArray();
+    }
+
+    m_settings->beginGroup(SEC_UIState);
+    QByteArray data = m_settings->value(key).toByteArray();
+    m_settings->endGroup();
+    return data;
+}
+
+void ConfigHelper::setUiState(const QString &key, const QByteArray &data)
+{
+    m_settings->beginGroup(SEC_UIState);
+    m_settings->setValue(key, QVariant(data));
+    m_settings->endGroup();
 }
 
 QByteArray ConfigHelper::getMainWindowState() const
 {
-    return settings->value("MainWindowState").toByteArray();
-}
-
-QByteArray ConfigHelper::getTableGeometry() const
-{
-    return settings->value("MainTableGeometry").toByteArray();
-}
-
-QByteArray ConfigHelper::getTableState() const
-{
-    return settings->value("MainTableState").toByteArray();
-}
-
-void ConfigHelper::setMainWindowGeometry(const QByteArray &geometry)
-{
-    settings->setValue("MainWindowGeometry", QVariant(geometry));
+    return getUiState("MainWindowState");
 }
 
 void ConfigHelper::setMainWindowState(const QByteArray &state)
 {
-    settings->setValue("MainWindowState", QVariant(state));
+    setUiState("MainWindowState", state);
+}
+
+QByteArray ConfigHelper::getTableGeometry() const
+{
+    return getUiState("MainTableGeometry");
 }
 
 void ConfigHelper::setTableGeometry(const QByteArray &geometry)
 {
-    settings->setValue("MainTableGeometry", QVariant(geometry));
+    setUiState("MainTableGeometry", geometry);
+}
+
+QByteArray ConfigHelper::getTableState() const
+{
+    return getUiState("MainTableState");
 }
 
 void ConfigHelper::setTableState(const QByteArray &state)
 {
-    settings->setValue("MainTableState", QVariant(state));
+    setUiState("MainTableState", state);
+}
+
+QByteArray ConfigHelper::getMainWindowGeometry() const
+{
+    return getUiState("MainWindowGeometry");
+}
+
+void ConfigHelper::setMainWindowGeometry(const QByteArray &geometry)
+{
+    setUiState("MainWindowGeometry", geometry);
 }

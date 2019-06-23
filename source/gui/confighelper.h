@@ -10,32 +10,27 @@ class ConfigHelper : public QObject {
     Q_OBJECT
 
 public:
-    // Construct a ConfigHelper object using specified configuration file
-    // This constructor will call readGeneralSettings().
-    explicit ConfigHelper(const QString &configuration, QObject *parent = nullptr);
+    // Construct a ConfigHelper object using specified configuration
+    // file, this constructor will call readGeneralSettings()
+    explicit ConfigHelper(const QString &config, QObject *parent = nullptr);
 
     // Call read() function to read all connection profiles into specified
     // ConnectionTableModel. This function also calls readGeneralSettings().
     void read(ConnectionTableModel *model);
 
-    // readGeneralSettings() only reads General settings and store them into
-    // member variables.
+    // only reads [General] settings and store them into member variables.
     void readGeneralSettings();
 
     void save(const ConnectionTableModel &model);
 
+    Connection *configJsonToConnection(const QString &file);
     void importGuiConfigJson(ConnectionTableModel *model, const QString &file);
-
-    // format is only compatible with shadowsocks-csharp (shadowsocks-windows)
     void exportGuiConfigJson(const ConnectionTableModel &model, const QString &file);
 
-    Connection *configJsonToConnection(const QString &file);
-
+    // create or delete start up item
+    void setStartAtLogin();
     // start those connections marked as auto-start
     void startAllAutoStart(const ConnectionTableModel &model);
-
-    // create or delete start up item for ShadowSocksQt-GUI
-    void setStartAtLogin();
 
     // some functions used to communicate with SettingsDialog
     int  getToolbarStyle() const;
@@ -65,17 +60,21 @@ signals:
     void toolbarStyleChanged(const Qt::ToolButtonStyle);
 
 private:
+    bool isFileValid(void) const;
+    QByteArray getUiState(const QString &key) const;
+    void setUiState(const QString &key, const QByteArray &data);
     void checkProfileDataUsageReset(SQProfile &profile);
 
-    int toolbarStyle;
-    bool hideWindowOnStartup;
-    bool startAtLogin;
-    bool onlyOneInstace;
-    bool showToolbar;
-    bool showFilterBar;
-    bool nativeMenuBar;
-    QSettings *settings;
-    QString configFile;
+    QString m_configFile;
+    QSettings *m_settings;
+
+    int m_toolbarStyle;
+    bool m_showToolbar;
+    bool m_startOnLogin;
+    bool m_isOneInstace;
+    bool m_showFilterBar;
+    bool m_hideOnStartup;
+    bool m_useNativeMenu;
 };
 
 #endif // CONFIGHELPER_H

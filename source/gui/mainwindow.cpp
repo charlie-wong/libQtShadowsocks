@@ -187,14 +187,12 @@ MainWindow::MainWindow(ConfigHelper *confHelper, QWidget *parent) :
 MainWindow::~MainWindow()
 {
     configHelper->save(*model);
-
     configHelper->setTableGeometry(
         ui->connectionView->horizontalHeader()->saveGeometry()
     );
     configHelper->setTableState(
         ui->connectionView->horizontalHeader()->saveState()
     );
-
     configHelper->setMainWindowGeometry(saveGeometry());
     configHelper->setMainWindowState(saveState());
     // delete ui after everything in case it's deleted
