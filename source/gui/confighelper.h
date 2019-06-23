@@ -65,6 +65,8 @@ signals:
     void toolbarStyleChanged(const Qt::ToolButtonStyle);
 
 private:
+    void checkProfileDataUsageReset(SQProfile &profile);
+
     int toolbarStyle;
     bool hideWindowOnStartup;
     bool startAtLogin;
@@ -74,10 +76,6 @@ private:
     bool nativeMenuBar;
     QSettings *settings;
     QString configFile;
-
-    void checkProfileDataUsageReset(SQProfile &profile);
-
-    static const QString profilePrefix;
 };
 
 #endif // CONFIGHELPER_H

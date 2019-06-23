@@ -48,6 +48,11 @@ static void setupApplication(QApplication &app)
     QTranslator *trans = new QTranslator(&app);
     trans->load(QLocale::system(), "ssqt", "_", ":/i18n");
     app.installTranslator(trans);
+
+    QCommandLineParser cmdArgs;
+    cmdArgs.addHelpOption();
+    cmdArgs.addVersionOption();
+    cmdArgs.process(app);
 }
 
 int main(int argc, char *argv[])
@@ -56,35 +61,28 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     setupApplication(app);
 
-    CmdArgs opts;
-    opts.process(app);
+#ifdef Q_OS_WIN
+    QString configFile = app.applicationDirPath() + "/ui.ini";
+#else
+    QDir configDir = QDir::homePath() + "/.config/ShadowSocksQt";
+    QString configFile = configDir.absolutePath() + "/ui.ini";
 
-    QString configFile = "";
-
-    if(configFile.isEmpty()) {
-    #ifdef Q_OS_WIN
-        configFile = app.applicationDirPath() + "/config.ini";
-    #else
-        QDir configDir = QDir::homePath() + "/.config/ShadowSocksQt";
-        configFile = configDir.absolutePath() + "/config.ini";
-
-        if(!configDir.exists()) {
-            configDir.mkpath(configDir.absolutePath());
-        }
-    #endif
+    if(!configDir.exists()) {
+        configDir.mkpath(configDir.absolutePath());
     }
+#endif
 
-    ConfigHelper conf(configFile);
-    MainWindow mw(&conf);
+    ConfigHelper config(configFile);
+    MainWindow mainWindow(&config);
 
-    if(conf.isOnlyOneInstance() && mw.isInstanceRunning()) {
+    if(config.isOnlyOneInstance() && mainWindow.isInstanceRunning()) {
         return -1;
     }
 
-    mw.startAutoStartConnections();
+    mainWindow.startAutoStartConnections();
 
-    if(!conf.isHideWindowOnStartup()) {
-        mw.show();
+    if(!config.isHideWindowOnStartup()) {
+        mainWindow.show();
     }
 
     return app.exec();

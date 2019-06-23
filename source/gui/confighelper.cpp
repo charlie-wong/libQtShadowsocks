@@ -8,6 +8,8 @@
 
 #include "confighelper.h"
 
+#define SEC_Profile     "Profile"
+
 ConfigHelper::ConfigHelper(const QString &configuration, QObject *parent) :
     QObject(parent), configFile(configuration)
 {
@@ -15,12 +17,10 @@ ConfigHelper::ConfigHelper(const QString &configuration, QObject *parent) :
     readGeneralSettings();
 }
 
-const QString ConfigHelper::profilePrefix = "Profile";
-
 void ConfigHelper::save(const ConnectionTableModel &model)
 {
     int size = model.rowCount();
-    settings->beginWriteArray(profilePrefix);
+    settings->beginWriteArray(SEC_Profile);
 
     for(int i = 0; i < size; ++i) {
         settings->setArrayIndex(i);
@@ -236,7 +236,7 @@ void ConfigHelper::setShowFilterBar(bool show)
 
 void ConfigHelper::read(ConnectionTableModel *model)
 {
-    int size = settings->beginReadArray(profilePrefix);
+    int size = settings->beginReadArray(SEC_Profile);
     // qreal configVer = settings->value("ConfigVersion", QVariant(2.4)).toReal();
 
     for(int i = 0; i < size; ++i) {
